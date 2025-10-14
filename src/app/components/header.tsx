@@ -20,7 +20,6 @@ import {
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HelpAndSupportDialog } from './help-and-support';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -95,12 +94,12 @@ export function Header() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 
-                <HelpAndSupportDialog>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <LifeBuoy className="mr-2 h-4 w-4" />
-                      <span>Help &amp; Support</span>
-                    </DropdownMenuItem>
-                </HelpAndSupportDialog>
+                <DropdownMenuItem asChild>
+                  <a href="mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader">
+                    <LifeBuoy className="mr-2 h-4 w-4" />
+                    <span>Help &amp; Support</span>
+                  </a>
+                </DropdownMenuItem>
 
                 {user && (
                     <>

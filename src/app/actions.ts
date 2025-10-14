@@ -12,25 +12,14 @@ export async function sendSupportMessage(formData: FormData) {
     return { success: false, error: 'Message cannot be empty.' };
   }
 
-  try {
-    // ---- THIS IS WHERE YOU WOULD SEND THE EMAIL ----
-    // Example using a hypothetical email service:
-    // await sendEmail({
-    //   from: 'support@your-app.com',
-    //   to: 'shivamkonan143@gmail.com',
-    //   subject: `Support Request ${userEmail ? `from ${userEmail}`: ''}`,
-    //   text: message,
-    // });
-    
-    console.log('--- SUPPORT REQUEST ---');
-    console.log('User:', userEmail || 'Anonymous');
-    console.log('Message:', message);
-    console.log('-----------------------');
-    // ------------------------------------------------
+  // This function is no longer used and can be removed or repurposed.
+  // The UI now uses a mailto: link.
+  console.log('--- THIS ACTION IS NO LONGER IN USE ---');
+  console.log('User:', userEmail || 'Anonymous');
+  console.log('Message:', message);
+  console.log('-----------------------');
 
-    return { success: true, error: null };
-  } catch (error) {
-    console.error('Error sending support message:', error);
-    return { success: false, error: 'Failed to send message. Please try again later.' };
-  }
+  // Returning a success to avoid breaking anything if it's still called,
+  // but it should be removed from the UI.
+  return { success: true, error: null };
 }
