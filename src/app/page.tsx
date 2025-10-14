@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <YoutubeDownloaderInput />
-        {!isUserLoading && user && !isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
+        {!isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>
