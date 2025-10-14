@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,12 +10,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -40,6 +36,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import React, { useState } from 'react';
 import { Separator } from '@/components/ui/separator';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { user } = useUser();
@@ -90,92 +92,86 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   };
 
   return (
-      <DropdownMenu>
-        {/* We need a trigger, but we'll control the open state from the parent Dialog/Sheet.
-            This trigger can be a dummy element that is not displayed. */}
-        <DropdownMenuTrigger asChild>
-          <button className="hidden" />
-        </DropdownMenuTrigger>
-        {/* The DropdownMenuContent is what we want to render inside the Dialog/Sheet */}
-        <DropdownMenuContent className="w-full border-none shadow-none p-2">
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span>{t.header.theme}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => { setTheme('light'); closeMenu?.(); }}>
-                    <Sun className="mr-2 h-4 w-4" />
-                    <span>{t.header.light}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setTheme('dark'); closeMenu?.(); }}>
-                    <Moon className="mr-2 h-4 w-4" />
-                    <span>{t.header.dark}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setTheme('system'); closeMenu?.(); }}>
-                    <Laptop className="mr-2 h-4 w-4" />
-                    <span>{t.header.system}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
+      <div className="flex flex-col gap-1 p-2">
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start">
+              <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span>{t.header.theme}</span>
+              <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 pl-6">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('light'); closeMenu?.(); }}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>{t.header.light}</span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('dark'); closeMenu?.(); }}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>{t.header.dark}</span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('system'); closeMenu?.(); }}>
+              <Laptop className="mr-2 h-4 w-4" />
+              <span>{t.header.system}</span>
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
+        
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start">
+              <Languages className="mr-2 h-4 w-4" />
+              <span>{t.header.language}</span>
+              <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 pl-6">
+            <Button variant="ghost" className="w-full justify-start" onClick={() => handleLanguageChange('en')}>
+              <span>{t.header.english}</span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start" onClick={() => handleLanguageChange('hi')}>
+              <span>{t.header.hindi}</span>
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
 
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Languages className="mr-2 h-4 w-4" />
-                <span>{t.header.language}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
-                    <span>{t.header.english}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>
-                    <span>{t.header.hindi}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
+        <Button variant="ghost" className="w-full justify-start" onClick={handleShare}>
+          <Share2 className="mr-2 h-4 w-4" />
+          <span>{t.header.shareApp}</span>
+        </Button>
 
-            <DropdownMenuItem onClick={handleShare}>
-              <Share2 className="mr-2 h-4 w-4" />
-              <span>{t.header.shareApp}</span>
-            </DropdownMenuItem>
+        <Button variant="ghost" asChild className="w-full justify-start">
+          <a href={mailtoHref} onClick={() => closeMenu?.()}>
+            <LifeBuoy className="mr-2 h-4 w-4" />
+            <span>{t.header.helpAndSupport}</span>
+          </a>
+        </Button>
+        
+        <Separator className="my-1" />
 
-            <DropdownMenuItem asChild>
-              <a href={mailtoHref} onClick={() => closeMenu?.()}>
-                <LifeBuoy className="mr-2 h-4 w-4" />
-                <span>{t.header.helpAndSupport}</span>
-              </a>
-            </DropdownMenuItem>
-
-            <Separator className="my-1" />
-
-            {user ? (
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t.header.logout}</span>
-                </DropdownMenuItem>
-            ) : (
-              <>
-                <DropdownMenuItem asChild>
-                  <Link href="/login" onClick={() => closeMenu?.()}>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    <span>{t.header.login}</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/signup" onClick={() => closeMenu?.()}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    <span>{t.header.register}</span>
-                  </Link>
-                </DropdownMenuItem>
-              </>
-            )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        {user ? (
+            <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>{t.header.logout}</span>
+            </Button>
+        ) : (
+          <>
+            <Button variant="ghost" asChild className="w-full justify-start">
+              <Link href="/login" onClick={() => closeMenu?.()}>
+                <LogIn className="mr-2 h-4 w-4" />
+                <span>{t.header.login}</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" asChild className="w-full justify-start">
+              <Link href="/signup" onClick={() => closeMenu?.()}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                <span>{t.header.register}</span>
+              </Link>
+            </Button>
+          </>
+        )}
+      </div>
   );
 }
 
