@@ -113,8 +113,10 @@ export function SubscriptionCard() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t.subscription.cancel}</Button>
-                        <Button onClick={handleConfirm}>{t.subscription.buttonSubscribe}</Button>
+                        <div className="w-full grid grid-cols-2 gap-2">
+                            <Button variant="outline" className="w-full" onClick={() => setIsDialogOpen(false)}>{t.subscription.cancel}</Button>
+                            <Button className="w-full" onClick={handleConfirm}>{t.subscription.buttonSubscribe}</Button>
+                        </div>
                     </DialogFooter>
                 </>
             );
