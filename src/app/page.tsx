@@ -140,7 +140,8 @@ export default function Home() {
                         Ad-Free Experience
                         </p>
                         <p className="text-sm text-muted-foreground">
-                        ₹50 for one month
+                        <span className="font-bold text-foreground text-base mr-2">₹50</span>
+                        <span className="line-through">₹249</span> for one month
                         </p>
                     </div>
                     {isSubscriptionLoading ? (
@@ -169,7 +170,10 @@ export default function Home() {
                               <div className="py-4">
                                 <div className="flex justify-between items-baseline p-4 rounded-lg bg-muted">
                                     <span className="font-medium">1 Month Subscription</span>
-                                    <span className="text-2xl font-bold">₹50</span>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-2xl font-bold">₹50</span>
+                                        <span className="text-lg font-medium line-through text-muted-foreground">₹249</span>
+                                    </div>
                                 </div>
                               </div>
                               <DialogFooter>
