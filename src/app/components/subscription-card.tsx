@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { useAuthModal } from '@/app/context/auth-modal-context';
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
 
@@ -31,7 +32,7 @@ export function SubscriptionCard() {
     const { user } = useUser();
     const { toast } = useToast();
     const firestore = useFirestore();
-    const router = useRouter();
+    const { openModal } = useAuthModal();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -40,7 +41,7 @@ export function SubscriptionCard() {
 
     const handleSubscribeClick = () => {
         if (!user) {
-            router.push('/login');
+            openModal('login');
             return;
         }
         setIsDialogOpen(true);

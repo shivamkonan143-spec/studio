@@ -54,6 +54,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { doc, deleteDoc } from 'firebase/firestore';
+import { useAuthModal } from '@/app/context/auth-modal-context';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -64,6 +65,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
   const { toast } = useToast();
+  const { openModal } = useAuthModal();
 
   const subscriptionRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -79,6 +81,16 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
     }
     closeMenu?.();
   };
+
+  const handleLoginClick = () => {
+    openModal('login');
+    closeMenu?.();
+  }
+
+  const handleSignupClick = () => {
+    openModal('signup');
+    closeMenu?.();
+  }
 
   const handleCancelSubscription = async () => {
     if (!subscriptionRef) return;
@@ -263,17 +275,13 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           </>
         ) : (
           <>
-            <Button variant="ghost" asChild className="w-full justify-start">
-              <Link href="/login" onClick={() => closeMenu?.()}>
-                <LogIn className="mr-2 h-4 w-4" />
-                <span>{t.header.login}</span>
-              </Link>
+            <Button variant="ghost" className="w-full justify-start" onClick={handleLoginClick}>
+              <LogIn className="mr-2 h-4 w-4" />
+              <span>{t.header.login}</span>
             </Button>
-            <Button variant="ghost" asChild className="w-full justify-start">
-              <Link href="/signup" onClick={() => closeMenu?.()}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                <span>{t.header.register}</span>
-              </Link>
+            <Button variant="ghost" className="w-full justify-start" onClick={handleSignupClick}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>{t.header.register}</span>
             </Button>
           </>
         )}
@@ -374,3 +382,4 @@ export function Header() {
     
 
     
+

@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/app/components/theme-provider';
 import { LanguageProvider } from '@/app/context/language-context';
+import { AuthModalProvider } from '@/app/context/auth-modal-context';
+import { AuthDialog } from '@/app/components/auth-dialog';
 
 export const metadata: Metadata = {
   title: 'Thumbnail Downloader',
@@ -36,8 +38,11 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
             <LanguageProvider>
-              {children}
-              <Toaster />
+              <AuthModalProvider>
+                {children}
+                <AuthDialog />
+                <Toaster />
+              </AuthModalProvider>
             </LanguageProvider>
           </FirebaseClientProvider>
         </ThemeProvider>

@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
+import { useAuthModal } from '@/app/context/auth-modal-context';
 
 
 const formSchema = z.object({
@@ -67,10 +68,10 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
     const [showAd, setShowAd] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
-    const router = useRouter();
     const { toast } = useToast();
     const { user } = useUser();
     const firestore = useFirestore();
+    const { openModal } = useAuthModal();
 
     const subscriptionRef = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -82,7 +83,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
   
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
       if (!user) {
-        router.push('/login');
+        openModal('login');
         return;
       }
       
@@ -688,3 +689,4 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
