@@ -1,7 +1,7 @@
 
 'use client';
 
-import { CheckCircle, Diamond } from 'lucide-react';
+import { CheckCircle, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useLanguage } from '@/app/context/language-context';
@@ -205,7 +205,7 @@ export function SubscriptionCard() {
                 <CardHeader className="p-8 pb-4">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-accent/10 rounded-lg">
-                            <Diamond className="w-6 h-6 text-accent" />
+                            <Gem className="w-6 h-6 text-accent" />
                         </div>
                         <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
                             {t.subscription.title}
@@ -244,3 +244,4 @@ export function SubscriptionCard() {
         </>
     );
 }
+
