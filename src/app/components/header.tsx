@@ -312,7 +312,7 @@ export function Header() {
   return (
     <header className="flex w-full flex-col items-center gap-2 py-2">
       <div className="w-full flex items-center justify-between">
-        <div className="flex-1">
+        <div className="flex-1 flex justify-start">
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <MenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -331,7 +331,7 @@ export function Header() {
             </MenuContentContainer>
           </MenuContainer>
         </div>
-        <div className="flex flex-1 justify-center">
+        <div className="flex-1 flex justify-center">
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent font-headline">
                 Welcome
             </h1>
