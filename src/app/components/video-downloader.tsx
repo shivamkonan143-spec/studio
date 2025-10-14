@@ -41,6 +41,9 @@ function getYouTubeVideoId(url: string): string | null {
       if (urlObj.pathname === '/watch') {
         return urlObj.searchParams.get('v');
       }
+      if (urlObj.pathname.startsWith('/shorts/')) {
+        return urlObj.pathname.split('/shorts/')[1].split('?')[0];
+      }
     }
   } catch (e) {
     console.error('Invalid URL for video ID extraction', e);
@@ -181,6 +184,7 @@ export function YoutubeTool() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
+          <CardTitle>{videoTitle || t.title}</CardTitle>
           <CardDescription>{t.videoDownloader.pasteUrl}</CardDescription>
         </CardHeader>
         <CardContent>
