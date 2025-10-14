@@ -23,6 +23,8 @@ import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
+import { editThumbnail } from '@/ai/flows/edit-thumbnail-flow';
+import { Textarea } from '@/components/ui/textarea';
 
 
 const formSchema = z.object({
@@ -142,6 +144,128 @@ export function YoutubeDownloaderInput() {
         </Card>
     );
 }
+
+function AiEditDialog({
+    thumbnail,
+    onDownload,
+  }: {
+    thumbnail: string | null;
+    onDownload: (url: string) => void;
+  }) {
+    const [prompt, setPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [editedImage, setEditedImage] = useState<string | null>(null);
+    const { toast } = useToast();
+  
+    const handleGenerate = async () => {
+      if (!prompt || !thumbnail) return;
+  
+      setIsGenerating(true);
+      setEditedImage(null);
+  
+      try {
+        const toDataURL = (url: string) => fetch(url)
+          .then(response => response.blob())
+          .then(blob => new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          }));
+  
+        const dataUrl = await toDataURL(thumbnail);
+  
+        const result = await editThumbnail({ imageUrl: dataUrl, prompt });
+        setEditedImage(result.editedImageUrl);
+      } catch (error) {
+        console.error('AI generation failed:', error);
+        toast({
+          variant: 'destructive',
+          title: 'AI Edit Failed',
+          description: 'Could not generate the image. Please try again.',
+        });
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+  
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="w-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
+            <Sparkles className="mr-2 h-4 w-4" />
+            AI Magic Edit
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>AI Magic Edit</DialogTitle>
+            <DialogDescription>
+              Describe the changes you want to make to the thumbnail.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+            <div className="space-y-4">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                    <Image
+                        src={thumbnail || ''}
+                        alt="Original Thumbnail"
+                        layout="fill"
+                        objectFit="contain"
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg">Original</span>
+                    </div>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="prompt">Your Edit Prompt</Label>
+                    <Textarea
+                        id="prompt"
+                        placeholder="e.g., 'Make this thumbnail more vibrant and add a sense of mystery'"
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        className="min-h-[100px]"
+                    />
+                </div>
+                 <Button onClick={handleGenerate} disabled={isGenerating || !prompt} className="w-full">
+                    {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Generate
+                </Button>
+            </div>
+            <div className="space-y-4">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted/20">
+                    {isGenerating ? (
+                        <div className="flex items-center justify-center h-full flex-col gap-2 text-muted-foreground">
+                            <Loader2 className="h-8 w-8 animate-spin" />
+                            <p>Generating new image...</p>
+                        </div>
+                    ): editedImage ? (
+                        <Image
+                            src={editedImage}
+                            alt="Edited Thumbnail"
+                            layout="fill"
+                            objectFit="contain"
+                        />
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                           <p>Your AI-generated image will appear here.</p>
+                        </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                         <span className="text-white font-semibold text-lg">Edited</span>
+                    </div>
+                </div>
+                <Button onClick={() => editedImage && onDownload(editedImage)} disabled={!editedImage} className="w-full" variant="destructive">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Edited Image
+                </Button>
+            </div>
+
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
 
 function ManualEditDialog({
@@ -271,7 +395,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   }, [videoId]);
   
   const updateThumbnailUrl = (id: string, newQuality: ThumbnailQuality) => {
-    setThumbnailUrl(`https://img.youtube.com/vi/${id}/${newQuality}.jpg`);
+    // Add a timestamp to bypass browser cache
+    setThumbnailUrl(`https://img.youtube.com/vi/${id}/${newQuality}.jpg?t=${new Date().getTime()}`);
   };
 
   const handleQualityChange = (newQuality: ThumbnailQuality) => {
@@ -298,6 +423,22 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     a.remove();
     window.URL.revokeObjectURL(downloadUrl);
   }
+
+  const downloadFromUrl = async (url: string, fileName: string) => {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok.');
+        const blob = await response.blob();
+        triggerDownload(blob, fileName);
+    } catch (error) {
+        console.error("Download from URL failed:", error);
+        toast({
+            variant: "destructive",
+            title: "Download Failed",
+            description: "Could not fetch the image for download.",
+        });
+    }
+  };
 
   const downloadEditedImage = (imageUrl: string, filters: React.CSSProperties['filter'], fileName: string) => {
     const img = new window.Image();
@@ -392,6 +533,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
         cropAndDownloadImage(thumbnailUrl, fileName);
     } else {
       try {
+        // Use a proxy to fetch the image to avoid CORS issues if any
         const response = await fetch(thumbnailUrl);
         if (!response.ok) {
           if (quality === 'maxresdefault') {
@@ -450,6 +592,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                       isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
                   )}>
                     <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
+                      unoptimized
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
@@ -470,7 +613,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                   </DialogHeader>
                   {thumbnailUrl && 
                     <div className="relative aspect-video w-full">
-                        <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" />
+                        <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" unoptimized />
                     </div>
                   }
                 </DialogContent>
@@ -484,10 +627,14 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             )}
             
-            <div className="pt-2">
+            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <AiEditDialog 
+                    thumbnail={thumbnailUrl} 
+                    onDownload={(url) => downloadFromUrl(url, `${videoId}_ai_edited_thumbnail.png`)} 
+                />
                 <ManualEditDialog
                     thumbnail={thumbnailUrl}
-                    onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_edited_thumbnail.png`)}
+                    onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_custom_edited_thumbnail.png`)}
                 />
             </div>
             
