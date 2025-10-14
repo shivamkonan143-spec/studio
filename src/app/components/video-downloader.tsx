@@ -283,12 +283,12 @@ export function YoutubeTool() {
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-5 w-5 text-pink-500" />
+                    <Instagram className="h-6 w-6 text-pink-500" />
                     </a>
                 </Button>
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5 text-red-600" />
+                    <Youtube className="h-6 w-6 text-red-600" />
                     </a>
                 </Button>
             </div>
