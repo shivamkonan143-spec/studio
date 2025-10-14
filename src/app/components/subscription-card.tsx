@@ -37,7 +37,7 @@ export function SubscriptionCard() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi' });
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi', upiId: '' });
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubscribeClick = () => {
@@ -134,7 +134,7 @@ export function SubscriptionCard() {
                     <div className="py-4 space-y-4">
                         <RadioGroup 
                             value={paymentMethod.type} 
-                            onValueChange={(value: PaymentMethodType) => setPaymentMethod({ type: value, upiId: '' })}
+                            onValueChange={(value: PaymentMethodType) => setPaymentMethod({ type: value, upiId: paymentMethod.upiId })}
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="upi" id="upi" />
@@ -241,11 +241,4 @@ export function SubscriptionCard() {
             </Dialog>
         </>
     );
-}
-
-// Add a new variant to the badge component
-declare module "@/components/ui/badge" {
-    interface BadgeProps {
-        variant: "default" | "secondary" | "destructive" | "outline" | "success";
-    }
 }
