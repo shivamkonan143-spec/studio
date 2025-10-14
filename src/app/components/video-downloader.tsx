@@ -505,7 +505,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
       return;
     }
   
-    const fileName = `${videoId}_${quality}_thumbnail.jpg`;
+    const uniqueTimestamp = new Date().getTime();
+    const fileName = `${videoId}_${quality}_thumbnail_${uniqueTimestamp}.jpg`;
 
     if (isShort) {
         // Since the source image might not be directly available for fetch due to CORS,
@@ -613,8 +614,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
           <div className="grid grid-cols-1 gap-4">
               <AdvancedEditDialog
                   thumbnail={thumbnailUrl}
-                  onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
-                  onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
+                  onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail_${new Date().getTime()}.png`)}
+                  onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail_${new Date().getTime()}.jpg`, aspect)}
               />
           </div>
           
@@ -676,6 +677,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
+
+    
 
     
 
