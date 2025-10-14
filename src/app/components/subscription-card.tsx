@@ -33,13 +33,6 @@ export function SubscriptionCard() {
     const firestore = useFirestore();
     const router = useRouter();
 
-    const subscriptionRef = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
-        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-    }, [firestore, user]);
-    
-    const { isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
-    
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi', upiId: '' });
@@ -223,7 +216,7 @@ export function SubscriptionCard() {
                             <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
                             <span className="text-muted-foreground">{t.subscription.duration}</span>
                         </div>
-                        <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick} disabled={isSubscriptionLoading}>
+                        <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick}>
                             {t.subscription.buttonSubscribe}
                         </Button>
                     </div>
