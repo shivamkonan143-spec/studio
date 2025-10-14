@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Youtube, Download, RefreshCcw, Loader2, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { Youtube, Download, RefreshCcw, Loader2, ArrowRight, Image as ImageIcon, Instagram } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -158,10 +158,6 @@ export function YoutubeTool() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ImageIcon className="h-5 w-5" />
-            <span>Enter YouTube Video URL</span>
-          </CardTitle>
           <CardDescription>Paste the URL of the YouTube video to download its thumbnail.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -219,7 +215,7 @@ export function YoutubeTool() {
                     />
                   </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl">
+                <DialogContent className="max-w-4xl p-2 sm:p-4">
                   <DialogHeader>
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
@@ -266,6 +262,24 @@ export function YoutubeTool() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>About Me</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+              <Instagram className="h-5 w-5" />
+            </a>
+          </Button>
+          <Button variant="outline" size="icon" asChild>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+              <Youtube className="h-5 w-5" />
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
