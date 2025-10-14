@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 
 
 const formSchema = z.object({
-  url: z.string().url({ message: 'Please enter a valid YouTube URL.' }),
+  url: z.string().url({ message: 'Please enter a valid URL.' }),
 });
 
 type Step = 'input' | 'preview';
@@ -159,7 +159,7 @@ export function YoutubeTool() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardDescription>Paste the URL of the YouTube video to download its thumbnail.</CardDescription>
+          <CardDescription>Paste the URL of the video to download its thumbnail.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -169,9 +169,9 @@ export function YoutubeTool() {
                 name="url"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="sr-only">YouTube Video URL</FormLabel>
+                    <FormLabel className="sr-only">Video URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://www.youtube.com/watch?v=..." {...field} disabled={step !== 'input'} />
+                      <Input placeholder="www.xyz.com" {...field} disabled={step !== 'input'} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
