@@ -18,7 +18,7 @@ export default function Home() {
     return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
   }, [firestore, user]);
 
-  const { data: subscription } = useDoc(subscriptionRef);
+  const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
   const isSubscribed = subscription?.active === true;
 
 
@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <YoutubeDownloaderInput />
-        {!isSubscribed && <SubscriptionCard />}
+        {!isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>
