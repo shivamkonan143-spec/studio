@@ -3,6 +3,9 @@
 
 import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput } from '@/app/components/video-downloader';
+import { SubscriptionCard } from '@/app/components/subscription-card';
+import { SocialLinks } from '@/app/components/social-links';
+
 
 export default function Home() {
   return (
@@ -10,6 +13,8 @@ export default function Home() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <YoutubeDownloaderInput />
+        <SubscriptionCard />
+        <SocialLinks />
       </div>
     </main>
   );
