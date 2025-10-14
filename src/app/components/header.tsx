@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Home } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Home, Info } from 'lucide-react';
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog"
 import {
   Sheet,
@@ -192,6 +193,33 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             </a>
         </Button>
 
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start">
+                    <Info className="mr-2 h-4 w-4" />
+                    <span>{t.header.aboutUs}</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t.header.aboutUs}</DialogTitle>
+                    <DialogDescription>
+                        {t.about.description}
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t.about.totalUsers}</span>
+                        <span className="font-bold">10,000+</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">{t.about.averageRating}</span>
+                        <span className="font-bold">4.8 / 5</span>
+                    </div>
+                </div>
+            </DialogContent>
+        </Dialog>
+
 
         <Button variant="ghost" asChild className="w-full justify-start">
           <a href={mailtoHref} onClick={() => closeMenu?.()}>
@@ -353,4 +381,6 @@ export function Header() {
     </header>
   );
 }
+    
+
     

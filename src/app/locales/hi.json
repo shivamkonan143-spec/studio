@@ -16,7 +16,13 @@
         "logout": "लॉग आउट",
         "login": "लॉग इन करें",
         "register": "रजिस्टर करें",
-        "myAccount": "मेरा खाता"
+        "myAccount": "मेरा खाता",
+        "aboutUs": "हमारे बारे में"
+    },
+    "about": {
+        "description": "यह Next.js और Firebase के साथ बनाया गया एक थंबनेल डाउनलोडर ऐप है।",
+        "totalUsers": "कुल उपयोगकर्ता",
+        "averageRating": "औसत रेटिंग"
     },
     "videoDownloader": {
         "pasteUrl": "थंबनेल डाउनलोड करने के लिए वीडियो का URL पेस्ट करें।",
@@ -156,3 +162,5 @@
         "user": "उपयोगकर्ता"
     }
 }
+
+    

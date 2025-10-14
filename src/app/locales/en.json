@@ -16,7 +16,13 @@
         "logout": "Log out",
         "login": "Log In",
         "register": "Register",
-        "myAccount": "My Account"
+        "myAccount": "My Account",
+        "aboutUs": "About Us"
+    },
+    "about": {
+        "description": "This is a thumbnail downloader app built with Next.js and Firebase.",
+        "totalUsers": "Total Users",
+        "averageRating": "Average Rating"
     },
     "videoDownloader": {
         "pasteUrl": "Paste the URL of the video to download its thumbnail.",
@@ -156,3 +162,5 @@
         "user": "User"
     }
 }
+
+    
