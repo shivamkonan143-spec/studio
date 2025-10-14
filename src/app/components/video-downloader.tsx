@@ -238,7 +238,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(true);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
-  const { locale } = useLanguage();
+  const { locale } } from useLanguage();
   const t = translations[locale];
 
   const { toast } = useToast();
@@ -515,7 +515,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                         thumbnail={thumbnailUrl}
                         onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_edited_thumbnail.png`)}
                     />
-                    <Button onClick={handleDownloadThumbnail}>
+                    <Button onClick={handleDownloadThumbnail} variant="destructive">
                         <Download className="mr-2 h-4 w-4" />
                         {t.videoDownloader.downloadThumbnail}
                     </Button>
@@ -535,3 +535,5 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
+
+    
