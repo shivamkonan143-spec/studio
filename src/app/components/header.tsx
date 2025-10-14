@@ -42,6 +42,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { doc, deleteDoc } from 'firebase/firestore';
+import Image from 'next/image';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -275,8 +276,8 @@ export function Header() {
           </MenuContainer>
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative rounded-full bg-primary p-2 shadow-lg">
-             <Youtube className="h-6 w-6 text-white"/>
+          <div className="relative">
+             <Image src="/logo.png" alt="App Logo" width={32} height={32} />
           </div>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
