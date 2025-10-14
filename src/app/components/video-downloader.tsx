@@ -108,7 +108,7 @@ export function YoutubeTool() {
             toast({
                 variant: 'destructive',
                 title: 'Download Failed',
-                description: 'Maximum quality is not available. Please select another quality.',
+                description: 'High quality is not available. Please select another quality.',
             });
             return;
         }
@@ -221,7 +221,7 @@ export function YoutubeTool() {
                           toast({
                               variant: 'default',
                               title: 'Quality not available',
-                              description: "Maximum quality isn't available for this video. Switched to SD quality.",
+                              description: "High quality isn't available for this video. Switched to High (360p) quality.",
                           })
                         }
                       }}
@@ -256,8 +256,8 @@ export function YoutubeTool() {
                         <SelectValue placeholder="Select quality" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem key="maxresdefault" value="maxresdefault">High</SelectItem>
-                        <SelectItem key="hqdefault" value="hqdefault">High (360p)</SelectItem>
+                        <SelectItem value="maxresdefault">High</SelectItem>
+                        <SelectItem value="hqdefault">High (360p)</SelectItem>
                     </SelectContent>
                 </Select>
               </div>
