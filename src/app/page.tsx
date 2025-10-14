@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { addDays, isBefore } from 'date-fns';
 import { Header } from '@/app/components/header';
 import { YoutubeTool } from '@/app/components/video-downloader';
@@ -14,9 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase, useDoc, setDocumentNonBlocking } from '@/firebase';
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
-import { setDocumentNonBlocking } from '@/firebase';
+
 
 type Subscription = {
   active: boolean;
@@ -29,8 +30,10 @@ export default function Home() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [paymentStep, setPaymentStep] = useState<'confirm' | 'methods'>('confirm');
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
+  const router = useRouter();
+
 
   const userSubscriptionRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -52,7 +55,6 @@ export default function Home() {
         setIsSubscribed(true);
       } else {
         setIsSubscribed(false);
-        // Check if the subscription is marked as active before updating
         if (subscriptionData.active && userSubscriptionRef) {
           setDocumentNonBlocking(userSubscriptionRef, { active: false }, { merge: true });
           toast({
@@ -105,6 +107,15 @@ export default function Home() {
       setIsDialogOpen(true);
     }
   }
+  
+  const handleSubscribeClick = () => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
+
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center bg-background px-4 pb-12">
@@ -138,81 +149,81 @@ export default function Home() {
                        <Badge variant="secondary">Subscribed</Badge>
                     ) : (
                       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-                      <DialogTrigger asChild>
-                         <Button disabled={!user}>Subscribe</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            {paymentStep === 'confirm' ? 'Confirm Subscription' : 'Choose Payment Method'}
-                          </DialogTitle>
-                          {paymentStep === 'confirm' && (
-                              <DialogDescription>
-                                  You are about to subscribe for an ad-free experience.
-                              </DialogDescription>
-                          )}
-                        </DialogHeader>
+                        <DialogTrigger asChild>
+                          <Button onClick={handleSubscribeClick}>Subscribe</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>
+                              {paymentStep === 'confirm' ? 'Confirm Subscription' : 'Choose Payment Method'}
+                            </DialogTitle>
+                            {paymentStep === 'confirm' && (
+                                <DialogDescription>
+                                    You are about to subscribe for an ad-free experience.
+                                </DialogDescription>
+                            )}
+                          </DialogHeader>
 
-                        {paymentStep === 'confirm' ? (
-                          <>
-                            <div className="py-4">
-                              <div className="flex justify-between items-baseline p-4 rounded-lg bg-muted">
-                                  <span className="font-medium">1 Month Subscription</span>
-                                  <span className="text-2xl font-bold">₹50</span>
+                          {paymentStep === 'confirm' ? (
+                            <>
+                              <div className="py-4">
+                                <div className="flex justify-between items-baseline p-4 rounded-lg bg-muted">
+                                    <span className="font-medium">1 Month Subscription</span>
+                                    <span className="text-2xl font-bold">₹50</span>
+                                </div>
                               </div>
-                            </div>
-                            <DialogFooter>
-                              <Button variant="outline" onClick={() => handleDialogClose(false)}>Cancel</Button>
-                              <Button onClick={() => setPaymentStep('methods')}>Pay Now</Button>
-                            </DialogFooter>
-                          </>
-                        ) : (
-                          <>
-                             <div className="py-4">
-                                  <RadioGroup defaultValue="upi" className="space-y-4">
-                                      <Label
-                                          htmlFor="upi"
-                                          className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
-                                      >
-                                          <div className="flex items-center gap-3">
-                                              <Wallet className="h-6 w-6" />
-                                              <span className="font-medium">UPI</span>
-                                          </div>
-                                          <RadioGroupItem value="upi" id="upi" />
-                                      </Label>
-                                       <Label
-                                          htmlFor="card"
-                                          className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
-                                      >
-                                          <div className="flex items-center gap-3">
-                                              <CreditCard className="h-6 w-6" />
-                                              <span className="font-medium">Credit/Debit Card</span>
-                                          </div>
-                                          <RadioGroupItem value="card" id="card" />
-                                      </Label>
-                                       <Label
-                                          htmlFor="netbanking"
-                                          className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
-                                      >
-                                          <div className="flex items-center gap-3">
-                                              <Landmark className="h-6 w-6" />
-                                              <span className="font-medium">Net Banking</span>
-                                          </div>
-                                          <RadioGroupItem value="netbanking" id="netbanking" />
-                                      </Label>
-                                  </RadioGroup>
-                             </div>
-                             <DialogFooter className="sm:justify-between">
-                               <Button variant="outline" onClick={() => setPaymentStep('confirm')}>
-                                  <ArrowLeft className="mr-2 h-4 w-4"/>
-                                  Back
-                               </Button>
-                               <Button onClick={handleSubscription}>Complete Payment</Button>
-                             </DialogFooter>
-                          </>
-                        )}
-                      </DialogContent>
-                    </Dialog>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => handleDialogClose(false)}>Cancel</Button>
+                                <Button onClick={() => setPaymentStep('methods')}>Pay Now</Button>
+                              </DialogFooter>
+                            </>
+                          ) : (
+                            <>
+                              <div className="py-4">
+                                    <RadioGroup defaultValue="upi" className="space-y-4">
+                                        <Label
+                                            htmlFor="upi"
+                                            className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Wallet className="h-6 w-6" />
+                                                <span className="font-medium">UPI</span>
+                                            </div>
+                                            <RadioGroupItem value="upi" id="upi" />
+                                        </Label>
+                                        <Label
+                                            htmlFor="card"
+                                            className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <CreditCard className="h-6 w-6" />
+                                                <span className="font-medium">Credit/Debit Card</span>
+                                            </div>
+                                            <RadioGroupItem value="card" id="card" />
+                                        </Label>
+                                        <Label
+                                            htmlFor="netbanking"
+                                            className="flex items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <Landmark className="h-6 w-6" />
+                                                <span className="font-medium">Net Banking</span>
+                                            </div>
+                                            <RadioGroupItem value="netbanking" id="netbanking" />
+                                        </Label>
+                                    </RadioGroup>
+                              </div>
+                              <DialogFooter className="sm:justify-between">
+                                <Button variant="outline" onClick={() => setPaymentStep('confirm')}>
+                                    <ArrowLeft className="mr-2 h-4 w-4"/>
+                                    Back
+                                </Button>
+                                <Button onClick={handleSubscription}>Complete Payment</Button>
+                              </DialogFooter>
+                            </>
+                          )}
+                        </DialogContent>
+                      </Dialog>
                     )}
                 </div>
             </CardContent>
@@ -223,5 +234,3 @@ export default function Home() {
     </main>
   );
 }
-
-    
