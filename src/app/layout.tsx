@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'download videoba',
-  description: 'Download videos from any URL.',
+  title: 'YouTube Thumbnail Downloader',
+  description: 'Download high-quality thumbnails from any YouTube video.',
 };
 
 export default function RootLayout({
