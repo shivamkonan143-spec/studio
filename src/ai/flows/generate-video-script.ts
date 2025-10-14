@@ -39,10 +39,15 @@ const getVideoTranscript = ai.defineTool(
   async (input) => {
     try {
       const info = await ytdl.getInfo(input.url);
-      const tracks = info.player_response.captions?.playerCaptionsTracklistRenderer.captionTracks;
+      const tracks =
+        info.player_response.captions?.playerCaptionsTracklistRenderer
+          .captionTracks;
 
       if (tracks && tracks.length > 0) {
-        const track = tracks.find((t) => t.kind === 'asr' || t.isTranslatable);
+        const track =
+          tracks.find((t) => t.vssId?.startsWith('a.')) || // Auto-generated
+          tracks.find((t) => t.vssId?.startsWith('.')); // Manually-created
+
         if (track) {
           const transcriptResponse = await fetch(track.baseUrl);
           const transcriptXml = await transcriptResponse.text();
@@ -56,7 +61,7 @@ const getVideoTranscript = ai.defineTool(
             .replace(/<[^>]*>/g, '')
             .trim()
             .split('\n')
-            .map(line => line.trim())
+            .map(line => decodeURIComponent(line.replace(/\+/g, ' ')).trim())
             .filter(line => line.length > 0)
             .join(' ');
           return lines;
