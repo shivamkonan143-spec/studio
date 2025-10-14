@@ -7,8 +7,8 @@ import {
   type AutomaticDownloadToolSelectionOutput,
 } from '@/ai/flows/automatic-download-tool-selection';
 
-// A more forgiving regex for URLs
-const URL_REGEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+// A more forgiving regex for URLs that includes query parameters.
+const URL_REGEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-?=%&]*)*\/?$/;
 
 
 export async function getVideoTool(
