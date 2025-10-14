@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, Trash2, ImagePlus } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -23,7 +23,6 @@ import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
-import { editThumbnail } from '@/ai/flows/edit-thumbnail-flow';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -147,146 +146,158 @@ export function YoutubeDownloaderInput() {
 }
 
 function AdvancedEditDialog({
-    thumbnail,
-    onDownload,
-  }: {
-    thumbnail: string | null;
-    onDownload: (url: string, filters?: React.CSSProperties['filter']) => void;
-  }) {
-    // Filter states
-    const [brightness, setBrightness] = useState(100);
-    const [contrast, setContrast] = useState(100);
-    const [saturate, setSaturate] = useState(100);
-    const [sepia, setSepia] = useState(0);
-    const [grayscale, setGrayscale] = useState(0);
-    const [invert, setInvert] = useState(0);
-    
-    // AI Edit states
-    const [isRemovingObject, setIsRemovingObject] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  thumbnail,
+  onDownload,
+  onCropAndDownload
+}: {
+  thumbnail: string | null;
+  onDownload: (url: string, filters?: React.CSSProperties['filter']) => void;
+  onCropAndDownload: (url: string, aspect: number) => void;
+}) {
+  // Filter states
+  const [brightness, setBrightness] = useState(100);
+  const [contrast, setContrast] = useState(100);
+  const [saturate, setSaturate] = useState(100);
+  const [sepia, setSepia] = useState(0);
+  const [grayscale, setGrayscale] = useState(0);
+  const [invert, setInvert] = useState(0);
 
+  // Crop states
+  const [cropAspect, setCropAspect] = useState<number | null>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
-    const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
-  
-    const resetFilters = () => {
-      setBrightness(100);
-      setContrast(100);
-      setSaturate(100);
-      setSepia(0);
-      setGrayscale(0);
-      setInvert(0);
+  const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
+
+  useEffect(() => {
+    if (!thumbnail) return;
+
+    const canvas = previewCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.src = thumbnail;
+    img.onload = () => {
+        let { width: w, height: h, sx, sy } = getCropDimensions(img.width, img.height, cropAspect);
+        canvas.width = w;
+        canvas.height = h;
+
+        ctx.filter = filters;
+        ctx.drawImage(img, sx, sy, w, h, 0, 0, w, h);
     };
+  }, [thumbnail, filters, cropAspect]);
 
-    const handleAddImageClick = () => {
-        fileInputRef.current?.click();
-    };
+  const getCropDimensions = (imgWidth: number, imgHeight: number, aspect: number | null) => {
+    if (aspect === null) {
+      return { width: imgWidth, height: imgHeight, sx: 0, sy: 0 };
+    }
 
-    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            // TODO: Implement logic to add the image to the canvas
-            console.log("Image selected:", file.name);
-        }
-    };
-  
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">
-            <SlidersHorizontal className="mr-2 h-4 w-4" />
-            Customize
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Advanced Thumbnail Editor</DialogTitle>
-            <DialogDescription>
-              Use filters for basic adjustments or AI tools for advanced editing.
-            </DialogDescription>
-          </DialogHeader>
-          <Tabs defaultValue="filters" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="filters">Filters</TabsTrigger>
-                <TabsTrigger value="ai">AI Edit</TabsTrigger>
-            </TabsList>
-            <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-lg border">
-                {/* This will be replaced by a canvas for interactive editing */}
-                <Image
-                    src={thumbnail || ''}
-                    alt="Thumbnail"
-                    layout="fill"
-                    objectFit="contain"
-                    style={{ filter: filters }}
-                />
-            </div>
-            <TabsContent value="filters">
-                <div className="grid grid-cols-2 gap-4 pt-4">
-                    <div className="space-y-2">
-                        <Label>Brightness ({brightness}%)</Label>
-                        <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Contrast ({contrast}%)</Label>
-                        <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Saturation ({saturate}%)</Label>
-                        <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Sepia ({sepia}%)</Label>
-                        <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Grayscale ({grayscale}%)</Label>
-                        <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Invert ({invert}%)</Label>
-                        <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
-                    </div>
-                </div>
-                 <DialogFooter className="pt-6">
-                    <Button variant="outline" onClick={resetFilters}>Reset</Button>
-                    <Button onClick={() => thumbnail && onDownload(thumbnail, filters)}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download with Filters
-                    </Button>
-                </DialogFooter>
-            </TabsContent>
-            <TabsContent value="ai">
-                 <div className="flex justify-center gap-2 pt-4">
-                    <Button variant={isRemovingObject ? "destructive" : "outline"} onClick={() => setIsRemovingObject(!isRemovingObject)}>
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {isRemovingObject ? "Cancel" : "Remove Object"}
-                    </Button>
-                    <Button variant="outline" onClick={handleAddImageClick}>
-                        <ImagePlus className="mr-2 h-4 w-4" />
-                        Add Image
-                    </Button>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                    />
-                </div>
-                <p className="text-center text-sm text-muted-foreground mt-2">
-                    {isRemovingObject ? "Tap on the object you want to remove." : "Use AI to make advanced edits."}
-                </p>
-                <DialogFooter className="pt-6">
-                    <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download AI Edited Image
-                    </Button>
-                </DialogFooter>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-    );
+    const imgAspect = imgWidth / imgHeight;
+    let width = imgWidth;
+    let height = imgHeight;
+    let sx = 0;
+    let sy = 0;
+
+    if (imgAspect > aspect) { // Image is wider than target
+      width = imgHeight * aspect;
+      sx = (imgWidth - width) / 2;
+    } else { // Image is taller than or equal to target
+      height = imgWidth / aspect;
+      sy = (imgHeight - height) / 2;
+    }
+    return { width, height, sx, sy };
   }
+
+  const resetFilters = () => {
+    setBrightness(100);
+    setContrast(100);
+    setSaturate(100);
+    setSepia(0);
+    setGrayscale(0);
+    setInvert(0);
+  };
+  
+  const handleDownloadCropped = () => {
+    if (thumbnail && cropAspect) {
+        onCropAndDownload(thumbnail, cropAspect);
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="w-full">
+          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          Customize
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Customize Thumbnail</DialogTitle>
+          <DialogDescription>
+            Apply filters or crop your image.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex-1">
+                <div className="relative mx-auto w-full max-w-lg aspect-video bg-muted/20 rounded-lg overflow-hidden border">
+                    <canvas ref={previewCanvasRef} className="absolute top-0 left-0 w-full h-full" />
+                </div>
+            </div>
+            <div className="w-full md:w-64 space-y-6">
+                <div>
+                    <h3 className="font-semibold mb-2">Filters</h3>
+                    <div className="space-y-3">
+                        <div className="space-y-2">
+                            <Label className="text-xs">Brightness ({brightness}%)</Label>
+                            <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Contrast ({contrast}%)</Label>
+                            <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Saturation ({saturate}%)</Label>
+                            <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Sepia ({sepia}%)</Label>
+                            <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
+                        </div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                        <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">Reset Filters</Button>
+                        <Button size="sm" onClick={() => thumbnail && onDownload(thumbnail, filters)} className="w-full">
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                        </Button>
+                    </div>
+                </div>
+                <div>
+                    <h3 className="font-semibold mb-2">Crop</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                        <Button variant={cropAspect === 16/9 ? 'secondary' : 'outline'} onClick={() => setCropAspect(16/9)}>16:9</Button>
+                        <Button variant={cropAspect === 9/16 ? 'secondary' : 'outline'} onClick={() => setCropAspect(9/16)}>9:16</Button>
+                        <Button variant={cropAspect === 1/1 ? 'secondary' : 'outline'} onClick={() => setCropAspect(1/1)}>1:1</Button>
+                    </div>
+                    <Button 
+                        onClick={handleDownloadCropped}
+                        disabled={!cropAspect}
+                        className="w-full mt-4"
+                    >
+                        <Crop className="mr-2 h-4 w-4" />
+                        Download Cropped Image
+                    </Button>
+                     <Button variant="link" size="sm" onClick={() => setCropAspect(null)}>Remove Crop</Button>
+                </div>
+            </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string, isShort: boolean }) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -400,7 +411,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     };
   };
 
-  const cropAndDownloadImage = (imageUrl: string, fileName: string) => {
+  const cropAndDownloadImage = (imageUrl: string, fileName: string, aspect?: number) => {
     const img = new window.Image();
     img.crossOrigin = 'anonymous';
     img.src = imageUrl;
@@ -412,7 +423,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
         const originalWidth = img.width;
         const originalHeight = img.height;
         
-        const targetAspectRatio = 9 / 16;
+        const targetAspectRatio = aspect || (9 / 16);
         let newWidth = originalWidth;
         let newHeight = originalHeight;
         let sx = 0;
@@ -492,9 +503,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     }
   };
 
-  return (
-    <>
-      {isGenerating || !thumbnailUrl ? (
+  if (isGenerating || !thumbnailUrl) {
+    return (
         <Card>
             <CardContent className="pt-6">
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
@@ -505,77 +515,76 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             </CardContent>
         </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ImageIcon className="h-5 w-5" />
-              <span>{t.videoDownloader.previewTitle}</span>
-            </CardTitle>
-            <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {thumbnailUrl ? (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <div className={cn(
-                      "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
-                      isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
-                  )}>
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
-                      unoptimized
-                      onError={() => {
-                        if (quality === 'maxresdefault' && videoId) {
-                          setQuality('hqdefault');
-                          updateThumbnailUrl(videoId, 'hqdefault');
-                          toast({
-                              variant: 'default',
-                              title: t.videoDownloader.qualityUnavailableTitle,
-                              description: t.videoDownloader.qualityUnavailableDescription,
-                          })
-                        }
-                      }}
-                    />
-                  </div>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl p-2 sm:p-4">
-                  <DialogHeader>
-                    <DialogTitle>{t.videoDownloader.previewTitle}</DialogTitle>
-                  </DialogHeader>
-                  {thumbnailUrl && 
-                    <div className="relative aspect-video w-full">
-                        <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" unoptimized />
-                    </div>
-                  }
-                </DialogContent>
-              </Dialog>
-            ) : (
-                <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <span>{t.videoDownloader.loadingThumbnail}</span>
-                    </div>
+    )
+  }
+    
+  return (
+    <Card>
+        <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+            <ImageIcon className="h-5 w-5" />
+            <span>{t.videoDownloader.previewTitle}</span>
+        </CardTitle>
+        <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+        {thumbnailUrl ? (
+            <Dialog>
+            <DialogTrigger asChild>
+                <div className={cn(
+                    "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
+                    isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
+                )}>
+                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
+                    unoptimized
+                    onError={() => {
+                    if (quality === 'maxresdefault' && videoId) {
+                        setQuality('hqdefault');
+                        updateThumbnailUrl(videoId, 'hqdefault');
+                        toast({
+                            variant: 'default',
+                            title: t.videoDownloader.qualityUnavailableTitle,
+                            description: t.videoDownloader.qualityUnavailableDescription,
+                        })
+                    }
+                    }}
+                />
                 </div>
-            )}
-            
-            <AdvancedEditDialog
-                thumbnail={thumbnailUrl}
-                onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
-            />
-
-            {videoTitle && (
-                <div className="space-y-2">
-                    <Label>{t.videoDownloader.videoTitle}</Label>
-                    <div className="relative flex items-center gap-2">
-                        <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
-                        <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
-                            <Clipboard className="h-4 w-4" />
-                            <span className="sr-only">{t.videoDownloader.copyTitle}</span>
-                        </Button>
-                    </div>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl p-2 sm:p-4">
+                <DialogHeader>
+                <DialogTitle>{t.videoDownloader.previewTitle}</DialogTitle>
+                </DialogHeader>
+                {thumbnailUrl && 
+                <div className="relative aspect-video w-full">
+                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" unoptimized />
                 </div>
-            )}
+                }
+            </DialogContent>
+            </Dialog>
+        ) : (
+            <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <span>{t.videoDownloader.loadingThumbnail}</span>
+                </div>
+            </div>
+        )}
+        
+        {videoTitle && (
+            <div className="space-y-2">
+                <Label>{t.videoDownloader.videoTitle}</Label>
+                <div className="relative flex items-center gap-2">
+                    <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
+                    <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
+                        <Clipboard className="h-4 w-4" />
+                        <span className="sr-only">{t.videoDownloader.copyTitle}</span>
+                    </Button>
+                </div>
+            </div>
+        )}
 
+        <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
                 <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
                 <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
@@ -588,23 +597,31 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                     </SelectContent>
                 </Select>
             </div>
-            
-            <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
-                <Download className="mr-2 h-4 w-4" />
-                {t.videoDownloader.downloadThumbnail}
-            </Button>
+             <div className="space-y-2">
+                <Label>&nbsp;</Label>
+                <AdvancedEditDialog
+                    thumbnail={thumbnailUrl}
+                    onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
+                    onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
+                />
+            </div>
+        </div>
+        
+        
+        <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
+            <Download className="mr-2 h-4 w-4" />
+            {t.videoDownloader.downloadThumbnail}
+        </Button>
 
 
-            <Button asChild className="w-full" size="lg" variant="outline">
-                <Link href="/">
-                    <RefreshCcw className="mr-2 h-4 w-4" />
-                    <span>{t.videoDownloader.tryAnother}</span>
-                </Link>
-            </Button>
-            <AdPlaceholder />
-          </CardContent>
-        </Card>
-      )}
-    </>
+        <Button asChild className="w-full" size="lg" variant="outline">
+            <Link href="/">
+                <RefreshCcw className="mr-2 h-4 w-4" />
+                <span>{t.videoDownloader.tryAnother}</span>
+            </Link>
+        </Button>
+        <AdPlaceholder />
+        </CardContent>
+    </Card>
   );
 }
