@@ -63,7 +63,11 @@
         "successDescription": "Thank you for subscribing. Enjoy an ad-free experience for 30 days.",
         "errorDescription": "You must be logged in to subscribe.",
         "expiredTitle": "Subscription Expired",
-        "expiredDescription": "Your ad-free subscription has ended. Please subscribe again."
+        "expiredDescription": "Your ad-free subscription has ended. Please subscribe again.",
+        "cancelSubscription": "Cancel Subscription",
+        "cancelledTitle": "Subscription Cancelled",
+        "cancelledDescription": "Your subscription has been successfully cancelled.",
+        "cancelFailedDescription": "Failed to cancel subscription. Please try again."
     },
     "payment": {
         "upi": "UPI",
@@ -140,3 +144,5 @@
         "user": "User"
     }
 }
+
+    

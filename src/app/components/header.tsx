@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Youtube, Home } from 'lucide-react';
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -41,19 +41,49 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { doc, deleteDoc } from 'firebase/firestore';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { user } = useUser();
   const auth = useAuth();
+  const firestore = useFirestore();
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
   const { toast } = useToast();
 
+  const subscriptionRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+  }, [firestore, user]);
+  const { data: subscription } = useDoc(subscriptionRef);
+  const isSubscribed = subscription?.active === true;
+
+
   const handleLogout = async () => {
     if (auth) {
       await auth.signOut();
+    }
+    closeMenu?.();
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!subscriptionRef) return;
+    try {
+        await deleteDoc(subscriptionRef);
+        toast({
+            variant: 'success',
+            title: t.subscription.cancelledTitle,
+            description: t.subscription.cancelledDescription,
+        });
+    } catch (error) {
+        console.error("Failed to cancel subscription", error);
+        toast({
+            variant: 'destructive',
+            title: t.common.error,
+            description: t.subscription.cancelFailedDescription
+        });
     }
     closeMenu?.();
   };
@@ -162,10 +192,18 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         <Separator className="my-1" />
 
         {user ? (
+          <>
+            {isSubscribed && (
+                <Button variant="ghost" className="w-full justify-start" onClick={handleCancelSubscription}>
+                    <Unplug className="mr-2 h-4 w-4" />
+                    <span>{t.subscription.cancelSubscription}</span>
+                </Button>
+            )}
             <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>{t.header.logout}</span>
             </Button>
+          </>
         ) : (
           <>
             <Button variant="ghost" asChild className="w-full justify-start">
@@ -279,5 +317,6 @@ export function Header() {
     </header>
   );
 }
+    
 
     
