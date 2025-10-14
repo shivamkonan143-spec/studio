@@ -27,7 +27,7 @@ type ThumbnailQuality = 'maxresdefault' | 'hqdefault';
 
 const qualityLabels: Record<ThumbnailQuality, string> = {
     maxresdefault: 'High',
-    hqdefault: 'Low',
+    hqdefault: 'High (360p)',
 };
 
 function getYouTubeVideoId(url: string): string | null {
@@ -261,8 +261,8 @@ export function YoutubeTool() {
                         <SelectValue placeholder="Select quality" />
                     </SelectTrigger>
                     <SelectContent>
-                        {Object.entries(qualityLabels).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                        {(Object.keys(qualityLabels) as ThumbnailQuality[]).map((key) => (
+                            <SelectItem key={key} value={key}>{qualityLabels[key]}</SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
