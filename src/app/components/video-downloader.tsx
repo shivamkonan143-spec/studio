@@ -22,6 +22,7 @@ import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider"
+import { AdPlaceholder } from '@/app/components/ad-placeholder';
 
 
 const formSchema = z.object({
@@ -136,6 +137,7 @@ export function YoutubeDownloaderInput() {
                     </Button>
                 </form>
                 </Form>
+                 <AdPlaceholder />
             </CardContent>
         </Card>
     );
@@ -526,9 +528,12 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                     <span>{t.videoDownloader.tryAnother}</span>
                 </Link>
             </Button>
+            <AdPlaceholder />
           </CardContent>
         </Card>
       )}
     </>
   );
 }
+
+    

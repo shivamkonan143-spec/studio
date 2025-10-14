@@ -141,7 +141,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         <Button variant="ghost" asChild className="w-full justify-start">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
               <MessageCircle className="mr-2 h-4 w-4" />
-              <span>Shere app</span>
+              <span>{t.header.shareApp}</span>
             </a>
         </Button>
 
@@ -275,3 +275,5 @@ export function Header() {
     </header>
   );
 }
+
+    
