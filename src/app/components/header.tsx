@@ -1,13 +1,27 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, LogOut, User as UserIcon } from 'lucide-react';
+import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useTheme } from 'next-themes';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const { setTheme } = useTheme();
 
   const handleLogout = async () => {
     if (auth) {
@@ -28,15 +42,66 @@ export function Header() {
           {!isUserLoading && (
             <>
               {user ? (
-                <>
-                  <div className="flex items-center gap-2 text-sm">
-                    <UserIcon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{user.email}</span>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={handleLogout}>
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Settings className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>
+                      <div className="flex items-center gap-2">
+                        <UserIcon className="h-4 w-4" />
+                        <span>{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span>Theme</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuItem onClick={() => setTheme('light')}>
+                            <Sun className="mr-2 h-4 w-4" />
+                            <span>Light</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setTheme('dark')}>
+                            <Moon className="mr-2 h-4 w-4" />
+                            <span>Dark</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setTheme('system')}>
+                            <Laptop className="mr-2 h-4 w-4" />
+                            <span>System</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuSub>
+                       <DropdownMenuSubTrigger>
+                        <Languages className="mr-2 h-4 w-4" />
+                        <span>Language</span>
+                       </DropdownMenuSubTrigger>
+                       <DropdownMenuPortal>
+                         <DropdownMenuSubContent>
+                           <DropdownMenuItem>
+                             <span>English</span>
+                           </DropdownMenuItem>
+                           <DropdownMenuItem>
+                             <span>Hindi</span>
+                           </DropdownMenuItem>
+                         </DropdownMenuSubContent>
+                       </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
                   <Button asChild variant="ghost">
