@@ -241,7 +241,7 @@ export function YoutubeTool() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>{videoTitle || t.title}</CardTitle>
+          <CardTitle>{t.title}</CardTitle>
           <CardDescription>{t.videoDownloader.pasteUrl}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -386,5 +386,3 @@ export function YoutubeTool() {
     </div>
   );
 }
-
-    
