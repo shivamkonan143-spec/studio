@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignIn, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const formSchema = z.object({
@@ -140,7 +140,12 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm relative">
+        <Link href="/" passHref>
+            <Button variant="ghost" size="icon" className="absolute top-4 right-4">
+                <X className="h-5 w-5" />
+            </Button>
+        </Link>
         <CardHeader>
           <CardTitle>Log In</CardTitle>
           <CardDescription>Enter your credentials to access your account.</CardDescription>
