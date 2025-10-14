@@ -199,7 +199,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" 
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
                       onError={() => {
                         // If maxres fails, fall back to hq
                         if (quality === 'maxresdefault' && videoId) {
@@ -220,7 +220,7 @@ export function YoutubeTool() {
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
                   <div className="relative aspect-video w-full">
-                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" fill objectFit="contain" />
+                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -264,17 +264,20 @@ export function YoutubeTool() {
       )}
 
       <Card>
-        <CardContent className="flex items-center gap-4 pt-6">
-          <Button variant="outline" size="icon" asChild>
-            <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
-              <Instagram className="h-5 w-5" />
-            </a>
-          </Button>
-          <Button variant="outline" size="icon" asChild>
-            <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
-              <Youtube className="h-5 w-5" />
-            </a>
-          </Button>
+        <CardContent className="flex flex-col items-center gap-4 pt-6">
+            <p className="text-sm font-medium text-muted-foreground">Subscribe</p>
+            <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" asChild>
+                    <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-5 w-5" />
+                    </a>
+                </Button>
+                <Button variant="outline" size="icon" asChild>
+                    <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
+                    <Youtube className="h-5 w-5" />
+                    </a>
+                </Button>
+            </div>
         </CardContent>
       </Card>
     </div>
