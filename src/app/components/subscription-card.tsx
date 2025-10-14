@@ -35,7 +35,7 @@ export function SubscriptionCard() {
                         <span className="text-lg text-muted-foreground line-through">{t.originalPrice}</span>
                         <span className="text-muted-foreground">{t.duration}</span>
                     </div>
-                    <Button size="lg" className="w-full">
+                    <Button size="lg" variant="destructive" className="w-full">
                         {t.buttonSubscribe}
                     </Button>
                 </div>
