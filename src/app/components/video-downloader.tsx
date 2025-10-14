@@ -188,25 +188,6 @@ function AdvancedEditDialog({
 
   const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
 
-  useEffect(() => {
-    if (!thumbnail || !isOpen) return;
-
-    const canvas = previewCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx) return;
-
-    const img = new window.Image();
-    img.crossOrigin = 'anonymous';
-    img.src = thumbnail;
-    img.onload = () => {
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-
-        ctx.filter = filters;
-        ctx.drawImage(img, 0, 0);
-    };
-  }, [thumbnail, filters, isOpen]);
-
   const resetFilters = () => {
     setBrightness(100);
     setContrast(100);
@@ -234,7 +215,17 @@ function AdvancedEditDialog({
         <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1">
                 <div className="relative mx-auto w-full max-w-lg aspect-video bg-muted/20 rounded-lg overflow-hidden border">
-                    <canvas ref={previewCanvasRef} className="absolute top-0 left-0 w-full h-full object-contain" />
+                    {thumbnail && (
+                      <Image
+                        src={thumbnail}
+                        alt="Thumbnail preview"
+                        layout="fill"
+                        objectFit="contain"
+                        className="absolute top-0 left-0 w-full h-full"
+                        style={{ filter: filters }}
+                        unoptimized
+                      />
+                    )}
                 </div>
             </div>
             <div className="w-full md:w-64 space-y-6">
@@ -268,10 +259,6 @@ function AdvancedEditDialog({
                 </div>
             </div>
         </div>
-        <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </DialogClose>
       </DialogContent>
     </Dialog>
   );
@@ -642,6 +629,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
+
+    
 
     
 
