@@ -180,6 +180,7 @@ function AdvancedEditDialog({
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturate, setSaturate] = useState(100);
+  const [sepia, setSepia] = useState(0);
   const [grayscale, setGrayscale] = useState(0);
   const [invert, setInvert] = useState(0);
   const [sharpen, setSharpen] = useState(0);
@@ -191,6 +192,7 @@ function AdvancedEditDialog({
     brightness(${brightness + (sharpen * 0.1) + (clear * 0.05)}%) 
     contrast(${contrast + (sharpen * 0.25) - (smooth * 0.1)}%) 
     saturate(${saturate + (clear * 0.1)}%) 
+    sepia(${sepia}%) 
     grayscale(${grayscale}%) 
     invert(${invert}%)
   `;
@@ -199,6 +201,7 @@ function AdvancedEditDialog({
     setBrightness(100);
     setContrast(100);
     setSaturate(100);
+    setSepia(0);
     setGrayscale(0);
     setInvert(0);
     setSharpen(0);
@@ -214,15 +217,15 @@ function AdvancedEditDialog({
           Customize
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl p-4 md:p-6 grid grid-rows-[auto_minmax(0,1fr)_auto] max-h-[90vh]">
+      <DialogContent className="sm:max-w-4xl p-6">
         <DialogHeader>
           <DialogTitle>Customize Thumbnail</DialogTitle>
           <DialogDescription>
             Apply filters to your image.
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8 overflow-hidden">
-            <div className="flex-1 flex items-center justify-center bg-muted/20 rounded-lg overflow-hidden border">
+        <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex-1 flex items-center justify-center bg-muted/20 p-4 rounded-lg">
                 <div className="relative w-full max-w-lg aspect-video">
                     {thumbnail && (
                       <Image
@@ -236,43 +239,46 @@ function AdvancedEditDialog({
                     )}
                 </div>
             </div>
-            <div className="w-full md:w-64 flex flex-col">
-                <h3 className="font-semibold mb-2 shrink-0">Filters</h3>
-                <div className="space-y-4 overflow-y-auto pr-2 flex-1">
-                    <div className="space-y-2">
-                        <Label className="text-xs">Sharpen ({sharpen}%)</Label>
-                        <Slider value={[sharpen]} onValueChange={(v) => setSharpen(v[0])} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs">Clear ({clear}%)</Label>
-                        <Slider value={[clear]} onValueChange={(v) => setClear(v[0])} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs">Smooth ({smooth}%)</Label>
-                        <Slider value={[smooth]} onValueChange={(v) => setSmooth(v[0])} max={100} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs">Brightness ({brightness}%)</Label>
-                        <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs">Contrast ({contrast}%)</Label>
-                        <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-xs">Saturation ({saturate}%)</Label>
-                        <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label className="text-xs">Grayscale ({grayscale}%)</Label>
-                        <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label className="text-xs">Invert ({invert}%)</Label>
-                        <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
-                    </div>
+            <div className="w-full md:w-64 space-y-4">
+                <h3 className="font-semibold">Filters</h3>
+                <div className="space-y-2">
+                    <Label className="text-xs">Sharpen ({sharpen}%)</Label>
+                    <Slider value={[sharpen]} onValueChange={(v) => setSharpen(v[0])} max={100} step={1} />
                 </div>
-                <div className="flex gap-2 mt-4 shrink-0">
+                <div className="space-y-2">
+                    <Label className="text-xs">Clear ({clear}%)</Label>
+                    <Slider value={[clear]} onValueChange={(v) => setClear(v[0])} max={100} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label className="text-xs">Smooth ({smooth}%)</Label>
+                    <Slider value={[smooth]} onValueChange={(v) => setSmooth(v[0])} max={100} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label className="text-xs">Brightness ({brightness}%)</Label>
+                    <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label className="text-xs">Contrast ({contrast}%)</Label>
+                    <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label className="text-xs">Saturation ({saturate}%)</Label>
+                    <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
+                </div>
+                 <div className="space-y-2">
+                    <Label className="text-xs">Sepia ({sepia}%)</Label>
+                    <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
+                </div>
+                 <div className="space-y-2">
+                    <Label className="text-xs">Grayscale ({grayscale}%)</Label>
+                    <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
+                </div>
+                 <div className="space-y-2">
+                    <Label className="text-xs">Invert ({invert}%)</Label>
+                    <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
+                </div>
+
+                <div className="flex gap-2 pt-2">
                     <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">Reset Filters</Button>
                     <Button size="sm" onClick={() => { if (thumbnail) { onDownload(thumbnail, filters); setIsOpen(false); } }} className="w-full">
                         <Download className="mr-2 h-4 w-4" />
@@ -655,4 +661,5 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
