@@ -218,7 +218,6 @@ export function Header() {
     <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
       <div className="w-full flex items-center justify-between">
         <div className="flex-1">
-         {!isUserLoading && (
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <MenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -236,7 +235,6 @@ export function Header() {
               <MenuContent closeMenu={() => setIsMenuOpen(false)} />
             </MenuContentContainer>
           </MenuContainer>
-          )}
         </div>
         <div className="flex flex-1 justify-center">
           <div className="relative rounded-full bg-primary p-2 shadow-lg">
