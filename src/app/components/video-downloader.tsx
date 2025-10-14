@@ -81,6 +81,11 @@ export function YoutubeDownloaderInput() {
     const isSubscribed = subscription?.active === true;
   
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      
       if (!isSubscribed) {
         setClickCount(prev => prev + 1);
         setShowAd(true);
