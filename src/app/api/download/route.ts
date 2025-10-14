@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (!format) {
-      return NextResponse.json({ error: 'Could not find a suitable format. The video may be region-locked or private.' }, { status: 400 });
+      return NextResponse.json({ error: 'Could not find a suitable format.' }, { status: 400 });
     }
     
     const videoStream = ytdl(url, { format });
@@ -71,6 +71,6 @@ export async function GET(req: NextRequest) {
 
   } catch (error: any) {
     console.error('ytdl error:', error);
-    return NextResponse.json({ error: 'Failed to fetch video information. The video may be private, age-restricted, region-locked, or deleted.' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not process video. Please try another one.' }, { status: 500 });
   }
 }

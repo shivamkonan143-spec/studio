@@ -91,8 +91,8 @@ export function VideoDownloader() {
       const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}&type=${downloadType}`);
   
       if (!response.ok || !response.body) {
-        const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred during download.' }));
-        throw new Error(errorData.error || 'Failed to start download. The video might be private or restricted.');
+        const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred.' }));
+        throw new Error(errorData.error || 'Failed to start download.');
       }
   
       const contentDisposition = response.headers.get('Content-Disposition');
@@ -143,7 +143,7 @@ export function VideoDownloader() {
       toast({
         variant: 'destructive',
         title: 'Download Failed',
-        description: error.message || 'Could not download the file. Please try another video.',
+        description: 'Could not download the file. Please try another video or quality.',
       });
       handleReset();
     }
