@@ -233,7 +233,7 @@ function AdvancedEditDialog({
                       <Image
                         src={thumbnail}
                         alt="Thumbnail preview"
-                        layout="fill"
+                        fill
                         objectFit="cover"
                         className="absolute top-0 left-0"
                         style={{ filter: filters }}
@@ -244,12 +244,13 @@ function AdvancedEditDialog({
             </div>
             <div className="w-full md:w-64 space-y-6">
                 <div>
-                    <h3 className="font-semibold mb-2">Filters</h3>
+                    <h3 className="font-semibold mb-2">Presets</h3>
                      <div className="grid grid-cols-3 gap-2 mb-4">
                         <Button variant="outline" size="sm" onClick={() => applyPreset('sharpen')}>Sharpen</Button>
                         <Button variant="outline" size="sm" onClick={() => applyPreset('clear')}>Clear</Button>
                         <Button variant="outline" size="sm" onClick={() => applyPreset('smooth')}>Smooth</Button>
                     </div>
+                    <h3 className="font-semibold mb-2">Filters</h3>
                     <div className="space-y-3">
                         <div className="space-y-2">
                             <Label className="text-xs">Brightness ({brightness}%)</Label>
@@ -266,6 +267,14 @@ function AdvancedEditDialog({
                         <div className="space-y-2">
                             <Label className="text-xs">Sepia ({sepia}%)</Label>
                             <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label className="text-xs">Grayscale ({grayscale}%)</Label>
+                            <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
+                        </div>
+                         <div className="space-y-2">
+                            <Label className="text-xs">Invert ({invert}%)</Label>
+                            <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
                         </div>
                     </div>
                     <div className="flex gap-2 mt-4">
@@ -650,5 +659,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
 }
 
 
+
+    
 
     
