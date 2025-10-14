@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormMessage, FormItem } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -217,7 +217,7 @@ export function YoutubeTool() {
             {thumbnailUrl ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
+                  <div className="relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border aspect-video">
                     <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" className="mx-auto"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
@@ -261,9 +261,8 @@ export function YoutubeTool() {
                         <SelectValue placeholder="Select quality" />
                     </SelectTrigger>
                     <SelectContent>
-                        {(Object.keys(qualityLabels) as ThumbnailQuality[]).map((key) => (
-                            <SelectItem key={key} value={key}>{qualityLabels[key]}</SelectItem>
-                        ))}
+                        <SelectItem key="maxresdefault" value="maxresdefault">High</SelectItem>
+                        <SelectItem key="hqdefault" value="hqdefault">High (360p)</SelectItem>
                     </SelectContent>
                 </Select>
               </div>
