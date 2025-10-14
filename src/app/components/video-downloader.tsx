@@ -171,11 +171,9 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
 function AdvancedEditDialog({
   thumbnail,
   onDownload,
-  onCropAndDownload
 }: {
   thumbnail: string | null;
   onDownload: (url: string, filters?: React.CSSProperties['filter']) => void;
-  onCropAndDownload: (url: string, aspect: number) => void;
 }) {
   // Filter states
   const [brightness, setBrightness] = useState(100);
@@ -185,8 +183,6 @@ function AdvancedEditDialog({
   const [grayscale, setGrayscale] = useState(0);
   const [invert, setInvert] = useState(0);
 
-  // Crop states
-  const [cropAspect, setCropAspect] = useState<number | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
@@ -202,35 +198,13 @@ function AdvancedEditDialog({
     img.crossOrigin = 'anonymous';
     img.src = thumbnail;
     img.onload = () => {
-        let { width: w, height: h, sx, sy } = getCropDimensions(img.width, img.height, cropAspect);
-        canvas.width = w;
-        canvas.height = h;
+        canvas.width = img.width;
+        canvas.height = img.height;
 
         ctx.filter = filters;
-        ctx.drawImage(img, sx, sy, w, h, 0, 0, w, h);
+        ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
     };
-  }, [thumbnail, filters, cropAspect]);
-
-  const getCropDimensions = (imgWidth: number, imgHeight: number, aspect: number | null) => {
-    if (aspect === null) {
-      return { width: imgWidth, height: imgHeight, sx: 0, sy: 0 };
-    }
-
-    const imgAspect = imgWidth / imgHeight;
-    let width = imgWidth;
-    let height = imgHeight;
-    let sx = 0;
-    let sy = 0;
-
-    if (imgAspect > aspect) { // Image is wider than target
-      width = imgHeight * aspect;
-      sx = (imgWidth - width) / 2;
-    } else { // Image is taller than or equal to target
-      height = imgWidth / aspect;
-      sy = (imgHeight - height) / 2;
-    }
-    return { width, height, sx, sy };
-  }
+  }, [thumbnail, filters]);
 
   const resetFilters = () => {
     setBrightness(100);
@@ -241,12 +215,6 @@ function AdvancedEditDialog({
     setInvert(0);
   };
   
-  const handleDownloadCropped = () => {
-    if (thumbnail && cropAspect) {
-        onCropAndDownload(thumbnail, cropAspect);
-    }
-  };
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -259,7 +227,7 @@ function AdvancedEditDialog({
         <DialogHeader>
           <DialogTitle>Customize Thumbnail</DialogTitle>
           <DialogDescription>
-            Apply filters or crop your image.
+            Apply filters to your image.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col md:flex-row gap-8">
@@ -297,23 +265,6 @@ function AdvancedEditDialog({
                         </Button>
                     </div>
                 </div>
-                <div>
-                    <h3 className="font-semibold mb-2">Crop</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                        <Button variant={cropAspect === 16/9 ? 'secondary' : 'outline'} onClick={() => setCropAspect(16/9)}>16:9</Button>
-                        <Button variant={cropAspect === 9/16 ? 'secondary' : 'outline'} onClick={() => setCropAspect(9/16)}>9:16</Button>
-                        <Button variant={cropAspect === 1/1 ? 'secondary' : 'outline'} onClick={() => setCropAspect(1/1)}>1:1</Button>
-                    </div>
-                    <Button 
-                        onClick={handleDownloadCropped}
-                        disabled={!cropAspect}
-                        className="w-full mt-4"
-                    >
-                        <Crop className="mr-2 h-4 w-4" />
-                        Download Cropped Image
-                    </Button>
-                     <Button variant="link" size="sm" onClick={() => setCropAspect(null)}>Remove Crop</Button>
-                </div>
             </div>
         </div>
       </DialogContent>
@@ -326,7 +277,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isTitleLoading, setIsTitleLoading] = useState(true);
-  const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
+  const [quality, setQuality] = useState<ThumbnailQuality>('hqdefault');
   const { locale } = useLanguage();
   const t = translations[locale];
   const { user } = useUser();
@@ -353,7 +304,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
         previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    const initialQuality = 'maxresdefault';
+    const initialQuality = 'hqdefault';
     setQuality(initialQuality);
     updateThumbnailUrl(videoId, initialQuality);
     
@@ -633,7 +584,6 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               <AdvancedEditDialog
                   thumbnail={thumbnailUrl}
                   onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail_${new Date().getTime()}.png`)}
-                  onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail_${new Date().getTime()}.jpg`, aspect)}
               />
           </div>
           
@@ -687,6 +637,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
+
+    
 
     
 
