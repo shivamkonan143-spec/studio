@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy } from 'lucide-react';
+import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, MessageSquare, UserPlus } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,11 +20,14 @@ import {
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLanguage } from '@/app/context/language-context';
+import { translations } from '@/app/locales/translations';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { setTheme } = useTheme();
+  const { locale, changeLocale } = useLanguage();
 
   const handleLogout = async () => {
     if (auth) {
@@ -87,10 +90,10 @@ export function Header() {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => changeLocale('en')}>
                         <span>English</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => changeLocale('hi')}>
                         <span>Hindi</span>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -125,7 +128,7 @@ export function Header() {
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/signup">
-                          <UserIcon className="mr-2 h-4 w-4" />
+                          <UserPlus className="mr-2 h-4 w-4" />
                           <span>Register</span>
                         </Link>
                       </DropdownMenuItem>
@@ -174,7 +177,7 @@ export function Header() {
         </div>
       </div>
       <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-        Thumbnail Downloader
+        {translations[locale].title}
       </h1>
     </header>
   );

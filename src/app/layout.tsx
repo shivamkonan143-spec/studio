@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/app/components/theme-provider';
+import { LanguageProvider } from '@/app/context/language-context';
 
 export const metadata: Metadata = {
   title: 'Thumbnail Downloader',
@@ -32,8 +33,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <FirebaseClientProvider>
-            {children}
-            <Toaster />
+            <LanguageProvider>
+              {children}
+              <Toaster />
+            </LanguageProvider>
           </FirebaseClientProvider>
         </ThemeProvider>
       </body>
