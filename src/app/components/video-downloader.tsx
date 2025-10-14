@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -19,8 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
-import { editThumbnail } from '@/ai/flows/edit-thumbnail-flow';
-import { Textarea } from '@/components/ui/textarea';
+import { Slider } from "@/components/ui/slider"
 
 
 const formSchema = z.object({
@@ -55,87 +54,94 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
   return { id: null, isShort: false };
 }
 
-function AiEditDialog({ thumbnail, onDownload }: { thumbnail: string | null, onDownload: (url: string) => void }) {
-    const [prompt, setPrompt] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [editedThumbnail, setEditedThumbnail] = useState<string | null>(null);
-    const { toast } = useToast();
-
-    const handleGenerate = async () => {
-        if (!prompt || !thumbnail) return;
-        setIsGenerating(true);
-        setEditedThumbnail(null);
-        try {
-            const result = await editThumbnail({ image: thumbnail, prompt });
-            if (result.editedImage) {
-                setEditedThumbnail(result.editedImage);
-            } else {
-                throw new Error("AI did not return an image.");
-            }
-        } catch (error) {
-            console.error("AI editing failed:", error);
-            toast({
-                variant: 'destructive',
-                title: "Editing Failed",
-                description: "The AI could not process your request. Please try a different prompt.",
-            });
-        } finally {
-            setIsGenerating(false);
-        }
+function ManualEditDialog({
+    thumbnail,
+    onDownload,
+  }: {
+    thumbnail: string | null;
+    onDownload: (url: string, filters: React.CSSProperties['filter']) => void;
+  }) {
+    const [brightness, setBrightness] = useState(100);
+    const [contrast, setContrast] = useState(100);
+    const [saturate, setSaturate] = useState(100);
+    const [sepia, setSepia] = useState(0);
+    const [grayscale, setGrayscale] = useState(0);
+    const [invert, setInvert] = useState(0);
+  
+    const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
+  
+    const resetFilters = () => {
+      setBrightness(100);
+      setContrast(100);
+      setSaturate(100);
+      setSepia(0);
+      setGrayscale(0);
+      setInvert(0);
     };
-
+  
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Edit with AI
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                    <DialogTitle>Edit Thumbnail with AI</DialogTitle>
-                    <DialogDescription>
-                        Describe the changes you want to make to the thumbnail. For example, "make it more vibrant" or "add the text 'New Video!' at the bottom".
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                        {isGenerating && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-                                <Loader2 className="h-8 w-8 animate-spin text-white" />
-                            </div>
-                        )}
-                        <Image
-                            src={editedThumbnail || thumbnail || ''}
-                            alt="Thumbnail"
-                            layout="fill"
-                            objectFit="contain"
-                        />
-                    </div>
-                    <Textarea
-                        placeholder="e.g., increase brightness, add a red border, crop to a square"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        disabled={isGenerating}
-                    />
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Customize
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Thumbnail</DialogTitle>
+            <DialogDescription>
+              Adjust the sliders to change the appearance of the thumbnail.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+              <Image
+                src={thumbnail || ''}
+                alt="Thumbnail"
+                layout="fill"
+                objectFit="contain"
+                style={{ filter: filters }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Brightness ({brightness}%)</Label>
+                    <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
                 </div>
-                <DialogFooter>
-                    {editedThumbnail && (
-                         <Button onClick={() => onDownload(editedThumbnail)}>
-                            <Download className="mr-2 h-4 w-4" />
-                            Download Edited
-                        </Button>
-                    )}
-                    <Button onClick={handleGenerate} disabled={isGenerating || !prompt}>
-                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Generate
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                <div className="space-y-2">
+                    <Label>Contrast ({contrast}%)</Label>
+                    <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label>Saturation ({saturate}%)</Label>
+                    <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label>Sepia ({sepia}%)</Label>
+                    <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label>Grayscale ({grayscale}%)</Label>
+                    <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
+                </div>
+                <div className="space-y-2">
+                    <Label>Invert ({invert}%)</Label>
+                    <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
+                </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={resetFilters}>Reset</Button>
+            <Button onClick={() => thumbnail && onDownload(thumbnail, filters)}>
+              <Download className="mr-2 h-4 w-4" />
+              Download Edited
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     );
-}
+  }
 
 export function YoutubeTool() {
   const [step, setStep] = useState<Step>('input');
@@ -220,29 +226,34 @@ export function YoutubeTool() {
     window.URL.revokeObjectURL(downloadUrl);
   }
 
-    const downloadImageFromUrl = async (url: string, fileName: string) => {
-        try {
-            // For data URIs, we need to convert them to a blob first
-            if (url.startsWith('data:')) {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                triggerDownload(blob, fileName);
-            } else {
-                // For regular URLs, fetch and create a blob
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Network response was not ok.');
-                const blob = await response.blob();
+  const downloadEditedImage = (imageUrl: string, filters: React.CSSProperties['filter'], fileName: string) => {
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageUrl;
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.filter = filters || '';
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob((blob) => {
+            if (blob) {
                 triggerDownload(blob, fileName);
             }
-        } catch (error) {
-            console.error('Download error:', error);
-            toast({
-                variant: 'destructive',
-                title: "Download Failed",
-                description: "Could not download the edited image.",
-            });
-        }
+        }, 'image/png');
     };
+    img.onerror = () => {
+        toast({
+            variant: 'destructive',
+            title: "Download Failed",
+            description: "Could not download the edited image.",
+        });
+    };
+  };
 
   const cropAndDownloadImage = (imageUrl: string, fileName: string) => {
     const img = new window.Image();
@@ -481,7 +492,10 @@ export function YoutubeTool() {
                 </Select>
               </div>
                <div className="space-y-2 self-end grid grid-cols-2 gap-2">
-                    <AiEditDialog thumbnail={thumbnailUrl} onDownload={(url) => downloadImageFromUrl(url, `${videoId}_edited_thumbnail.png`)} />
+                    <ManualEditDialog
+                        thumbnail={thumbnailUrl}
+                        onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_edited_thumbnail.png`)}
+                    />
                     <Button onClick={handleDownloadThumbnail}>
                         <Download className="mr-2 h-4 w-4" />
                         {t.videoDownloader.downloadThumbnail}
