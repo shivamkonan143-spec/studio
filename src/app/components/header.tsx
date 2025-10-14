@@ -15,6 +15,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -208,7 +209,7 @@ export function Header() {
 
   return (
     <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
-      <div className="flex w-full items-center justify-between">
+      <div className="w-full flex items-center justify-between">
         <div className="flex-1">
          {!isUserLoading && (
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -231,7 +232,7 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative -translate-x-1 -translate-y-1 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2 shadow-lg">
+          <div className="relative rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2 shadow-lg">
              <Download className="h-6 w-6 text-white"/>
           </div>
         </div>
@@ -267,13 +268,9 @@ export function Header() {
            )}
         </div>
       </div>
-      <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl font-headline">
         {t.title}
       </h1>
     </header>
   );
 }
-
-    
-
-    
