@@ -159,7 +159,7 @@ export function YoutubeTool() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Youtube className="h-5 w-5" />
+            <ImageIcon className="h-5 w-5" />
             <span>Enter YouTube Video URL</span>
           </CardTitle>
           <CardDescription>Paste the URL of the YouTube video to download its thumbnail.</CardDescription>
@@ -203,7 +203,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
+                    <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" 
                       onError={() => {
                         // If maxres fails, fall back to hq
                         if (quality === 'maxresdefault' && videoId) {
@@ -224,7 +224,7 @@ export function YoutubeTool() {
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
                   <div className="relative aspect-video w-full">
-                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" />
+                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" fill objectFit="contain" />
                   </div>
                 </DialogContent>
               </Dialog>
