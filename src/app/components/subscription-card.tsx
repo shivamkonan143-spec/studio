@@ -14,8 +14,15 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 
-type PaymentMethod = 'upi' | 'card' | 'netbanking';
+type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
+
+interface PaymentMethod {
+    type: PaymentMethodType;
+    upiId?: string;
+}
+
 
 export function SubscriptionCard() {
     const { locale } = useLanguage();
@@ -30,7 +37,7 @@ export function SubscriptionCard() {
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi' });
     const [isProcessing, setIsProcessing] = useState(false);
 
     const handleSubscribeClick = () => {
@@ -50,6 +57,14 @@ export function SubscriptionCard() {
     };
     
     const handlePayNow = () => {
+        if (paymentMethod.type === 'upi' && !paymentMethod.upiId) {
+            toast({
+                variant: 'destructive',
+                title: t.common.error,
+                description: t.payment.upiIdRequired,
+            });
+            return;
+        }
         setStep(3);
     };
 
@@ -65,7 +80,8 @@ export function SubscriptionCard() {
                 active: true,
                 subscribedAt: serverTimestamp(),
                 expiresAt: expiresAt,
-                paymentMethod: paymentMethod,
+                paymentMethod: paymentMethod.type,
+                ...(paymentMethod.type === 'upi' && { upiId: paymentMethod.upiId })
             }, { merge: true });
 
             toast({
@@ -116,10 +132,29 @@ export function SubscriptionCard() {
                         <DialogTitle>{t.subscription.dialogPaymentTitle}</DialogTitle>
                     </DialogHeader>
                     <div className="py-4 space-y-4">
-                        <RadioGroup defaultValue={paymentMethod} onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}>
+                        <RadioGroup 
+                            value={paymentMethod.type} 
+                            onValueChange={(value: PaymentMethodType) => setPaymentMethod({ type: value, upiId: '' })}
+                        >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="upi" id="upi" />
                                 <Label htmlFor="upi">{t.payment.upi}</Label>
+                            </div>
+                            {paymentMethod.type === 'upi' && (
+                                <div className="pl-6 pt-2 pb-2">
+                                    <Label htmlFor="upiId" className="text-xs text-muted-foreground">{t.payment.upiId}</Label>
+                                    <Input 
+                                        id="upiId" 
+                                        placeholder={t.payment.upiIdPlaceholder}
+                                        value={paymentMethod.upiId}
+                                        onChange={(e) => setPaymentMethod({...paymentMethod, upiId: e.target.value})}
+                                        className="mt-1"
+                                    />
+                                </div>
+                            )}
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="phonepe" id="phonepe" />
+                                <Label htmlFor="phonepe">{t.payment.phonepe}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="card" id="card" />

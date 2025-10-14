@@ -68,7 +68,11 @@
     "payment": {
         "upi": "UPI",
         "card": "Credit/Debit Card",
-        "netbanking": "Net Banking"
+        "netbanking": "Net Banking",
+        "phonepe": "PhonePe",
+        "upiId": "UPI ID",
+        "upiIdPlaceholder": "Enter your UPI ID",
+        "upiIdRequired": "Please enter your UPI ID."
     },
     "login": {
         "title": "Log In",

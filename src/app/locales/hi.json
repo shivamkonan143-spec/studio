@@ -68,7 +68,11 @@
     "payment": {
         "upi": "UPI",
         "card": "क्रेडिट/डेबिट कार्ड",
-        "netbanking": "नेट बैंकिंग"
+        "netbanking": "नेट बैंकिंग",
+        "phonepe": "PhonePe",
+        "upiId": "UPI ID",
+        "upiIdPlaceholder": "अपनी UPI ID दर्ज करें",
+        "upiIdRequired": "कृपया अपनी UPI ID दर्ज करें।"
     },
     "login": {
         "title": "लॉग इन करें",
