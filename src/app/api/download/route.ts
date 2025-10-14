@@ -28,36 +28,41 @@ export async function GET(req: NextRequest) {
       fileExtension = 'mp3';
       mimeType = 'audio/mpeg';
     } else {
-      // Video download logic
       let videoFormats = ytdl.filterFormats(info.formats, (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo);
+      
+      if (videoFormats.length === 0) {
+        // Fallback to formats with video but maybe not audio
+        videoFormats = ytdl.filterFormats(info.formats, 'video');
+      }
 
-      format = ytdl.chooseFormat(videoFormats, {
-        quality: quality,
-      });
-
-      // Fallback to highest quality if the selected quality is not available with audio
+      format = ytdl.chooseFormat(videoFormats, { quality: quality });
+      
       if (!format) {
-        format = ytdl.chooseFormat(videoFormats, {
-            quality: 'highest',
-        });
+        format = ytdl.chooseFormat(videoFormats, { quality: 'highest' });
       }
       
       fileExtension = 'mp4';
       mimeType = 'video/mp4';
     }
 
-
     if (!format) {
       return NextResponse.json({ error: 'Could not find a suitable format for this video.' }, { status: 400 });
     }
-
+    
     const videoStream = ytdl(url, { format });
     const passthrough = new PassThrough();
+    
+    let contentLength = '0';
+    if(format.contentLength) {
+        contentLength = format.contentLength;
+    }
+
     videoStream.pipe(passthrough);
 
     const headers = new Headers();
     headers.set('Content-Type', mimeType);
     headers.set('Content-Disposition', `attachment; filename="${title}.${fileExtension}"`);
+    headers.set('Content-Length', contentLength);
 
     return new NextResponse(passthrough as any, {
       status: 200,
@@ -69,3 +74,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch video information. The video may be private, region-locked, or deleted.' }, { status: 500 });
   }
 }
+
+    

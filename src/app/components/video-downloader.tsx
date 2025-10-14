@@ -81,20 +81,20 @@ export function VideoDownloader() {
       toast({ variant: 'destructive', title: 'Selection Required', description: `Please select a ${downloadType} quality.` });
       return;
     }
-    
+  
     setStep('downloading');
     setDownloadProgress(0);
-
+  
     const url = form.getValues('url');
-
+  
     try {
       const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}&type=${downloadType}`);
-
-      if (!response.ok) {
-        const errorData = await response.json();
+  
+      if (!response.ok || !response.body) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to start download.' }));
         throw new Error(errorData.error || 'Failed to start download.');
       }
-      
+  
       const contentDisposition = response.headers.get('Content-Disposition');
       let filename = downloadType === 'video' ? 'video.mp4' : 'audio.mp3';
       if (contentDisposition) {
@@ -104,22 +104,39 @@ export function VideoDownloader() {
         }
       }
       
-      const blob = await response.blob();
+      const contentLength = response.headers.get('Content-Length');
+      const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+      let loadedSize = 0;
+  
+      const reader = response.body.getReader();
+      const chunks: Uint8Array[] = [];
+  
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        chunks.push(value);
+        loadedSize += value.length;
+        if (totalSize > 0) {
+          const progress = (loadedSize / totalSize) * 100;
+          setDownloadProgress(progress);
+        }
+      }
+  
+      const blob = new Blob(chunks);
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
       a.download = filename;
       document.body.appendChild(a);
-      a.click();
+a.click();
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
-      
-      setDownloadProgress(50);
-      setTimeout(() => {
-        setDownloadProgress(100);
-        setStep('complete');
-      }, 500);
-
+  
+      setDownloadProgress(100);
+      setStep('complete');
+  
     } catch (error: any) {
       console.error('Download error:', error);
       toast({
@@ -266,3 +283,5 @@ export function VideoDownloader() {
     </div>
   );
 }
+
+    
