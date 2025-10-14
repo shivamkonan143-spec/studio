@@ -535,5 +535,3 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
-
-    

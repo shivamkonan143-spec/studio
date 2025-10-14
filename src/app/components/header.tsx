@@ -233,7 +233,7 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative rounded-lg bg-red-500 p-2 shadow-lg">
+          <div className="relative rounded-lg bg-primary p-2 shadow-lg">
              <Youtube className="h-6 w-6 text-white"/>
           </div>
         </div>
@@ -275,5 +275,3 @@ export function Header() {
     </header>
   );
 }
-
-    
