@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Youtube } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Youtube, Home } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -95,6 +95,12 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 
   return (
       <div className="flex flex-col gap-1 p-2">
+        <Button variant="ghost" asChild className="w-full justify-start">
+          <Link href="/" onClick={() => closeMenu?.()}>
+            <Home className="mr-2 h-4 w-4" />
+            <span>{t.header.home}</span>
+          </Link>
+        </Button>
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-start">
@@ -233,7 +239,7 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative rounded-lg bg-primary p-2 shadow-lg">
+          <div className="relative rounded-full bg-primary p-2 shadow-lg">
              <Youtube className="h-6 w-6 text-white"/>
           </div>
         </div>
@@ -275,3 +281,5 @@ export function Header() {
     </header>
   );
 }
+
+    

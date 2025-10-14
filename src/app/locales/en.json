@@ -3,6 +3,7 @@
     "title": "Thumbnail Downloader",
     "header": {
         "menu": "Menu",
+        "home": "Home",
         "theme": "Theme",
         "light": "Light",
         "dark": "Dark",
