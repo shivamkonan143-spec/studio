@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuPortal,
-  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -90,84 +89,92 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col gap-1 p-2">
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>
-          <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span>{t.header.theme}</span>
-        </DropdownMenuSubTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem onClick={() => { setTheme('light'); closeMenu?.(); }}>
-              <Sun className="mr-2 h-4 w-4" />
-              <span>{t.header.light}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => { setTheme('dark'); closeMenu?.(); }}>
-              <Moon className="mr-2 h-4 w-4" />
-              <span>{t.header.dark}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => { setTheme('system'); closeMenu?.(); }}>
-              <Laptop className="mr-2 h-4 w-4" />
-              <span>{t.header.system}</span>
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuPortal>
-      </DropdownMenuSub>
+      <DropdownMenu>
+        {/* We need a trigger, but we'll control the open state from the parent Dialog/Sheet.
+            This trigger can be a dummy element that is not displayed. */}
+        <DropdownMenuTrigger asChild>
+          <button className="hidden" />
+        </DropdownMenuTrigger>
+        {/* The DropdownMenuContent is what we want to render inside the Dialog/Sheet */}
+        <DropdownMenuContent className="w-full border-none shadow-none p-2">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span>{t.header.theme}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => { setTheme('light'); closeMenu?.(); }}>
+                    <Sun className="mr-2 h-4 w-4" />
+                    <span>{t.header.light}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setTheme('dark'); closeMenu?.(); }}>
+                    <Moon className="mr-2 h-4 w-4" />
+                    <span>{t.header.dark}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setTheme('system'); closeMenu?.(); }}>
+                    <Laptop className="mr-2 h-4 w-4" />
+                    <span>{t.header.system}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
 
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>
-          <Languages className="mr-2 h-4 w-4" />
-          <span>{t.header.language}</span>
-        </DropdownMenuSubTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuSubContent>
-            <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
-              <span>{t.header.english}</span>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Languages className="mr-2 h-4 w-4" />
+                <span>{t.header.language}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                    <span>{t.header.english}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>
+                    <span>{t.header.hindi}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+
+            <DropdownMenuItem onClick={handleShare}>
+              <Share2 className="mr-2 h-4 w-4" />
+              <span>{t.header.shareApp}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>
-              <span>{t.header.hindi}</span>
+
+            <DropdownMenuItem asChild>
+              <a href={mailtoHref} onClick={() => closeMenu?.()}>
+                <LifeBuoy className="mr-2 h-4 w-4" />
+                <span>{t.header.helpAndSupport}</span>
+              </a>
             </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuPortal>
-      </DropdownMenuSub>
 
-      <DropdownMenuItem onClick={handleShare}>
-        <Share2 className="mr-2 h-4 w-4" />
-        <span>{t.header.shareApp}</span>
-      </DropdownMenuItem>
+            <Separator className="my-1" />
 
-      <DropdownMenuItem asChild>
-        <a href={mailtoHref} onClick={() => closeMenu?.()}>
-          <LifeBuoy className="mr-2 h-4 w-4" />
-          <span>{t.header.helpAndSupport}</span>
-        </a>
-      </DropdownMenuItem>
-
-      <Separator className="my-1" />
-
-      {user ? (
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{t.header.logout}</span>
-          </DropdownMenuItem>
-      ) : (
-        <>
-          <DropdownMenuItem asChild>
-            <Link href="/login" onClick={() => closeMenu?.()}>
-              <LogIn className="mr-2 h-4 w-4" />
-              <span>{t.header.login}</span>
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/signup" onClick={() => closeMenu?.()}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              <span>{t.header.register}</span>
-            </Link>
-          </DropdownMenuItem>
-        </>
-      )}
-    </div>
+            {user ? (
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>{t.header.logout}</span>
+                </DropdownMenuItem>
+            ) : (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href="/login" onClick={() => closeMenu?.()}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    <span>{t.header.login}</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/signup" onClick={() => closeMenu?.()}>
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    <span>{t.header.register}</span>
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
+        </DropdownMenuContent>
+      </DropdownMenu>
   );
 }
 
@@ -212,11 +219,11 @@ export function Header() {
             </MenuTrigger>
             <MenuContentContainer
               side="left"
-              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-lg"}
+              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-lg p-0"}
             >
-              <MenuHeader>
-                  <MenuTitle className="p-4 pb-0">{t.header.menu}</MenuTitle>
-                  {!isMobile && <Separator />}
+              <MenuHeader className="p-4 pb-2">
+                  <MenuTitle>{t.header.menu}</MenuTitle>
+                  {!isMobile && <Separator className="mt-2" />}
               </MenuHeader>
               <MenuContent closeMenu={() => setIsMenuOpen(false)} />
             </MenuContentContainer>
@@ -266,5 +273,7 @@ export function Header() {
     </header>
   );
 }
+
+    
 
     
