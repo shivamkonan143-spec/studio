@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, Instagram, ArrowRight, X, Youtube } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,10 @@ const formSchema = z.object({
 
 type Step = 'input' | 'preview';
 type ThumbnailQuality = 'maxresdefault' | 'hqdefault';
+
+interface OembedResponse {
+    title: string;
+}
 
 function getYouTubeVideoId(url: string): string | null {
   try {
@@ -48,6 +52,7 @@ function getYouTubeVideoId(url: string): string | null {
 export function YoutubeTool() {
   const [step, setStep] = useState<Step>('input');
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [videoTitle, setVideoTitle] = useState<string>('');
   const [videoId, setVideoId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
@@ -74,12 +79,26 @@ export function YoutubeTool() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
+    setVideoTitle('');
     const extractedVideoId = getYouTubeVideoId(values.url);
+
     if (extractedVideoId) {
       setVideoId(extractedVideoId);
       const initialQuality = 'maxresdefault';
       setQuality(initialQuality);
       updateThumbnailUrl(extractedVideoId, initialQuality);
+      
+      try {
+        const oembedUrl = `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${extractedVideoId}&format=json`;
+        const response = await fetch(oembedUrl);
+        if(response.ok) {
+            const data: OembedResponse = await response.json();
+            setVideoTitle(data.title);
+        }
+      } catch (error) {
+        console.error("Failed to fetch video title", error);
+      }
+
       setStep('preview');
     } else {
       toast({
@@ -92,6 +111,13 @@ export function YoutubeTool() {
     }
     setIsGenerating(false);
   };
+  
+  const handleCopyTitle = () => {
+    navigator.clipboard.writeText(videoTitle);
+    toast({
+        title: t.videoDownloader.titleCopied,
+    });
+  }
 
   const handleDownloadThumbnail = async () => {
     if (!thumbnailUrl || !videoId) {
@@ -146,6 +172,7 @@ export function YoutubeTool() {
     setStep('input');
     setThumbnailUrl(null);
     setVideoId(null);
+    setVideoTitle('');
     setIsGenerating(false);
     form.reset();
   };
@@ -251,6 +278,19 @@ export function YoutubeTool() {
                 </div>
             )}
             
+            {videoTitle && (
+                <div className="space-y-2">
+                    <Label>{t.videoDownloader.videoTitle}</Label>
+                    <div className="relative">
+                        <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
+                        <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" onClick={handleCopyTitle}>
+                            <Clipboard className="h-4 w-4"/>
+                            <span className="sr-only">{t.videoDownloader.copyTitle}</span>
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             <div className="grid w-full gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
@@ -282,3 +322,5 @@ export function YoutubeTool() {
     </div>
   );
 }
+
+    
