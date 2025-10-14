@@ -91,8 +91,8 @@ export function VideoDownloader() {
       const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}&type=${downloadType}`);
   
       if (!response.ok || !response.body) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to start download.' }));
-        throw new Error(errorData.error || 'Failed to start download.');
+        const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred during download.' }));
+        throw new Error(errorData.error || 'Failed to start download. The video might be private or restricted.');
       }
   
       const contentDisposition = response.headers.get('Content-Disposition');
@@ -119,22 +119,23 @@ export function VideoDownloader() {
         chunks.push(value);
         loadedSize += value.length;
         if (totalSize > 0) {
-          const progress = (loadedSize / totalSize) * 100;
+          const progress = Math.min(100, (loadedSize / totalSize) * 100);
           setDownloadProgress(progress);
         }
       }
   
+      setDownloadProgress(100);
+
       const blob = new Blob(chunks);
       const downloadUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
       a.download = filename;
       document.body.appendChild(a);
-a.click();
+      a.click();
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
   
-      setDownloadProgress(100);
       setStep('complete');
   
     } catch (error: any) {
@@ -142,7 +143,7 @@ a.click();
       toast({
         variant: 'destructive',
         title: 'Download Failed',
-        description: error.message || 'Could not download the video. Please try again.',
+        description: error.message || 'Could not download the file. Please try another video.',
       });
       handleReset();
     }
@@ -283,5 +284,3 @@ a.click();
     </div>
   );
 }
-
-    
