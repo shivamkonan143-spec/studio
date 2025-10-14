@@ -12,11 +12,11 @@ export function SubscriptionCard() {
     const t = translations[locale].subscription;
 
     return (
-        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-gradient-to-br from-primary/10 via-transparent to-transparent">
+        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-gradient-to-br from-accent/10 via-transparent to-transparent">
             <CardHeader className="p-8 pb-4">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                        <Star className="w-6 h-6 text-primary" />
+                    <div className="p-2 bg-accent/10 rounded-lg">
+                        <Star className="w-6 h-6 text-accent" />
                     </div>
                     <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
                         {t.title}
