@@ -107,14 +107,6 @@ export default function ForgotPasswordPage() {
               </form>
             </Form>
           )}
-          {!isSubmitted && (
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              {t.forgotPassword.rememberPassword}{' '}
-              <Link href="/login" className="font-medium text-primary hover:underline">
-                {t.login.title}
-              </Link>
-            </p>
-          )}
         </CardContent>
       </Card>
     </main>

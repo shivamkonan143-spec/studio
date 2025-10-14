@@ -134,8 +134,7 @@
         "backToLogin": "Back to Log In",
         "checkEmailToast": "Check your email",
         "resetLinkSent": "A password reset link has been sent to {email}.",
-        "failedToast": "Reset Failed",
-        "rememberPassword": "Remember your password?"
+        "failedToast": "Reset Failed"
     },
     "ad": {
         "placeholder": "Advertisement"
