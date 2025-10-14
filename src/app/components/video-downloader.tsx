@@ -109,9 +109,10 @@ export function YoutubeDownloaderInput() {
     return (
         <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
             <CardContent className="p-8 pt-8 text-center">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">
-                    Enter <span className="text-primary">YouTube</span> video URL
+                <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
+                    {t.title}
                 </h2>
+                <p className="text-muted-foreground mb-6">{t.videoDownloader.pasteUrl}</p>
                 
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
