@@ -14,46 +14,90 @@ import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { setDocumentNonBlocking } from '@/firebase';
 
+type Subscription = {
+  active: boolean;
+  expiresAt: Timestamp | null;
+  subscribedAt: Timestamp;
+}
 
 export default function Home() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [paymentStep, setPaymentStep] = useState<'confirm' | 'methods'>('confirm');
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const userSubscriptionRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+  }, [firestore, user]);
 
   useEffect(() => {
-    const subscribed = localStorage.getItem('isSubscribed') === 'true';
-    const subscriptionDateStr = localStorage.getItem('subscriptionDate');
-    
-    if (subscribed && subscriptionDateStr) {
-      const subscriptionDate = new Date(subscriptionDateStr);
-      const expiryDate = addDays(subscriptionDate, 30);
-      
-      if (isBefore(new Date(), expiryDate)) {
-        setIsSubscribed(true);
-      } else {
-        // Subscription has expired
-        localStorage.removeItem('isSubscribed');
-        localStorage.removeItem('subscriptionDate');
-        setIsSubscribed(false);
-        toast({
-          title: 'Subscription Expired',
-          description: 'Your ad-free subscription has ended. Please subscribe again.',
-        });
-      }
-    } else {
+    if (!user || !userSubscriptionRef) {
       setIsSubscribed(false);
+      return;
     }
-  }, [toast]);
 
-  const handleSubscription = () => {
-    const now = new Date();
+    const checkSubscription = async () => {
+      try {
+        const docSnap = await getDoc(userSubscriptionRef);
+        if (docSnap.exists()) {
+          const subData = docSnap.data() as Subscription;
+          if (subData.active && subData.expiresAt) {
+            const expiryDate = subData.expiresAt.toDate();
+            if (isBefore(new Date(), expiryDate)) {
+              setIsSubscribed(true);
+            } else {
+              setIsSubscribed(false);
+              // Optionally update the status in Firestore
+              setDocumentNonBlocking(userSubscriptionRef, { active: false }, { merge: true });
+              toast({
+                title: 'Subscription Expired',
+                description: 'Your ad-free subscription has ended. Please subscribe again.',
+              });
+            }
+          } else {
+            setIsSubscribed(false);
+          }
+        } else {
+          setIsSubscribed(false);
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        setIsSubscribed(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user, userSubscriptionRef, toast]);
+
+  const handleSubscription = async () => {
+    if (!userSubscriptionRef) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to subscribe.",
+      });
+      return;
+    }
+
+    const expiryDate = addDays(new Date(), 30);
+    const subscriptionData = {
+      active: true,
+      subscribedAt: serverTimestamp(),
+      expiresAt: expiryDate,
+    };
+    
+    setDocumentNonBlocking(userSubscriptionRef, subscriptionData, { merge: true });
+
     setIsSubscribed(true);
-    localStorage.setItem('isSubscribed', 'true');
-    localStorage.setItem('subscriptionDate', now.toISOString());
     setIsDialogOpen(false);
-    setPaymentStep('confirm'); // Reset step for next time
+    setPaymentStep('confirm');
     toast({
       title: 'Subscription Successful!',
       description: 'Thank you for subscribing. Enjoy an ad-free experience for 30 days.',
@@ -63,7 +107,6 @@ export default function Home() {
   const handleDialogClose = (open: boolean) => {
     if (!open) {
       setIsDialogOpen(false);
-      // Reset to confirmation step after a short delay to allow animation
       setTimeout(() => {
         setPaymentStep('confirm');
       }, 300);
@@ -103,7 +146,7 @@ export default function Home() {
                     ) : (
                       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
                       <DialogTrigger asChild>
-                         <Button>Subscribe</Button>
+                         <Button disabled={!user}>Subscribe</Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>

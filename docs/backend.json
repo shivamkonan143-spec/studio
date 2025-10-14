@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "VideoDownload": {
@@ -73,12 +74,34 @@
         "email",
         "registrationDate"
       ]
+    },
+    "Subscription": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Subscription",
+      "type": "object",
+      "description": "Represents a user's subscription status.",
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the subscription is currently active."
+        },
+        "subscribedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the user subscribed."
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the subscription expires."
+        }
+      },
+      "required": ["active", "subscribedAt", "expiresAt"]
     }
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {
@@ -118,8 +141,27 @@
             }
           ]
         }
+      },
+       {
+        "path": "/users/{userId}/subscriptions/{subscriptionId}",
+        "definition": {
+          "entityName": "Subscription",
+          "schema": {
+            "$ref": "#/backend/entities/Subscription"
+          },
+          "description": "Stores user subscription status. There will typically be one main subscription document per user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "subscriptionId",
+              "description": "The unique identifier for the subscription, e.g., 'main'."
+            }
+          ]
+        }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence and support secure list operations (QAPs). User data is stored under `/users/{userId}`. Video downloads associated with a user are stored in a subcollection `/users/{userId}/videoDownloads/{downloadId}`. This structure maintains a clear ownership model.  Authorization independence is achieved because the `videoDownloads` subcollection does not depend on parent document attributes for authorization; access control is directly based on the `userId` encoded in the path.  This structure also enforces that rules are not filters, as all video downloads under a specific user path have the same access control requirements."
+    ]
   }
 }
