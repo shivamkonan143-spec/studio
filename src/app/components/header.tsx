@@ -1,7 +1,8 @@
+
 'use client';
 
 import Link from 'next/link';
-import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu } from 'lucide-react';
+import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -127,7 +128,7 @@ export function Header() {
         </div>
         <div className="flex flex-1 justify-center">
           <div className="rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-2 shadow-lg">
-            <Play className="h-5 w-5 fill-white text-white" />
+            <Download className="h-5 w-5 text-white" />
           </div>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
