@@ -41,25 +41,6 @@ export function VideoDownloader() {
     resolver: zodResolver(formSchema),
     defaultValues: { url: '' },
   });
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (step === 'downloading') {
-      setDownloadProgress(0);
-      interval = setInterval(() => {
-        setDownloadProgress((prev) => {
-          const newProgress = prev + Math.random() * 10;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            setStep('complete');
-            return 100;
-          }
-          return newProgress;
-        });
-      }, 300);
-    }
-    return () => clearInterval(interval);
-  }, [step]);
   
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // Skip analysis and go directly to quality selection
@@ -67,13 +48,62 @@ export function VideoDownloader() {
     setStep('quality');
   };
 
-  const handleDownload = () => {
-    if (selectedQuality) {
-      setStep('downloading');
-    } else {
-       toast({ variant: 'destructive', title: 'Selection Required', description: "Please select a video quality." });
+  const handleDownload = async () => {
+    if (!selectedQuality) {
+      toast({ variant: 'destructive', title: 'Selection Required', description: "Please select a video quality." });
+      return;
     }
-  }
+    
+    setStep('downloading');
+    setDownloadProgress(0);
+
+    const url = form.getValues('url');
+
+    try {
+      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to start download.');
+      }
+      
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'video.mp4';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length > 1) {
+          filename = filenameMatch[1];
+        }
+      }
+      
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+      
+      // This is a rough simulation, as we don't have real progress from this method
+      setDownloadProgress(50);
+      setTimeout(() => {
+        setDownloadProgress(100);
+        setStep('complete');
+      }, 500);
+
+
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Download Failed',
+        description: error.message || 'Could not download the video. Please try again.',
+      });
+      handleReset();
+    }
+  };
 
   const handleReset = () => {
     setStep('input');
@@ -153,9 +183,9 @@ export function VideoDownloader() {
                 </Label>
               ))}
             </RadioGroup>
-            <Button onClick={handleDownload} disabled={!selectedQuality} className="mt-6 w-full" size="lg" variant="default">
-              <Download className="mr-2 h-4 w-4" />
-              Download Video
+            <Button onClick={handleDownload} disabled={!selectedQuality || isPending} className="mt-6 w-full" size="lg" variant="default">
+              {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+              {isPending ? 'Preparing Download...' : 'Download Video'}
             </Button>
           </CardContent>
         </Card>
@@ -169,7 +199,7 @@ export function VideoDownloader() {
               <span>{step === 'downloading' ? 'Downloading...' : 'Download Complete'}</span>
             </CardTitle>
             {step === 'downloading' && <CardDescription>Your video is being downloaded. Please wait.</CardDescription>}
-            {step === 'complete' && <CardDescription>Your video has been saved to your device's gallery!</CardDescription>}
+            {step === 'complete' && <CardDescription>Your video has been saved to your device's downloads folder!</CardDescription>}
           </CardHeader>
           <CardContent className="space-y-4">
             <Progress value={downloadProgress} className="w-full" />
