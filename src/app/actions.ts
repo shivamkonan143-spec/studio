@@ -7,6 +7,10 @@ import {
   type AutomaticDownloadToolSelectionOutput,
 } from '@/ai/flows/automatic-download-tool-selection';
 
+// A more forgiving regex for URLs
+const URL_REGEX = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+
+
 export async function getVideoTool(
   formData: FormData
 ): Promise<{ success: true; data: AutomaticDownloadToolSelectionOutput } | { success: false; error: string }> {
@@ -16,10 +20,8 @@ export async function getVideoTool(
     return { success: false, error: 'Please enter a video URL.' };
   }
 
-  // Basic URL validation
-  try {
-    new URL(url);
-  } catch (_) {
+  // Loosened URL validation
+  if (!URL_REGEX.test(url)) {
     return { success: false, error: 'Please enter a valid video URL.' };
   }
 
