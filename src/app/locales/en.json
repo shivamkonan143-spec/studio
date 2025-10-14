@@ -67,7 +67,10 @@
         "cancelSubscription": "Cancel Subscription",
         "cancelledTitle": "Subscription Cancelled",
         "cancelledDescription": "Your subscription has been successfully cancelled.",
-        "cancelFailedDescription": "Failed to cancel subscription. Please try again."
+        "cancelFailedDescription": "Failed to cancel subscription. Please try again.",
+        "cancelConfirmTitle": "Are you sure?",
+        "cancelConfirmDescription": "This action will cancel your premium subscription. You will lose ad-free access at the end of your current billing period.",
+        "confirm": "Confirm"
     },
     "payment": {
         "upi": "UPI",
@@ -144,5 +147,3 @@
         "user": "User"
     }
 }
-
-    

@@ -27,6 +27,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,7 +53,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { doc, deleteDoc } from 'firebase/firestore';
-import Image from 'next/image';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -195,10 +205,28 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         {user ? (
           <>
             {isSubscribed && (
-                <Button variant="ghost" className="w-full justify-start" onClick={handleCancelSubscription}>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-start">
                     <Unplug className="mr-2 h-4 w-4" />
                     <span>{t.subscription.cancelSubscription}</span>
-                </Button>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t.subscription.cancelConfirmTitle}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t.subscription.cancelConfirmDescription}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{t.subscription.cancel}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleCancelSubscription}>
+                      {t.subscription.confirm}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
@@ -325,8 +353,4 @@ export function Header() {
     </header>
   );
 }
-    
-
-    
-
     
