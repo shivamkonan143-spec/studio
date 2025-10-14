@@ -131,7 +131,6 @@
         "button": "Send Reset Link",
         "submittedTitle": "Check Your Inbox",
         "submittedDescription": "We've sent a password reset link to",
-        "backToLogin": "Back to Log In",
         "checkEmailToast": "Check your email",
         "resetLinkSent": "A password reset link has been sent to {email}.",
         "failedToast": "Reset Failed"

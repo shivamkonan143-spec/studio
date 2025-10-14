@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -78,12 +77,6 @@ export default function ForgotPasswordPage() {
                 {t.forgotPassword.submittedDescription}{' '}
                 <span className="font-medium text-foreground">{form.getValues('email')}</span>.
               </p>
-              <Button asChild variant="outline">
-                <Link href="/login">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  {t.forgotPassword.backToLogin}
-                </Link>
-              </Button>
             </div>
           ) : (
             <Form {...form}>

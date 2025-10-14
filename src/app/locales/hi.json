@@ -29,7 +29,7 @@
         "urlPlaceholder": "अपना वीडियो URL दर्ज करें",
         "getThumbnail": "थंबनेल प्राप्त करें",
         "previewTitle": "थंबनेल पूर्वावलोकन",
-        "previewDescription": "ज़ूम करने के لیے छवि पर क्लिक करें। गुणवत्ता चुनें और डाउनलोड करें।",
+        "previewDescription": "ज़ूम करने के लिए छवि पर क्लिक करें। गुणवत्ता चुनें और डाउनलोड करें।",
         "loadingThumbnail": "थंबनेल लोड हो रहा है...",
         "quality": "गुणवत्ता",
         "qualityHigh": "उच्च",
@@ -131,7 +131,6 @@
         "button": "रीसेट लिंक भेजें",
         "submittedTitle": "अपना इनबॉक्स जांचें",
         "submittedDescription": "हमने एक पासवर्ड रीसेट लिंक भेजा है",
-        "backToLogin": "लॉग इन पर वापस जाएं",
         "checkEmailToast": "अपना ईमेल जांचें",
         "resetLinkSent": "{email} पर एक पासवर्ड रीसेट लिंक भेजा गया है।",
         "failedToast": "रीसेट विफल"
