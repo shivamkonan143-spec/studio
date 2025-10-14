@@ -12,10 +12,12 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 
 type AuthCallback = (user: User | null, error: AuthError | null) => void;
 type PhoneAuthCallback = (confirmationResult: ConfirmationResult | null, error: AuthError | null) => void;
+type PasswordResetCallback = (success: boolean, error: AuthError | null) => void;
 
 
 /** Initiate anonymous sign-in (non-blocking). */
@@ -69,4 +71,10 @@ export function verifyOtp(confirmationResult: ConfirmationResult, otp: string, c
         });
 }
 
+/** Initiate password reset email (non-blocking). */
+export function initiatePasswordReset(authInstance: Auth, email: string, callback?: PasswordResetCallback): void {
+    sendPasswordResetEmail(authInstance, email)
+        .then(() => callback && callback(true, null))
+        .catch((error) => callback && callback(false, error));
+}
     
