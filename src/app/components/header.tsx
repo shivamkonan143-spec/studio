@@ -7,7 +7,7 @@ export function Header() {
         <Play className="h-5 w-5 text-white fill-white" />
       </div>
       <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-        YouTube Thumbnail Downloader
+        Thumbnail Downloader
       </h1>
     </header>
   );
