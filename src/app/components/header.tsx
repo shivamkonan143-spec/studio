@@ -127,8 +127,8 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-2 shadow-lg">
-            <Download className="h-5 w-5 text-white" />
+          <div className="relative -translate-x-1 -translate-y-1 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-[6px] shadow-lg">
+            <Download className="h-4 w-4 text-white" />
           </div>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
