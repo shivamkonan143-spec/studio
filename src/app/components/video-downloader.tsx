@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -199,7 +199,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
+                    <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" 
                       onError={() => {
                         // If maxres fails, fall back to hq
                         if (quality === 'maxresdefault' && videoId) {
@@ -265,7 +265,7 @@ export function YoutubeTool() {
 
       <Card>
         <CardContent className="flex flex-col items-center gap-4 pt-6">
-            <p className="text-sm font-medium text-muted-foreground">Subscribe</p>
+            <p className="text-sm font-medium text-red-500">Subscribe</p>
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
