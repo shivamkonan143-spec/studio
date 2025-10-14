@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, MessageSquare } from 'lucide-react';
+import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +20,6 @@ import {
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Messages } from './messages';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -97,15 +96,6 @@ export function Header() {
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
-                
-                {user && (
-                    <Messages>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            <span>Messages</span>
-                        </DropdownMenuItem>
-                    </Messages>
-                )}
 
                 <DropdownMenuItem asChild>
                   <a href={mailtoHref}>
