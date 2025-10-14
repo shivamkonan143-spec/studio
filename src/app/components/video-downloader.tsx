@@ -25,11 +25,6 @@ const formSchema = z.object({
 type Step = 'input' | 'preview';
 type ThumbnailQuality = 'maxresdefault' | 'hqdefault';
 
-const qualityLabels: Record<ThumbnailQuality, string> = {
-    maxresdefault: 'High',
-    hqdefault: 'High (360p)',
-};
-
 function getYouTubeVideoId(url: string): string | null {
   try {
     const urlObj = new URL(url);
@@ -218,7 +213,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border aspect-video">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" className="mx-auto"
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
