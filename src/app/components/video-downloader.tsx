@@ -125,44 +125,6 @@ export function YoutubeTool() {
     });
   }
 
-  const handleDownloadThumbnail = async () => {
-    if (!thumbnailUrl || !videoId) {
-      toast({
-        variant: 'destructive',
-        title: t.common.error,
-        description: 'Thumbnail URL not found.'
-      });
-      return;
-    }
-  
-    try {
-      const response = await fetch(thumbnailUrl);
-      if (!response.ok) {
-        // Fallback for maxresdefault if it doesn't exist
-        if (quality === 'maxresdefault') {
-            toast({
-                variant: 'destructive',
-                title: t.videoDownloader.downloadFailedTitle,
-                description: t.videoDownloader.downloadFailedDescription,
-            });
-            return;
-        }
-        throw new Error('Failed to fetch thumbnail image.');
-      }
-      
-      const blob = await response.blob();
-      triggerDownload(blob, `${videoId}_${quality}_thumbnail.jpg`);
-  
-    } catch (error: any) {
-      console.error('Download error:', error);
-      toast({
-        variant: 'destructive',
-        title: t.videoDownloader.downloadFailedTitle,
-        description: t.videoDownloader.downloadErrorDescription,
-      });
-    }
-  };
-
   const triggerDownload = (blob: Blob, fileName: string) => {
     const downloadUrl = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -173,6 +135,97 @@ export function YoutubeTool() {
     a.remove();
     window.URL.revokeObjectURL(downloadUrl);
   }
+
+  const cropAndDownloadImage = (imageUrl: string, fileName: string) => {
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageUrl;
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const originalWidth = img.width;
+        const originalHeight = img.height;
+        
+        const targetAspectRatio = 9 / 16;
+        let newWidth = originalWidth;
+        let newHeight = originalHeight;
+        let sx = 0;
+        let sy = 0;
+
+        if (originalWidth / originalHeight > targetAspectRatio) {
+            newWidth = originalHeight * targetAspectRatio;
+            sx = (originalWidth - newWidth) / 2;
+        } else {
+            newHeight = originalWidth / targetAspectRatio;
+            sy = (originalHeight - newHeight) / 2;
+        }
+        
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        ctx.drawImage(img, sx, sy, newWidth, newHeight, 0, 0, newWidth, newHeight);
+
+        canvas.toBlob((blob) => {
+            if (blob) {
+                triggerDownload(blob, fileName);
+            }
+        }, 'image/jpeg', 0.95);
+    };
+    img.onerror = () => {
+        toast({
+            variant: 'destructive',
+            title: t.videoDownloader.downloadFailedTitle,
+            description: t.videoDownloader.downloadErrorDescription,
+        });
+    };
+};
+
+  const handleDownloadThumbnail = async () => {
+    if (!thumbnailUrl || !videoId) {
+      toast({
+        variant: 'destructive',
+        title: t.common.error,
+        description: 'Thumbnail URL not found.'
+      });
+      return;
+    }
+  
+    const fileName = `${videoId}_${quality}_thumbnail.jpg`;
+
+    if (isShort) {
+        // Since the source image might not be directly available for fetch due to CORS,
+        // we pass the URL to the cropping function which loads it into an Image object.
+        cropAndDownloadImage(thumbnailUrl, fileName);
+    } else {
+      try {
+        const response = await fetch(thumbnailUrl);
+        if (!response.ok) {
+          if (quality === 'maxresdefault') {
+              toast({
+                  variant: 'destructive',
+                  title: t.videoDownloader.downloadFailedTitle,
+                  description: t.videoDownloader.downloadFailedDescription,
+              });
+              return;
+          }
+          throw new Error('Failed to fetch thumbnail image.');
+        }
+        
+        const blob = await response.blob();
+        triggerDownload(blob, fileName);
+    
+      } catch (error: any) {
+        console.error('Download error:', error);
+        toast({
+          variant: 'destructive',
+          title: t.videoDownloader.downloadFailedTitle,
+          description: t.videoDownloader.downloadErrorDescription,
+        });
+      }
+    }
+  };
 
   const handleReset = () => {
     setStep('input');
@@ -333,3 +386,5 @@ export function YoutubeTool() {
     </div>
   );
 }
+
+    
