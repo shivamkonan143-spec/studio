@@ -113,7 +113,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
     });
   
     return (
-        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
+        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(22_3,200,242,0.1),rgba(255,0,0,0.0))]">
             <CardContent className="p-8 pt-8 text-center">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
                     {t.title}
@@ -195,6 +195,22 @@ function AdvancedEditDialog({
     setInvert(0);
   };
   
+  const applyPreset = (preset: 'sharpen' | 'clear' | 'smooth') => {
+    resetFilters();
+    switch (preset) {
+        case 'sharpen':
+            setContrast(125);
+            break;
+        case 'clear':
+            setBrightness(105);
+            setSaturate(110);
+            break;
+        case 'smooth':
+            setContrast(90);
+            break;
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -229,6 +245,11 @@ function AdvancedEditDialog({
             <div className="w-full md:w-64 space-y-6">
                 <div>
                     <h3 className="font-semibold mb-2">Filters</h3>
+                     <div className="grid grid-cols-3 gap-2 mb-4">
+                        <Button variant="outline" size="sm" onClick={() => applyPreset('sharpen')}>Sharpen</Button>
+                        <Button variant="outline" size="sm" onClick={() => applyPreset('clear')}>Clear</Button>
+                        <Button variant="outline" size="sm" onClick={() => applyPreset('smooth')}>Smooth</Button>
+                    </div>
                     <div className="space-y-3">
                         <div className="space-y-2">
                             <Label className="text-xs">Brightness ({brightness}%)</Label>
@@ -382,7 +403,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const downloadEditedImage = (imageUrl: string, filters: React.CSSProperties['filter'], fileName: string) => {
     const img = new window.Image();
     img.crossOrigin = 'anonymous';
-    img.src = imageUrl;
+    img.src = imageUrl.split('?t=')[0] + `?t=${new Date().getTime()}`;
     img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -411,7 +432,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const cropAndDownloadImage = (imageUrl: string, fileName: string, aspect?: number) => {
     const img = new window.Image();
     img.crossOrigin = 'anonymous';
-    img.src = imageUrl;
+    img.src = imageUrl.split('?t=')[0] + `?t=${new Date().getTime()}`;
     img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -627,3 +648,4 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
+
