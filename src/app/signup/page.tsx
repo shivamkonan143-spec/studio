@@ -78,7 +78,7 @@ export default function SignUpPage() {
   };
 
   const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
-    let title = 'Sign Up Failed';
+    let title = 'Registration Failed';
     let description = 'An unexpected error occurred. Please try again.';
 
     if (provider === 'email') {
@@ -139,7 +139,7 @@ export default function SignUpPage() {
             </Button>
         </Link>
         <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
+          <CardTitle>Register</CardTitle>
           <CardDescription>Create a new account to get started.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -172,7 +172,7 @@ export default function SignUpPage() {
                     )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                    {isLoading ? <Loader2 className="animate-spin" /> : 'Sign Up'}
+                    {isLoading ? <Loader2 className="animate-spin" /> : 'Register'}
                 </Button>
                 </form>
             </Form>
@@ -190,7 +190,7 @@ export default function SignUpPage() {
 
           <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
             {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-            Sign up with Google
+            Register with Google
           </Button>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
