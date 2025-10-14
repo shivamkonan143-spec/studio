@@ -264,17 +264,14 @@ export function YoutubeTool() {
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>About Me</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center gap-4">
+        <CardContent className="flex items-center gap-4 pt-6">
           <Button variant="outline" size="icon" asChild>
-            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
               <Instagram className="h-5 w-5" />
             </a>
           </Button>
           <Button variant="outline" size="icon" asChild>
-            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
+            <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
               <Youtube className="h-5 w-5" />
             </a>
           </Button>
