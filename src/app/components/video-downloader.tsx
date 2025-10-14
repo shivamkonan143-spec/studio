@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 
 const formSchema = z.object({
@@ -111,12 +112,11 @@ export function YoutubeTool() {
       if (!response.ok) {
         // Fallback for maxresdefault if it doesn't exist
         if (quality === 'maxresdefault') {
-            const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-            const fallbackResponse = await fetch(fallbackUrl);
-            if (!fallbackResponse.ok) throw new Error('Failed to fetch thumbnail image.');
-            
-            const blob = await fallbackResponse.blob();
-            triggerDownload(blob, `${videoId}_hq_thumbnail.jpg`);
+            toast({
+                variant: 'destructive',
+                title: 'Download Failed',
+                description: 'Maximum quality is not available. Please select another quality.',
+            });
             return;
         }
         throw new Error('Failed to fetch thumbnail image.');
@@ -196,26 +196,38 @@ export function YoutubeTool() {
               <ImageIcon className="h-5 w-5" />
               <span>Thumbnail Preview</span>
             </CardTitle>
-            <CardDescription>Select the desired quality and download the thumbnail.</CardDescription>
+            <CardDescription>Click the image to zoom. Select quality and download.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {thumbnailUrl ? (
-              <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border">
-                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
-                  onError={() => {
-                    // If maxres fails, fall back to hq
-                    if (quality === 'maxresdefault' && videoId) {
-                      setQuality('hqdefault');
-                      updateThumbnailUrl(videoId, 'hqdefault');
-                      toast({
-                          variant: 'default',
-                          title: 'Quality not available',
-                          description: "Maximum quality isn't available for this video. Switched to High quality.",
-                      })
-                    }
-                  }}
-                />
-              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
+                      onError={() => {
+                        // If maxres fails, fall back to hq
+                        if (quality === 'maxresdefault' && videoId) {
+                          setQuality('hqdefault');
+                          updateThumbnailUrl(videoId, 'hqdefault');
+                          toast({
+                              variant: 'default',
+                              title: 'Quality not available',
+                              description: "Maximum quality isn't available for this video. Switched to SD quality.",
+                          })
+                        }
+                      }}
+                    />
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle>Thumbnail Preview</DialogTitle>
+                  </DialogHeader>
+                  <div className="relative aspect-video w-full">
+                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" />
+                  </div>
+                </DialogContent>
+              </Dialog>
             ) : (
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
