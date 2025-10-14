@@ -141,7 +141,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         <Button variant="ghost" asChild className="w-full justify-start">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
               <MessageCircle className="mr-2 h-4 w-4" />
-              <span>Share on WhatsApp</span>
+              <span>Shere app</span>
             </a>
         </Button>
 
