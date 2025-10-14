@@ -324,7 +324,7 @@ function AdvancedEditDialog({
 export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string, isShort: boolean }) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(true);
+  const [isTitleLoading, setIsTitleLoading] = useState(true);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
   const { locale } = useLanguage();
   const t = translations[locale];
@@ -346,11 +346,11 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   useEffect(() => {
     if (!videoId) return;
     
-    setIsGenerating(true);
     const initialQuality = 'maxresdefault';
     setQuality(initialQuality);
     updateThumbnailUrl(videoId, initialQuality);
     
+    setIsTitleLoading(true);
     const fetchVideoInfo = async () => {
         try {
             const oembedUrl = `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`;
@@ -362,7 +362,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
         } catch (error) {
             console.error("Failed to fetch video title", error);
         } finally {
-            setIsGenerating(false);
+            setIsTitleLoading(false);
         }
     };
     
@@ -541,13 +541,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     }
   };
 
-  if (isGenerating || !thumbnailUrl) {
+  if (!thumbnailUrl) {
     return (
         <Card>
             <CardContent className="pt-6">
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <ImageIcon className="h-8 w-8" />
                     <span>{t.videoDownloader.loadingThumbnail}</span>
                     </div>
                 </div>
@@ -604,7 +604,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
           ) : (
               <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                  <Loader2 className="h-8 w-8 animate-spin" />
+                  <ImageIcon className="h-8 w-8" />
                   <span>{t.videoDownloader.loadingThumbnail}</span>
                   </div>
               </div>
@@ -618,7 +618,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
               />
           </div>
           
-          {videoTitle && (
+          {videoTitle ? (
               <div className="space-y-2">
                   <Label>{t.videoDownloader.videoTitle}</Label>
                   <div className="relative flex items-center gap-2">
@@ -629,6 +629,16 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                       </Button>
                   </div>
               </div>
+          ) : isTitleLoading && (
+            <div className="space-y-2">
+                <Label>{t.videoDownloader.videoTitle}</Label>
+                <div className="relative flex items-center gap-2">
+                    <Input value={t.common.loading} readOnly className="pr-12 bg-muted/40"/>
+                    <Button size="icon" variant="outline" className="shrink-0" disabled>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    </Button>
+                </div>
+            </div>
           )}
 
           <div className="grid grid-cols-1 gap-4">
@@ -666,5 +676,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
+
+    
 
     
