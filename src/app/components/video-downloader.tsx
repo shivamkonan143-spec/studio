@@ -407,7 +407,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     window.URL.revokeObjectURL(downloadUrl);
 
     if (!checkIfRatingGiven()) {
-      setIsRatingOpen(true);
+      setTimeout(() => setIsRatingOpen(true), 1000);
     }
   }
 
