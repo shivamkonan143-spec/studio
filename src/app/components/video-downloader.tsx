@@ -183,8 +183,19 @@ function AdvancedEditDialog({
   const [sepia, setSepia] = useState(0);
   const [grayscale, setGrayscale] = useState(0);
   const [invert, setInvert] = useState(0);
+  const [sharpen, setSharpen] = useState(0);
+  const [clear, setClear] = useState(0);
+  const [smooth, setSmooth] = useState(0);
 
-  const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
+
+  const filters = `
+    brightness(${brightness + (sharpen * 0.1) + (clear * 0.05)}%) 
+    contrast(${contrast + (sharpen * 0.25) - (smooth * 0.1)}%) 
+    saturate(${saturate + (clear * 0.1)}%) 
+    sepia(${sepia}%) 
+    grayscale(${grayscale}%) 
+    invert(${invert}%)
+  `;
 
   const resetFilters = () => {
     setBrightness(100);
@@ -193,24 +204,11 @@ function AdvancedEditDialog({
     setSepia(0);
     setGrayscale(0);
     setInvert(0);
+    setSharpen(0);
+    setClear(0);
+    setSmooth(0);
   };
   
-  const applyPreset = (preset: 'sharpen' | 'clear' | 'smooth') => {
-    resetFilters();
-    switch (preset) {
-        case 'sharpen':
-            setContrast(125);
-            break;
-        case 'clear':
-            setBrightness(105);
-            setSaturate(110);
-            break;
-        case 'smooth':
-            setContrast(90);
-            break;
-    }
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -244,14 +242,20 @@ function AdvancedEditDialog({
             </div>
             <div className="w-full md:w-64 space-y-6">
                 <div>
-                    <h3 className="font-semibold mb-2">Presets</h3>
-                     <div className="grid grid-cols-3 gap-2 mb-4">
-                        <Button variant="outline" size="sm" onClick={() => applyPreset('sharpen')}>Sharpen</Button>
-                        <Button variant="outline" size="sm" onClick={() => applyPreset('clear')}>Clear</Button>
-                        <Button variant="outline" size="sm" onClick={() => applyPreset('smooth')}>Smooth</Button>
-                    </div>
                     <h3 className="font-semibold mb-2">Filters</h3>
                     <div className="space-y-3">
+                        <div className="space-y-2">
+                            <Label className="text-xs">Sharpen ({sharpen}%)</Label>
+                            <Slider value={[sharpen]} onValueChange={(v) => setSharpen(v[0])} max={100} step={1} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Clear ({clear}%)</Label>
+                            <Slider value={[clear]} onValueChange={(v) => setClear(v[0])} max={100} step={1} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs">Smooth ({smooth}%)</Label>
+                            <Slider value={[smooth]} onValueChange={(v) => setSmooth(v[0])} max={100} step={1} />
+                        </div>
                         <div className="space-y-2">
                             <Label className="text-xs">Brightness ({brightness}%)</Label>
                             <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
