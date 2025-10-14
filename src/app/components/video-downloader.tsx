@@ -61,7 +61,7 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
   return { id: null, isShort: false };
 }
 
-export function YoutubeDownloaderInput() {
+export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id: string, isShort: boolean) => void }) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [clickCount, setClickCount] = useState(0);
     const [showAd, setShowAd] = useState(false);
@@ -95,15 +95,15 @@ export function YoutubeDownloaderInput() {
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
   
       if (extractedVideoId) {
-        router.push(`/preview?id=${extractedVideoId}&isShort=${isShortVideo}`);
+        onGetThumbnail(extractedVideoId, isShortVideo);
       } else {
         toast({
           variant: 'destructive',
           title: t.videoDownloader.invalidUrlTitle,
           description: t.videoDownloader.invalidUrlDescription,
         });
-        setIsGenerating(false);
       }
+      setIsGenerating(false);
     };
   
     const form = useForm<z.infer<typeof formSchema>>({
@@ -321,7 +321,7 @@ function AdvancedEditDialog({
 }
 
 
-export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string, isShort: boolean }) {
+export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { videoId: string, isShort: boolean, onTryAnother: () => void }) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isTitleLoading, setIsTitleLoading] = useState(true);
@@ -669,11 +669,9 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
           </Button>
 
 
-          <Button asChild className="w-full" size="lg" variant="outline">
-              <Link href="/">
-                  <RefreshCcw className="mr-2 h-4 w-4" />
-                  <span>{t.videoDownloader.tryAnother}</span>
-              </Link>
+          <Button onClick={onTryAnother} className="w-full" size="lg" variant="outline">
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              <span>{t.videoDownloader.tryAnother}</span>
           </Button>
           {!isSubscribed && <AdPlaceholder showAd={true} />}
           </CardContent>
