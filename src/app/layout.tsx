@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/app/components/theme-provider';
 import { LanguageProvider } from '@/app/context/language-context';
 
 export const metadata: Metadata = {
-  title: 'unic',
+  title: 'Thumbnail Downloader',
   description: 'Download thumbnails from any video.',
 };
 

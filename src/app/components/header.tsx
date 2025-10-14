@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,7 +43,7 @@ export function Header() {
     return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
   };
 
-  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20unic${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
+  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
 
 
   return (
@@ -142,7 +142,7 @@ export function Header() {
         </div>
         <div className="flex flex-1 justify-center">
           <div className="relative -translate-x-1 -translate-y-1 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-1.5 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="M5 17a1 1 0 0 0 1.8.6l2.7-4.2c.2-.3.2-.8 0-1.1L6.8 8.1a1 1 0 0 0-1.6.8v8Z"/><path d="M12 3v2"/><path d="M19 17a1 1 0 0 1-1.8.6l-2.7-4.2c-.2-.3-.2-.8 0-1.1L17.2 8a1 1 0 0 1 1.6.8v8Z"/><path d="M18.5 4.5 16 7"/><path d="m5.5 4.5 2.5 2.5"/><path d="M12 21a6 6 0 0 0 3.5-10.7"/></svg>
+             <Download className="h-4 w-4 text-white"/>
           </div>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
