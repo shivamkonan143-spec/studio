@@ -235,7 +235,7 @@ function AdvancedEditDialog({
                         alt="Thumbnail preview"
                         layout="fill"
                         objectFit="cover"
-                        className="absolute top-0 left-0 w-full h-full"
+                        className="absolute top-0 left-0"
                         style={{ filter: filters }}
                         unoptimized
                       />
@@ -649,3 +649,6 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   );
 }
 
+
+
+    
