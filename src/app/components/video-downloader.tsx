@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -163,24 +163,34 @@ export function YoutubeTool() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-start gap-4 sm:flex-row">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="url"
                 render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel className="sr-only">Video URL</FormLabel>
-                    <FormControl>
-                      <Input placeholder="www.xyz.com" {...field} disabled={step !== 'input'} />
-                    </FormControl>
+                  <FormItem>
+                    <div className="relative flex w-full items-center rounded-lg border-2 border-transparent bg-muted/40 transition-all focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+                      <FormControl>
+                        <Input 
+                          placeholder="Enter your video URL" 
+                          {...field} 
+                          disabled={step !== 'input'}
+                          className="h-12 flex-1 border-0 bg-transparent pl-4 pr-2 text-base placeholder:text-muted-foreground/80 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        />
+                      </FormControl>
+                      <Button 
+                        type="submit" 
+                        size="icon"
+                        className="mr-2 h-9 w-14 shrink-0" 
+                        disabled={step !== 'input' || isGenerating}
+                      >
+                         {isGenerating ? <Loader2 className="animate-spin" /> : <ArrowRight />}
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full sm:w-auto" disabled={step !== 'input' || isGenerating}>
-                 {isGenerating ? <Loader2 className="animate-spin" /> : <span>Get Thumbnail</span>}
-                 {!isGenerating && <ArrowRight className="ml-2 h-4 w-4" />}
-              </Button>
             </form>
           </Form>
         </CardContent>
@@ -202,7 +212,6 @@ export function YoutubeTool() {
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
                     <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" 
                       onError={() => {
-                        // If maxres fails, fall back to hq
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
                           updateThumbnailUrl(videoId, 'hqdefault');
