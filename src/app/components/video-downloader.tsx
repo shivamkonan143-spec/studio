@@ -172,7 +172,7 @@ function ManualEditDialog({
     return (
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">
+          <Button variant="outline" className="w-full">
             <SlidersHorizontal className="mr-2 h-4 w-4" />
             Customize
           </Button>
@@ -441,12 +441,12 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
             </CardTitle>
             <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             {thumbnailUrl ? (
               <Dialog>
                 <DialogTrigger asChild>
                   <div className={cn(
-                      "relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border",
+                      "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
                       isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
                   )}>
                     <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
@@ -484,6 +484,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             )}
             
+            <div className="pt-2">
+                <ManualEditDialog
+                    thumbnail={thumbnailUrl}
+                    onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_edited_thumbnail.png`)}
+                />
+            </div>
+            
             {videoTitle && (
                 <div className="space-y-2">
                     <Label>{t.videoDownloader.videoTitle}</Label>
@@ -497,8 +504,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             )}
 
-            <div className="grid w-full gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
+            <div className="space-y-2">
                 <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
                 <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
                     <SelectTrigger id="quality">
@@ -509,18 +515,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                         <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
                     </SelectContent>
                 </Select>
-              </div>
-               <div className="space-y-2 self-end grid grid-cols-2 gap-2">
-                    <ManualEditDialog
-                        thumbnail={thumbnailUrl}
-                        onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_edited_thumbnail.png`)}
-                    />
-                    <Button onClick={handleDownloadThumbnail} variant="destructive">
-                        <Download className="mr-2 h-4 w-4" />
-                        {t.videoDownloader.downloadThumbnail}
-                    </Button>
-               </div>
             </div>
+            
+            <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                {t.videoDownloader.downloadThumbnail}
+            </Button>
+
 
             <Button asChild className="w-full" size="lg" variant="outline">
                 <Link href="/">
@@ -535,5 +536,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
+
+
 
     
