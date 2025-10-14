@@ -64,7 +64,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
     const shareData = {
       title: t.title,
       text: t.share.text,
-      url: window.location.href,
+      url: 'https://6000-firebase-studio-1760436580721.cluster-osvg2nzmmzhzqqjio6oojllbg4.cloudworkstations.dev/',
     };
     if (navigator.share) {
       try {
@@ -270,3 +270,5 @@ export function Header() {
     </header>
   );
 }
+
+    
