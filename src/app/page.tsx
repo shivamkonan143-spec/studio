@@ -10,7 +10,7 @@ import { doc } from 'firebase/firestore';
 
 
 export default function Home() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
   const subscriptionRef = useMemoFirebase(() => {
@@ -27,7 +27,7 @@ export default function Home() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <YoutubeDownloaderInput />
-        {!isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
+        {!isUserLoading && user && !isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>
