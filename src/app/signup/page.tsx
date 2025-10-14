@@ -177,22 +177,6 @@ export default function SignUpPage() {
                 </form>
             </Form>
 
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-                </span>
-            </div>
-          </div>
-
-          <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
-            {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-            Register with Google
-          </Button>
-
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login" className="font-medium text-primary hover:underline">
