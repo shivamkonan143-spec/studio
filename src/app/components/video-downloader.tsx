@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Link, Sparkles, Download, Check, Clapperboard, RefreshCcw, Loader2, ArrowRight } from 'lucide-react';
+import { Youtube, Sparkles, Download, Check, Clapperboard, RefreshCcw, Loader2, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,16 +13,20 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { getVideoTool } from '@/app/actions';
 import type { AutomaticDownloadToolSelectionOutput } from '@/ai/flows/automatic-download-tool-selection';
 import { Label } from '@/components/ui/label';
 
 const formSchema = z.object({
-  url: z.string().url({ message: 'Please enter a valid video URL.' }),
+  url: z.string().url({ message: 'Please enter a valid YouTube URL.' }),
 });
 
-type Step = 'input' | 'analyzing' | 'quality' | 'downloading' | 'complete';
+type Step = 'input' | 'quality' | 'downloading' | 'complete';
 const VIDEO_QUALITIES = ['1080p', '720p', '480p'];
+
+const defaultAiResponse: AutomaticDownloadToolSelectionOutput = {
+  downloadTool: 'youtube-dl',
+  reasoning: 'This tool is recommended for all YouTube video downloads for best compatibility.'
+};
 
 export function VideoDownloader() {
   const [step, setStep] = useState<Step>('input');
@@ -58,20 +62,9 @@ export function VideoDownloader() {
   }, [step]);
   
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    setStep('analyzing');
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append('url', values.url);
-      const result = await getVideoTool(formData);
-
-      if (result.success) {
-        setAiResponse(result.data);
-        setStep('quality');
-      } else {
-        toast({ variant: 'destructive', title: 'Analysis Failed', description: result.error });
-        setStep('input');
-      }
-    });
+    // Skip analysis and go directly to quality selection
+    setAiResponse(defaultAiResponse);
+    setStep('quality');
   };
 
   const handleDownload = () => {
@@ -95,10 +88,10 @@ export function VideoDownloader() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Link className="h-5 w-5" />
-            <span>Enter Video URL</span>
+            <Youtube className="h-5 w-5" />
+            <span>Enter YouTube Video URL</span>
           </CardTitle>
-          <CardDescription>Paste the URL of the video you want to download.</CardDescription>
+          <CardDescription>Paste the URL of the YouTube video you want to download.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -108,40 +101,31 @@ export function VideoDownloader() {
                 name="url"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel className="sr-only">Video URL</FormLabel>
+                    <FormLabel className="sr-only">YouTube Video URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/video.mp4" {...field} disabled={step !== 'input'} />
+                      <Input placeholder="https://www.youtube.com/watch?v=..." {...field} disabled={step !== 'input'} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full sm:w-auto" disabled={step !== 'input' || isPending}>
-                {isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
-                   <span>Analyze URL</span>
-                   <ArrowRight className="ml-2 h-4 w-4" />
-                  </>
-                )}
+              <Button type="submit" className="w-full sm:w-auto" disabled={step !== 'input'}>
+                 <span>Get Download Options</span>
+                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
 
-      {aiResponse && (
+      {aiResponse && (step === 'quality' || step === 'downloading' || step === 'complete') && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-accent" />
               <span>Automated Tool Selection</span>
             </CardTitle>
-            <CardDescription>Our AI has determined the best tool for this URL.</CardDescription>
+            <CardDescription>Our system has selected the best tool for YouTube.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="font-medium">Recommended Tool: <span className="font-mono rounded bg-muted px-2 py-1 text-sm">{aiResponse.downloadTool}</span></p>
