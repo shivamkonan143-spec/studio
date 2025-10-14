@@ -626,24 +626,20 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                     </div>
                 </div>
             )}
-
+            
             <ManualEditDialog
                 thumbnail={thumbnailUrl}
                 onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_custom_edited_thumbnail.png`)}
             />
-            
+
             {videoTitle && (
                 <div className="space-y-2">
                     <Label>{t.videoDownloader.videoTitle}</Label>
                     <div className="relative flex items-center gap-2">
                         <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
-                        <Button variant="ghost" size="icon" className="absolute top-1/2 right-12 -translate-y-1/2 h-8 w-8" onClick={handleCopyTitle}>
-                            <Clipboard className="h-4 w-4"/>
+                        <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
+                            <Clipboard className="h-4 w-4" />
                             <span className="sr-only">{t.videoDownloader.copyTitle}</span>
-                        </Button>
-                        <Button size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
-                            <Sparkles className="h-4 w-4" />
-                            <span className="sr-only">AI Edit Title</span>
                         </Button>
                     </div>
                 </div>
