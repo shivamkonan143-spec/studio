@@ -38,8 +38,7 @@ export function SubscriptionCard() {
         return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
     }, [firestore, user]);
     
-    const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
-    const isSubscribed = subscription?.active === true;
+    const { isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
     
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -224,15 +223,9 @@ export function SubscriptionCard() {
                             <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
                             <span className="text-muted-foreground">{t.subscription.duration}</span>
                         </div>
-                        {isSubscribed ? (
-                            <Badge variant="success" className="w-full text-center justify-center text-lg py-2">
-                                {t.subscription.statusSubscribed}
-                            </Badge>
-                        ) : (
-                            <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick} disabled={isSubscriptionLoading}>
-                                {t.subscription.buttonSubscribe}
-                            </Button>
-                        )}
+                        <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick} disabled={isSubscriptionLoading}>
+                            {t.subscription.buttonSubscribe}
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
@@ -244,5 +237,3 @@ export function SubscriptionCard() {
         </>
     );
 }
-
-
