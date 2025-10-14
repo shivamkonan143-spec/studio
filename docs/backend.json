@@ -71,7 +71,6 @@
       },
       "required": [
         "id",
-        "email",
         "registrationDate"
       ]
     },
@@ -102,7 +101,8 @@
   "auth": {
     "providers": [
       "password",
-      "google.com"
+      "google.com",
+      "phone"
     ]
   },
   "firestore": {
@@ -166,3 +166,5 @@
     ]
   }
 }
+
+    
