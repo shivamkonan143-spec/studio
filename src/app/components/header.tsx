@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy } from 'lucide-react';
+import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, MessageSquare } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +20,7 @@ import {
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Messages } from './messages';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -94,6 +95,15 @@ export function Header() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
                 
+                {user && (
+                    <Messages>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <MessageSquare className="mr-2 h-4 w-4" />
+                            <span>Messages</span>
+                        </DropdownMenuItem>
+                    </Messages>
+                )}
+
                 <DropdownMenuItem asChild>
                   <a href="mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader">
                     <LifeBuoy className="mr-2 h-4 w-4" />
@@ -134,7 +144,7 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative -translate-x-1 -translate-y-1 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-[6px] shadow-lg">
+          <div className="relative -translate-x-1 -translate-y-1 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-1.5 shadow-lg">
             <Download className="h-4 w-4 text-white" />
           </div>
         </div>

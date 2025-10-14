@@ -95,7 +95,32 @@
           "description": "The date and time when the subscription expires."
         }
       },
-      "required": ["active", "subscribedAt", "expiresAt"]
+      "required": [
+        "active",
+        "subscribedAt",
+        "expiresAt"
+      ]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Represents a message or announcement sent to users.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the message."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main body of the message."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the message was created."
+        }
+      },
+      "required": ["title", "content", "createdAt"]
     }
   },
   "auth": {
@@ -142,7 +167,7 @@
           ]
         }
       },
-       {
+      {
         "path": "/users/{userId}/subscriptions/{subscriptionId}",
         "definition": {
           "entityName": "Subscription",
@@ -161,8 +186,23 @@
             }
           ]
         }
+      },
+      {
+        "path": "/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": {
+            "$ref": "#/backend/entities/Message"
+          },
+          "description": "Stores global messages or announcements for all users.",
+          "params": [
+            {
+              "name": "messageId",
+              "description": "The unique identifier for the message."
+            }
+          ]
+        }
       }
     ]
   }
 }
-    
