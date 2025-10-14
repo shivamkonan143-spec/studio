@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,7 +17,6 @@ import {
   DialogDescription,
   DialogFooter,
   DialogTrigger,
-  DialogClose
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -31,6 +30,7 @@ export function HelpAndSupportDialog({ children }: { children: React.ReactNode }
   const { user } = useUser();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { message: '' },
