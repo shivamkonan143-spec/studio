@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { addDays, isBefore } from 'date-fns';
 import { Header } from '@/app/components/header';
 import { YoutubeTool } from '@/app/components/video-downloader';
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
@@ -23,17 +24,39 @@ export default function Home() {
 
   useEffect(() => {
     const subscribed = localStorage.getItem('isSubscribed') === 'true';
-    setIsSubscribed(subscribed);
-  }, []);
+    const subscriptionDateStr = localStorage.getItem('subscriptionDate');
+    
+    if (subscribed && subscriptionDateStr) {
+      const subscriptionDate = new Date(subscriptionDateStr);
+      const expiryDate = addDays(subscriptionDate, 30);
+      
+      if (isBefore(new Date(), expiryDate)) {
+        setIsSubscribed(true);
+      } else {
+        // Subscription has expired
+        localStorage.removeItem('isSubscribed');
+        localStorage.removeItem('subscriptionDate');
+        setIsSubscribed(false);
+        toast({
+          title: 'Subscription Expired',
+          description: 'Your ad-free subscription has ended. Please subscribe again.',
+        });
+      }
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [toast]);
 
   const handleSubscription = () => {
+    const now = new Date();
     setIsSubscribed(true);
     localStorage.setItem('isSubscribed', 'true');
+    localStorage.setItem('subscriptionDate', now.toISOString());
     setIsDialogOpen(false);
     setPaymentStep('confirm'); // Reset step for next time
     toast({
       title: 'Subscription Successful!',
-      description: 'Thank you for subscribing. Enjoy an ad-free experience.',
+      description: 'Thank you for subscribing. Enjoy an ad-free experience for 30 days.',
     });
   };
 
