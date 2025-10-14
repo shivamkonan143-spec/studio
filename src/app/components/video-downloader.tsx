@@ -1,12 +1,14 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,7 +28,6 @@ const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL.' }),
 });
 
-type Step = 'input' | 'preview';
 type ThumbnailQuality = 'maxresdefault' | 'hqdefault';
 
 interface OembedResponse {
@@ -53,6 +54,93 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
   }
   return { id: null, isShort: false };
 }
+
+export function YoutubeDownloaderInput() {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const { locale } = useLanguage();
+    const t = translations[locale];
+    const router = useRouter();
+    const { toast } = useToast();
+  
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: { url: '' },
+    });
+  
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+      setIsGenerating(true);
+      const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
+  
+      if (extractedVideoId) {
+        router.push(`/preview?id=${extractedVideoId}&isShort=${isShortVideo}`);
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t.videoDownloader.invalidUrlTitle,
+          description: t.videoDownloader.invalidUrlDescription,
+        });
+        setIsGenerating(false);
+      }
+    };
+  
+    return (
+        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
+            <CardContent className="p-8 pt-12 text-center">
+                <div className="inline-flex items-center justify-center bg-primary rounded-xl p-3 mb-6 shadow-lg shadow-primary/20">
+                    <Youtube className="h-8 w-8 text-white" />
+                </div>
+
+                <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">
+                    Enter <span className="text-primary">YouTube</span> video URL
+                </h2>
+                
+                <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
+                    <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                        <FormItem>
+                        <div className="relative">
+                            <FormControl>
+                            <Input
+                                placeholder={t.videoDownloader.urlPlaceholder}
+                                {...field}
+                                disabled={isGenerating}
+                                className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                            />
+                            </FormControl>
+                            {field.value && (
+                            <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => form.reset({ url: '' })}
+                                className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
+                            )}
+                        </div>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <Button 
+                    type="submit" 
+                    className="w-full"
+                    size="lg"
+                    disabled={isGenerating}
+                    >
+                    {isGenerating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
+                    </Button>
+                </form>
+                </Form>
+            </CardContent>
+        </Card>
+    );
+}
+
 
 function ManualEditDialog({
     thumbnail,
@@ -143,23 +231,42 @@ function ManualEditDialog({
     );
   }
 
-export function YoutubeTool() {
-  const [step, setStep] = useState<Step>('input');
+export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string, isShort: boolean }) {
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
-  const [videoId, setVideoId] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(true);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
-  const [isShort, setIsShort] = useState<boolean>(false);
   const { locale } = useLanguage();
   const t = translations[locale];
 
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { url: '' },
-  });
+  useEffect(() => {
+    if (!videoId) return;
+    
+    setIsGenerating(true);
+    const initialQuality = 'maxresdefault';
+    setQuality(initialQuality);
+    updateThumbnailUrl(videoId, initialQuality);
+    
+    const fetchVideoInfo = async () => {
+        try {
+            const oembedUrl = `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`;
+            const response = await fetch(oembedUrl);
+            if(response.ok) {
+                const data: OembedResponse = await response.json();
+                setVideoTitle(data.title);
+            }
+        } catch (error) {
+            console.error("Failed to fetch video title", error);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+    
+    fetchVideoInfo();
+
+  }, [videoId]);
   
   const updateThumbnailUrl = (id: string, newQuality: ThumbnailQuality) => {
     setThumbnailUrl(`https://img.youtube.com/vi/${id}/${newQuality}.jpg`);
@@ -171,42 +278,6 @@ export function YoutubeTool() {
           updateThumbnailUrl(videoId, newQuality);
       }
   }
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsGenerating(true);
-    setVideoTitle('');
-    const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
-    setIsShort(isShortVideo);
-
-    if (extractedVideoId) {
-      setVideoId(extractedVideoId);
-      const initialQuality = 'maxresdefault';
-      setQuality(initialQuality);
-      updateThumbnailUrl(extractedVideoId, initialQuality);
-      
-      try {
-        const oembedUrl = `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${extractedVideoId}&format=json`;
-        const response = await fetch(oembedUrl);
-        if(response.ok) {
-            const data: OembedResponse = await response.json();
-            setVideoTitle(data.title);
-        }
-      } catch (error) {
-        console.error("Failed to fetch video title", error);
-      }
-
-      setStep('preview');
-    } else {
-      toast({
-        variant: 'destructive',
-        title: t.videoDownloader.invalidUrlTitle,
-        description: t.videoDownloader.invalidUrlDescription,
-      });
-      setThumbnailUrl(null);
-      setVideoId(null);
-    }
-    setIsGenerating(false);
-  };
   
   const handleCopyTitle = () => {
     navigator.clipboard.writeText(videoTitle);
@@ -346,74 +417,20 @@ export function YoutubeTool() {
     }
   };
 
-  const handleReset = () => {
-    setStep('input');
-    setThumbnailUrl(null);
-    setVideoId(null);
-    setVideoTitle('');
-    setIsGenerating(false);
-    setIsShort(false);
-    form.reset();
-  };
-
   return (
-    <div className="space-y-6">
-      <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
-        <CardContent className="p-8 pt-12 text-center">
-            <div className="inline-flex items-center justify-center bg-primary rounded-xl p-3 mb-6 shadow-lg shadow-primary/20">
-                <Youtube className="h-8 w-8 text-white" />
-            </div>
-
-            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">
-                Enter <span className="text-primary">YouTube</span> video URL
-            </h2>
-            
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="relative">
-                      <FormControl>
-                        <Input
-                          placeholder={t.videoDownloader.urlPlaceholder}
-                          {...field}
-                          disabled={step !== 'input'}
-                          className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
-                        />
-                      </FormControl>
-                      {field.value && (
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => form.reset({ url: '' })}
-                          className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
-                        >
-                          <X className="h-5 w-5" />
-                        </Button>
-                      )}
+    <>
+      {isGenerating || !thumbnailUrl ? (
+        <Card>
+            <CardContent className="pt-6">
+                <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <span>{t.videoDownloader.loadingThumbnail}</span>
                     </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button 
-                type="submit" 
-                className="w-full"
-                size="lg"
-                disabled={step !== 'input' || isGenerating}
-              >
-                 {isGenerating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      {step === 'preview' && (
+                </div>
+            </CardContent>
+        </Card>
+      ) : (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -503,15 +520,15 @@ export function YoutubeTool() {
                </div>
             </div>
 
-            <Button onClick={handleReset} className="w-full" size="lg" variant="outline" disabled={isGenerating}>
-              <RefreshCcw className="mr-2 h-4 w-4" />
-              <span>{t.videoDownloader.tryAnother}</span>
+            <Button asChild className="w-full" size="lg" variant="outline">
+                <Link href="/">
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    <span>{t.videoDownloader.tryAnother}</span>
+                </Link>
             </Button>
           </CardContent>
         </Card>
       )}
-    </div>
+    </>
   );
 }
-
-    
