@@ -138,11 +138,6 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           </CollapsibleContent>
         </Collapsible>
 
-        <Button variant="ghost" className="w-full justify-start" onClick={handleShare}>
-          <Share2 className="mr-2 h-4 w-4" />
-          <span>{t.header.shareApp}</span>
-        </Button>
-        
         <Button variant="ghost" asChild className="w-full justify-start">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
               <MessageCircle className="mr-2 h-4 w-4" />
