@@ -20,6 +20,13 @@ export default function Home() {
 
   const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
   const isSubscribed = subscription?.active === true;
+  
+  // Determine if the card should be shown.
+  // We wait for both user and subscription to finish loading.
+  // Show if:
+  // 1. Not loading user or subscription.
+  // 2. The user is not subscribed.
+  const showSubscriptionCard = !isUserLoading && !isSubscriptionLoading && !isSubscribed;
 
 
   return (
@@ -27,7 +34,7 @@ export default function Home() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <YoutubeDownloaderInput />
-        {!isSubscriptionLoading && !isSubscribed && <SubscriptionCard />}
+        {showSubscriptionCard && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>
