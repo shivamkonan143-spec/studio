@@ -220,7 +220,7 @@ export function SubscriptionCard() {
                             <span className="font-medium">{t.subscription.benefit}</span>
                         </div>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold">{t.subscription.price}</span>
+                            <span className="text-4xl font-bold text-green-600">{t.subscription.price}</span>
                             <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
                             <span className="text-muted-foreground">{t.subscription.duration}</span>
                         </div>
@@ -244,4 +244,5 @@ export function SubscriptionCard() {
         </>
     );
 }
+
 
