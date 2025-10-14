@@ -40,6 +40,9 @@ export function Header() {
     return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
   };
 
+  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
+
+
   return (
     <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
       <div className="flex w-full items-center justify-between">
@@ -105,7 +108,7 @@ export function Header() {
                 )}
 
                 <DropdownMenuItem asChild>
-                  <a href="mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader">
+                  <a href={mailtoHref}>
                     <LifeBuoy className="mr-2 h-4 w-4" />
                     <span>Help &amp; Support</span>
                   </a>
