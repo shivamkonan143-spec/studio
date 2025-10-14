@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Youtube, Sparkles, Download, Check, Clapperboard, RefreshCcw, Loader2, ArrowRight } from 'lucide-react';
+import { Youtube, Sparkles, Download, Check, Clapperboard, RefreshCcw, Loader2, ArrowRight, Video, Music } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import type { AutomaticDownloadToolSelectionOutput } from '@/ai/flows/automatic-download-tool-selection';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid YouTube URL.' }),
 });
 
 type Step = 'input' | 'quality' | 'downloading' | 'complete';
+type DownloadType = 'video' | 'audio';
+
 const VIDEO_QUALITIES = ['1080p', '720p', '480p'];
+const AUDIO_QUALITIES = [{id: 'highest', label: 'Highest'}, {id: 'lowest', label: 'Lowest'}];
 
 const defaultAiResponse: AutomaticDownloadToolSelectionOutput = {
   downloadTool: 'youtube-dl',
@@ -49,7 +53,7 @@ function getYouTubeVideoId(url: string): string | null {
 
 export function VideoDownloader() {
   const [step, setStep] = useState<Step>('input');
-  const [aiResponse, setAiResponse] = useState<AutomaticDownloadToolSelectionOutput | null>(null);
+  const [downloadType, setDownloadType] = useState<DownloadType>('video');
   const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -69,13 +73,12 @@ export function VideoDownloader() {
     } else {
       setThumbnailUrl(null);
     }
-    setAiResponse(defaultAiResponse);
     setStep('quality');
   };
 
   const handleDownload = async () => {
     if (!selectedQuality) {
-      toast({ variant: 'destructive', title: 'Selection Required', description: "Please select a video quality." });
+      toast({ variant: 'destructive', title: 'Selection Required', description: `Please select a ${downloadType} quality.` });
       return;
     }
     
@@ -85,7 +88,7 @@ export function VideoDownloader() {
     const url = form.getValues('url');
 
     try {
-      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}`);
+      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}&quality=${selectedQuality}&type=${downloadType}`);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -93,7 +96,7 @@ export function VideoDownloader() {
       }
       
       const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = 'video.mp4';
+      let filename = downloadType === 'video' ? 'video.mp4' : 'audio.mp3';
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
         if (filenameMatch && filenameMatch.length > 1) {
@@ -130,7 +133,6 @@ export function VideoDownloader() {
 
   const handleReset = () => {
     setStep('input');
-    setAiResponse(null);
     setSelectedQuality(null);
     setDownloadProgress(0);
     setThumbnailUrl(null);
@@ -172,49 +174,68 @@ export function VideoDownloader() {
         </CardContent>
       </Card>
 
-      {aiResponse && (step === 'quality' || step === 'downloading' || step === 'complete') && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-accent" />
-              <span>Automated Tool Selection</span>
-            </CardTitle>
-            <CardDescription>Our system has selected the best tool for YouTube.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="font-medium">Recommended Tool: <span className="font-mono rounded bg-muted px-2 py-1 text-sm">{aiResponse.downloadTool}</span></p>
-            <p className="text-sm text-muted-foreground">{aiResponse.reasoning}</p>
-          </CardContent>
-        </Card>
-      )}
-
       {step === 'quality' && (
         <Card>
           <CardHeader>
              {thumbnailUrl && (
               <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg">
-                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" />
+                <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" />
               </div>
             )}
             <CardTitle className="flex items-center gap-2">
               <Clapperboard className="h-5 w-5" />
-              <span>Select Video Quality</span>
+              <span>Select Download Options</span>
             </CardTitle>
-            <CardDescription>Choose your desired resolution for the download.</CardDescription>
+            <CardDescription>Choose your desired download type and quality.</CardDescription>
           </CardHeader>
           <CardContent>
-            <RadioGroup onValueChange={setSelectedQuality} value={selectedQuality || ''} className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {VIDEO_QUALITIES.map((quality) => (
-                <Label key={quality} htmlFor={quality} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent/20 hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
-                  <RadioGroupItem value={quality} id={quality} className="sr-only" />
-                  <span className="text-lg font-bold">{quality}</span>
-                  <span className="text-xs text-muted-foreground">{quality === '1080p' ? 'Full HD' : quality === '720p' ? 'HD' : 'Standard'}</span>
-                </Label>
-              ))}
-            </RadioGroup>
+            <div className='space-y-4'>
+              <div>
+                <Label className="text-base font-semibold">Download Type</Label>
+                <RadioGroup onValueChange={(v) => { setDownloadType(v as DownloadType); setSelectedQuality(null); }} value={downloadType} className="mt-2 grid grid-cols-2 gap-4">
+                  <Label htmlFor="video" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent/20 hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
+                    <RadioGroupItem value="video" id="video" className="sr-only" />
+                    <Video className="mb-2 h-8 w-8" />
+                    <span className="font-bold">Video</span>
+                  </Label>
+                   <Label htmlFor="audio" className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent/20 hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
+                    <RadioGroupItem value="audio" id="audio" className="sr-only" />
+                    <Music className="mb-2 h-8 w-8" />
+                    <span className="font-bold">Audio (MP3)</span>
+                  </Label>
+                </RadioGroup>
+              </div>
+
+              <Separator />
+
+              <div>
+                <Label className="text-base font-semibold">{downloadType === 'video' ? 'Video' : 'Audio'} Quality</Label>
+                {downloadType === 'video' ? (
+                  <RadioGroup onValueChange={setSelectedQuality} value={selectedQuality || ''} className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-3">
+                    {VIDEO_QUALITIES.map((quality) => (
+                      <Label key={quality} htmlFor={quality} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent/20 hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value={quality} id={quality} className="sr-only" />
+                        <span className="text-lg font-bold">{quality}</span>
+                        <span className="text-xs text-muted-foreground">{quality === '1080p' ? 'Full HD' : quality === '720p' ? 'HD' : 'Standard'}</span>
+                      </Label>
+                    ))}
+                  </RadioGroup>
+                ) : (
+                   <RadioGroup onValueChange={setSelectedQuality} value={selectedQuality || ''} className="mt-2 grid grid-cols-2 gap-4">
+                    {AUDIO_QUALITIES.map((quality) => (
+                      <Label key={quality.id} htmlFor={quality.id} className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent/20 hover:text-accent-foreground [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value={quality.id} id={quality.id} className="sr-only" />
+                        <span className="text-lg font-bold">{quality.label}</span>
+                      </Label>
+                    ))}
+                  </RadioGroup>
+                )}
+              </div>
+            </div>
+
             <Button onClick={handleDownload} disabled={!selectedQuality || isPending} className="mt-6 w-full" size="lg" variant="default">
               {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-              {isPending ? 'Preparing Download...' : 'Download Video'}
+              {isPending ? 'Preparing Download...' : `Download ${downloadType === 'video' ? 'Video' : 'Audio'}`}
             </Button>
           </CardContent>
         </Card>
@@ -227,8 +248,8 @@ export function VideoDownloader() {
               {step === 'downloading' ? <Download className="h-5 w-5" /> : <Check className="h-5 w-5 text-green-500" />}
               <span>{step === 'downloading' ? 'Downloading...' : 'Download Complete'}</span>
             </CardTitle>
-            {step === 'downloading' && <CardDescription>Your video is being downloaded. Please wait.</CardDescription>}
-            {step === 'complete' && <CardDescription>Your video has been saved to your device's downloads folder!</CardDescription>}
+            {step === 'downloading' && <CardDescription>Your file is being downloaded. Please wait.</CardDescription>}
+            {step === 'complete' && <CardDescription>Your file has been saved to your device's downloads folder!</CardDescription>}
           </CardHeader>
           <CardContent className="space-y-4">
             <Progress value={downloadProgress} className="w-full" />
@@ -236,7 +257,7 @@ export function VideoDownloader() {
             {step === 'complete' && (
               <Button onClick={handleReset} className="w-full" variant="secondary">
                 <RefreshCcw className="mr-2 h-4 w-4" />
-                Download Another Video
+                Download Another File
               </Button>
             )}
           </CardContent>

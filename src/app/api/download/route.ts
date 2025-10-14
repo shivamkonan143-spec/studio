@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const url = searchParams.get('url');
   const quality = searchParams.get('quality') || 'highest';
+  const type = searchParams.get('type') || 'video'; // 'video' or 'audio'
 
   if (!url || !ytdl.validateURL(url)) {
     return NextResponse.json({ error: 'Invalid or missing YouTube URL' }, { status: 400 });
@@ -13,28 +14,46 @@ export async function GET(req: NextRequest) {
 
   try {
     const info = await ytdl.getInfo(url);
-    const title = info.videoDetails.title.replace(/[^\x00-\x7F]/g, ""); // Sanitize title
+    const title = info.videoDetails.title.replace(/[^\x00-\x7F]/g, "") || 'download';
 
-    let format = ytdl.chooseFormat(info.formats, { 
-      quality: quality,
-      filter: (format) => format.container === 'mp4' && format.hasAudio,
-    });
-    
-    // Fallback if no combined format is found, get the best video-only stream
-    if (!format) {
+    let format;
+    let fileExtension = 'mp4';
+    let mimeType = 'video/mp4';
+
+    if (type === 'audio') {
       format = ytdl.chooseFormat(info.formats, { 
-        quality: quality,
-        filter: (format) => format.container === 'mp4' && !format.hasAudio,
-       });
+        quality: quality === 'highest' ? 'highestaudio' : 'lowestaudio',
+        filter: 'audioonly' 
+      });
+      fileExtension = 'mp3';
+      mimeType = 'audio/mpeg';
+    } else {
+      // Video download logic
+      const qualities: ytdl.Filter[] = [
+        (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
+        'videoandaudio',
+        'video',
+      ];
+      if (quality !== 'highest') {
+        qualities.unshift((f) => f.container === 'mp4' && f.qualityLabel === quality && f.hasAudio);
+      }
+      
+      for (const q of qualities) {
+        format = ytdl.chooseFormat(info.formats, { 
+          quality: quality,
+          filter: q,
+        });
+        if (format) break;
+      }
+      if (format) {
+        fileExtension = format.container || 'mp4';
+        mimeType = format.mimeType || 'video/mp4';
+      }
     }
 
-    // If still no format, try to get any format
-    if (!format) {
-      format = ytdl.chooseFormat(info.formats, { quality });
-    }
 
     if (!format) {
-      return NextResponse.json({ error: 'Could not find a suitable video format.' }, { status: 400 });
+      return NextResponse.json({ error: 'Could not find a suitable format.' }, { status: 400 });
     }
 
     const videoStream = ytdl(url, { format });
@@ -42,8 +61,8 @@ export async function GET(req: NextRequest) {
     videoStream.pipe(passthrough);
 
     const headers = new Headers();
-    headers.set('Content-Type', format.mimeType || 'video/mp4');
-    headers.set('Content-Disposition', `attachment; filename="${title}.${format.container || 'mp4'}"`);
+    headers.set('Content-Type', mimeType);
+    headers.set('Content-Disposition', `attachment; filename="${title}.${fileExtension}"`);
 
     return new NextResponse(passthrough as any, {
       status: 200,
