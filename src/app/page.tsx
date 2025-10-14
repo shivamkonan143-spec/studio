@@ -141,7 +141,7 @@ export default function Home() {
                         </p>
                         <p className="text-sm text-muted-foreground">
                         <span className="font-bold text-foreground text-base mr-2">₹50</span>
-                        <span className="line-through">₹249</span> for one month
+                        <span className="line-through">₹249</span> for 1 Month
                         </p>
                     </div>
                     {isSubscriptionLoading ? (
