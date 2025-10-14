@@ -583,7 +583,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
             </CardTitle>
             <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             {thumbnailUrl ? (
               <Dialog>
                 <DialogTrigger asChild>
@@ -626,26 +626,24 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                     </div>
                 </div>
             )}
-            
-            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <AiEditDialog 
-                    thumbnail={thumbnailUrl} 
-                    onDownload={(url) => downloadFromUrl(url, `${videoId}_ai_edited_thumbnail.png`)} 
-                />
-                <ManualEditDialog
-                    thumbnail={thumbnailUrl}
-                    onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_custom_edited_thumbnail.png`)}
-                />
-            </div>
+
+            <ManualEditDialog
+                thumbnail={thumbnailUrl}
+                onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_custom_edited_thumbnail.png`)}
+            />
             
             {videoTitle && (
                 <div className="space-y-2">
                     <Label>{t.videoDownloader.videoTitle}</Label>
-                    <div className="relative">
+                    <div className="relative flex items-center gap-2">
                         <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
-                        <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" onClick={handleCopyTitle}>
+                        <Button variant="ghost" size="icon" className="absolute top-1/2 right-12 -translate-y-1/2 h-8 w-8" onClick={handleCopyTitle}>
                             <Clipboard className="h-4 w-4"/>
                             <span className="sr-only">{t.videoDownloader.copyTitle}</span>
+                        </Button>
+                        <Button size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
+                            <Sparkles className="h-4 w-4" />
+                            <span className="sr-only">AI Edit Title</span>
                         </Button>
                     </div>
                 </div>
