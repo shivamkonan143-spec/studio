@@ -28,6 +28,11 @@ export async function GET(req: NextRequest) {
        });
     }
 
+    // If still no format, try to get any format
+    if (!format) {
+      format = ytdl.chooseFormat(info.formats, { quality });
+    }
+
     if (!format) {
       return NextResponse.json({ error: 'Could not find a suitable video format.' }, { status: 400 });
     }
@@ -37,8 +42,8 @@ export async function GET(req: NextRequest) {
     videoStream.pipe(passthrough);
 
     const headers = new Headers();
-    headers.set('Content-Type', 'video/mp4');
-    headers.set('Content-Disposition', `attachment; filename="${title}.mp4"`);
+    headers.set('Content-Type', format.mimeType || 'video/mp4');
+    headers.set('Content-Disposition', `attachment; filename="${title}.${format.container || 'mp4'}"`);
 
     return new NextResponse(passthrough as any, {
       status: 200,
