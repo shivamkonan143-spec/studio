@@ -88,11 +88,11 @@ export function YoutubeDownloaderInput() {
         <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
             <CardContent className="p-8 pt-12 text-center">
                 <div className="inline-flex items-center justify-center bg-primary rounded-xl p-3 mb-6 shadow-lg shadow-primary/20">
-                    <Youtube className="h-8 w-8 text-white" />
+                    <Download className="h-8 w-8 text-white" />
                 </div>
 
                 <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">
-                    Enter <span className="text-primary">YouTube</span> video URL
+                    Enter video URL to <span className="text-primary">Download</span>
                 </h2>
                 
                 <Form {...form}>
