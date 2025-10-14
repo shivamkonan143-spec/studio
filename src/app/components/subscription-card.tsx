@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
-import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
@@ -31,7 +31,11 @@ export function SubscriptionCard() {
     const { toast } = useToast();
     const firestore = useFirestore();
 
-    const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+    const subscriptionRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+    }, [firestore, user]);
+    
     const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
     const isSubscribed = subscription?.active === true;
     

@@ -62,6 +62,14 @@ export function useCollection<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    // This check is important. If the ref is not memoized, it can cause infinite loops.
+    if (memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
+      const errorMessage = 'useCollection was called with a Firestore reference that was not created with useMemoFirebase. This will cause infinite loops. Memoize the reference using useMemoFirebase to fix this.';
+      console.error(errorMessage, memoizedTargetRefOrQuery);
+      // Throw an error to make it obvious during development.
+      throw new Error(errorMessage);
+    }
+    
     if (!memoizedTargetRefOrQuery) {
       setData(null);
       setIsLoading(false);
@@ -107,9 +115,7 @@ export function useCollection<T = any>(
 
     return () => unsubscribe();
   }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
-  if(memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
-    throw new Error(memoizedTargetRefOrQuery + ' was not properly memoized using useMemoFirebase');
-  }
+
   return { data, isLoading, error };
 }
 

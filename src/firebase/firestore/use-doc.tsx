@@ -39,7 +39,7 @@ export interface UseDocResult<T> {
  * @returns {UseDocResult<T>} Object with data, isLoading, error.
  */
 export function useDoc<T = any>(
-  memoizedDocRef: DocumentReference<DocumentData> | null | undefined,
+  memoizedDocRef: (DocumentReference<DocumentData> & {__memo?: boolean}) | null | undefined,
 ): UseDocResult<T> {
   type StateDataType = WithId<T> | null;
 
@@ -48,6 +48,14 @@ export function useDoc<T = any>(
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
+    // This check is important. If the ref is not memoized, it can cause infinite loops.
+    if (memoizedDocRef && !memoizedDocRef.__memo) {
+      const errorMessage = 'useDoc was called with a Firestore reference that was not created with useMemoFirebase. This will cause infinite loops. Memoize the reference using useMemoFirebase to fix this.';
+      console.error(errorMessage, memoizedDocRef);
+      // Throw an error to make it obvious during development.
+      throw new Error(errorMessage);
+    }
+
     if (!memoizedDocRef) {
       setData(null);
       setIsLoading(false);

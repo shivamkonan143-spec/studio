@@ -25,7 +25,7 @@ import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 
@@ -71,14 +71,13 @@ export function YoutubeDownloaderInput() {
     const { user } = useUser();
     const firestore = useFirestore();
 
-    const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+    const subscriptionRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+    }, [firestore, user]);
+
     const { data: subscription } = useDoc(subscriptionRef);
     const isSubscribed = subscription?.active === true;
-  
-    const form = useForm<z.infer<typeof formSchema>>({
-      resolver: zodResolver(formSchema),
-      defaultValues: { url: '' },
-    });
   
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
       if (!isSubscribed) {
@@ -100,6 +99,11 @@ export function YoutubeDownloaderInput() {
         setIsGenerating(false);
       }
     };
+  
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: { url: '' },
+    });
   
     return (
         <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
@@ -324,7 +328,11 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const { user } = useUser();
   const firestore = useFirestore();
 
-  const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+  const subscriptionRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+  }, [firestore, user]);
+
   const { data: subscription } = useDoc(subscriptionRef);
   const isSubscribed = subscription?.active === true;
 
