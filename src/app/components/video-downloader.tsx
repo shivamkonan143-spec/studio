@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -239,14 +239,18 @@ export function YoutubeTool() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{t.title}</CardTitle>
-          <CardDescription>{t.videoDownloader.pasteUrl}</CardDescription>
-        </CardHeader>
-        <CardContent>
+      <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
+        <CardContent className="p-8 pt-12 text-center">
+            <div className="inline-flex items-center justify-center bg-primary rounded-xl p-3 mb-6 shadow-lg shadow-primary/20">
+                <Youtube className="h-8 w-8 text-white" />
+            </div>
+
+            <h2 className="text-2xl font-bold tracking-tight text-foreground mb-4">
+                Enter <span className="text-primary">YouTube</span> video URL
+            </h2>
+            
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
               <FormField
                 control={form.control}
                 name="url"
@@ -258,7 +262,7 @@ export function YoutubeTool() {
                           placeholder={t.videoDownloader.urlPlaceholder}
                           {...field}
                           disabled={step !== 'input'}
-                          className="h-12 w-full rounded-lg border-2 border-muted/40 bg-muted/40 pr-10 text-base transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                          className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
                         />
                       </FormControl>
                       {field.value && (
@@ -283,7 +287,7 @@ export function YoutubeTool() {
                 size="lg"
                 disabled={step !== 'input' || isGenerating}
               >
-                 {isGenerating ? <Loader2 className="animate-spin" /> : <>{t.videoDownloader.getThumbnail} <ArrowRight className="ml-2" /></>}
+                 {isGenerating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
               </Button>
             </form>
           </Form>

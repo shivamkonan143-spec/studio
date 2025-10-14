@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Youtube } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -233,8 +233,8 @@ export function Header() {
           )}
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2 shadow-lg">
-             <Download className="h-6 w-6 text-white"/>
+          <div className="relative rounded-lg bg-red-500 p-2 shadow-lg">
+             <Youtube className="h-6 w-6 text-white"/>
           </div>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
