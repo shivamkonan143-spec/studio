@@ -26,10 +26,10 @@ type Step = 'input' | 'preview';
 type ThumbnailQuality = 'maxresdefault' | 'sddefault' | 'hqdefault' | 'mqdefault' | 'default';
 
 const qualityLabels: Record<ThumbnailQuality, string> = {
-    maxresdefault: 'Maximum',
+    maxresdefault: 'High',
     sddefault: 'HD (720p)',
     hqdefault: 'SD (480p)',
-    mqdefault: 'High (360p)',
+    mqdefault: 'Low',
     default: 'Medium (120p)',
 };
 
