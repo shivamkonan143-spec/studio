@@ -16,7 +16,7 @@ import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignIn, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
-import { onAuthStateChanged } from 'firebase/auth';
+import { AuthError } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -79,17 +79,24 @@ export default function LoginPage() {
     router.push('/');
   };
 
-  const handleAuthError = (error: any, provider: 'email' | 'google') => {
-    const title = provider === 'google' ? 'Google Sign-In Failed' : 'Login Failed';
-    const description = provider === 'google' 
-      ? 'Could not sign in with Google. Please try again.'
-      : 'Please check your email and password.';
-      
-    toast({
-      variant: 'destructive',
-      title: title,
-      description: error.message || description,
-    });
+  const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
+    if (provider === 'email' && (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential')) {
+        form.setError('password', {
+            type: 'manual',
+            message: 'Wrong password. Please try again.',
+        });
+    } else {
+        const title = provider === 'google' ? 'Google Sign-In Failed' : 'Login Failed';
+        const description = provider === 'google' 
+          ? 'Could not sign in with Google. Please try again.'
+          : 'Please check your email and password.';
+          
+        toast({
+          variant: 'destructive',
+          title: title,
+          description: error.message || description,
+        });
+    }
     setIsLoading(false);
     setIsGoogleLoading(false);
   };
