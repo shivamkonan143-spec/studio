@@ -141,6 +141,15 @@
         "shareFailedTitle": "Sharing Failed",
         "shareFailedDescription": "Could not share the app. Please try again."
     },
+    "rating": {
+        "title": "Rate our App",
+        "description": "Your feedback helps us improve.",
+        "submit": "Submit Rating",
+        "thanksTitle": "Thank You!",
+        "thanksDescription": "We appreciate your feedback.",
+        "selectRatingTitle": "No Rating Selected",
+        "selectRatingDescription": "Please select a star rating before submitting."
+    },
     "common": {
         "error": "Error",
         "loading": "Loading...",

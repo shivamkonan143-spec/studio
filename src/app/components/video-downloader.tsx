@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -27,6 +27,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
+import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
 
 
 const formSchema = z.object({
@@ -336,6 +337,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const t = translations[locale];
   const { user } = useUser();
   const firestore = useFirestore();
+  const [isRatingOpen, setIsRatingOpen] = useState(false);
 
   const subscriptionRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -403,6 +405,10 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     a.click();
     a.remove();
     window.URL.revokeObjectURL(downloadUrl);
+
+    if (!checkIfRatingGiven()) {
+      setIsRatingOpen(true);
+    }
   }
 
   const downloadFromUrl = async (url: string, fileName: string) => {
@@ -558,111 +564,112 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   }
     
   return (
-    <Card>
-        <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-            <ImageIcon className="h-5 w-5" />
-            <span>{t.videoDownloader.previewTitle}</span>
-        </CardTitle>
-        <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-        {thumbnailUrl ? (
-            <Dialog>
-            <DialogTrigger asChild>
-                <div className={cn(
-                    "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
-                    isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
-                )}>
-                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
-                    unoptimized
-                    onError={() => {
-                    if (quality === 'maxresdefault' && videoId) {
-                        setQuality('hqdefault');
-                        updateThumbnailUrl(videoId, 'hqdefault');
-                        toast({
-                            variant: 'default',
-                            title: t.videoDownloader.qualityUnavailableTitle,
-                            description: t.videoDownloader.qualityUnavailableDescription,
-                        })
-                    }
-                    }}
-                />
-                </div>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl p-2 sm:p-4">
-                <DialogHeader>
-                <DialogTitle>{t.videoDownloader.previewTitle}</DialogTitle>
-                </DialogHeader>
-                {thumbnailUrl && 
-                <div className="relative aspect-video w-full">
-                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" unoptimized />
-                </div>
-                }
-            </DialogContent>
-            </Dialog>
-        ) : (
-            <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
-                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span>{t.videoDownloader.loadingThumbnail}</span>
-                </div>
-            </div>
-        )}
+    <>
+      <Card>
+          <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5" />
+              <span>{t.videoDownloader.previewTitle}</span>
+          </CardTitle>
+          <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+          {thumbnailUrl ? (
+              <Dialog>
+              <DialogTrigger asChild>
+                  <div className={cn(
+                      "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
+                      isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
+                  )}>
+                  <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
+                      unoptimized
+                      onError={() => {
+                      if (quality === 'maxresdefault' && videoId) {
+                          setQuality('hqdefault');
+                          updateThumbnailUrl(videoId, 'hqdefault');
+                          toast({
+                              variant: 'default',
+                              title: t.videoDownloader.qualityUnavailableTitle,
+                              description: t.videoDownloader.qualityUnavailableDescription,
+                          })
+                      }
+                      }}
+                  />
+                  </div>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl p-2 sm:p-4">
+                  <DialogHeader>
+                  <DialogTitle>{t.videoDownloader.previewTitle}</DialogTitle>
+                  </DialogHeader>
+                  {thumbnailUrl && 
+                  <div className="relative aspect-video w-full">
+                      <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" unoptimized />
+                  </div>
+                  }
+              </DialogContent>
+              </Dialog>
+          ) : (
+              <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                  <span>{t.videoDownloader.loadingThumbnail}</span>
+                  </div>
+              </div>
+          )}
 
-        <div className="grid grid-cols-1 gap-4">
-            <AdvancedEditDialog
-                thumbnail={thumbnailUrl}
-                onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
-                onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
-            />
-        </div>
-        
-        {videoTitle && (
-            <div className="space-y-2">
-                <Label>{t.videoDownloader.videoTitle}</Label>
-                <div className="relative flex items-center gap-2">
-                    <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
-                    <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
-                        <Clipboard className="h-4 w-4" />
-                        <span className="sr-only">{t.videoDownloader.copyTitle}</span>
-                    </Button>
-                </div>
-            </div>
-        )}
+          <div className="grid grid-cols-1 gap-4">
+              <AdvancedEditDialog
+                  thumbnail={thumbnailUrl}
+                  onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
+                  onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
+              />
+          </div>
+          
+          {videoTitle && (
+              <div className="space-y-2">
+                  <Label>{t.videoDownloader.videoTitle}</Label>
+                  <div className="relative flex items-center gap-2">
+                      <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
+                      <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
+                          <Clipboard className="h-4 w-4" />
+                          <span className="sr-only">{t.videoDownloader.copyTitle}</span>
+                      </Button>
+                  </div>
+              </div>
+          )}
 
-        <div className="grid grid-cols-1 gap-4">
-            <div className="space-y-2">
-                <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
-                <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
-                    <SelectTrigger id="quality">
-                        <SelectValue placeholder="Select quality" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="maxresdefault">{t.videoDownloader.qualityHigh}</SelectItem>
-                        <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-        </div>
-        
-        
-        <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
-            <Download className="mr-2 h-4 w-4" />
-            {t.videoDownloader.downloadThumbnail}
-        </Button>
+          <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                  <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
+                  <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
+                      <SelectTrigger id="quality">
+                          <SelectValue placeholder="Select quality" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="maxresdefault">{t.videoDownloader.qualityHigh}</SelectItem>
+                          <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+          </div>
+          
+          
+          <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
+              <Download className="mr-2 h-4 w-4" />
+              {t.videoDownloader.downloadThumbnail}
+          </Button>
 
 
-        <Button asChild className="w-full" size="lg" variant="outline">
-            <Link href="/">
-                <RefreshCcw className="mr-2 h-4 w-4" />
-                <span>{t.videoDownloader.tryAnother}</span>
-            </Link>
-        </Button>
-        {!isSubscribed && <AdPlaceholder showAd={true} />}
-        </CardContent>
-    </Card>
+          <Button asChild className="w-full" size="lg" variant="outline">
+              <Link href="/">
+                  <RefreshCcw className="mr-2 h-4 w-4" />
+                  <span>{t.videoDownloader.tryAnother}</span>
+              </Link>
+          </Button>
+          {!isSubscribed && <AdPlaceholder showAd={true} />}
+          </CardContent>
+      </Card>
+      <RatingDialog isOpen={isRatingOpen} onOpenChange={setIsRatingOpen} />
+    </>
   );
 }
-
-    
