@@ -238,7 +238,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(true);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
-  const { locale } } from useLanguage();
+  const { locale } = useLanguage();
   const t = translations[locale];
 
   const { toast } = useToast();
