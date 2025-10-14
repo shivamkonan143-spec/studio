@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
 import { AuthError, sendPasswordResetEmail } from 'firebase/auth';
+import { DialogTitle } from '@radix-ui/react-dialog';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,6 +20,7 @@ import { initiateEmailSignIn, initiateGoogleSignIn, initiateEmailSignUp } from '
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useAuthModal } from '@/app/context/auth-modal-context';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -420,6 +422,9 @@ export function AuthDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent className="sm:max-w-md p-0">
+        <VisuallyHidden>
+          <DialogTitle>Authentication Form</DialogTitle>
+        </VisuallyHidden>
         {view === 'login' && <LoginView />}
         {view === 'signup' && <SignupView />}
         {view === 'forgot_password' && <ForgotPasswordView />}
