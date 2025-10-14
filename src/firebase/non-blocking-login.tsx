@@ -70,11 +70,4 @@ export function verifyOtp(confirmationResult: ConfirmationResult, otp: string, c
             callback(null, error);
         });
 }
-
-/** Initiate password reset email (non-blocking). */
-export function initiatePasswordReset(authInstance: Auth, email: string, callback?: PasswordResetCallback): void {
-    sendPasswordResetEmail(authInstance, email)
-        .then(() => callback && callback(true, null))
-        .catch((error) => callback && callback(false, error));
-}
     

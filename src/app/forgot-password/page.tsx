@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
 import { useState } from 'react';
-import { AuthError } from 'firebase/auth';
+import { AuthError, sendPasswordResetEmail } from 'firebase/auth';
 import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormMessage, FormItem, FormLabel } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/firebase';
-import { initiatePasswordReset } from '@/firebase/non-blocking-login';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -32,34 +31,26 @@ export default function ForgotPasswordPage() {
     defaultValues: { email: '' },
   });
 
-  const handleResetSuccess = () => {
-    setIsSubmitted(true);
-    setIsLoading(false);
-    toast({
-      title: 'Check your email',
-      description: `A password reset link has been sent to ${form.getValues('email')}.`,
-    });
-  };
-
-  const handleResetError = (error: AuthError) => {
-    setIsLoading(false);
-    toast({
-      variant: 'destructive',
-      title: 'Reset Failed',
-      description: error.message || 'An unexpected error occurred. Please try again.',
-    });
-  };
-
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
     setIsLoading(true);
-    initiatePasswordReset(auth, values.email, (success, error) => {
-      if (success) {
-        handleResetSuccess();
-      } else if (error) {
-        handleResetError(error);
-      }
-    });
+    sendPasswordResetEmail(auth, values.email)
+      .then(() => {
+        setIsSubmitted(true);
+        setIsLoading(false);
+        toast({
+          title: 'Check your email',
+          description: `A password reset link has been sent to ${values.email}.`,
+        });
+      })
+      .catch((error: AuthError) => {
+        setIsLoading(false);
+        toast({
+          variant: 'destructive',
+          title: 'Reset Failed',
+          description: error.message || 'An unexpected error occurred. Please try again.',
+        });
+      });
   };
 
   return (
