@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Youtube, Download, RefreshCcw, Loader2, Image as ImageIcon, Instagram, ArrowRight, X } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, Instagram, ArrowRight, X, Youtube } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -240,9 +240,7 @@ export function YoutubeTool() {
                   <DialogHeader>
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
-                  <div className="relative aspect-video w-full">
-                    <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" />
-                  </div>
+                  {thumbnailUrl && <Image src={thumbnailUrl} alt="Video thumbnail zoomed" width={1280} height={720} className="mx-auto rounded-md" />}
                 </DialogContent>
               </Dialog>
             ) : (
