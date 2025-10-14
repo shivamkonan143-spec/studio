@@ -6,40 +6,211 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
+import { useUser, useDoc, useFirestore } from '@/firebase';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { Badge } from '@/components/ui/badge';
+
+type PaymentMethod = 'upi' | 'card' | 'netbanking';
 
 export function SubscriptionCard() {
     const { locale } = useLanguage();
-    const t = translations[locale].subscription;
+    const t = translations[locale];
+    const { user } = useUser();
+    const { toast } = useToast();
+    const firestore = useFirestore();
+
+    const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+    const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
+    const isSubscribed = subscription?.active === true;
+    
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [step, setStep] = useState(1);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('upi');
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    const handleSubscribeClick = () => {
+        if (!user) {
+            toast({
+                variant: 'destructive',
+                title: t.common.error,
+                description: t.subscription.errorDescription,
+            });
+            return;
+        }
+        setIsDialogOpen(true);
+    };
+
+    const handleConfirm = () => {
+        setStep(2);
+    };
+    
+    const handlePayNow = () => {
+        setStep(3);
+    };
+
+    const handleCompletePayment = async () => {
+        if (!user || !firestore) return;
+        setIsProcessing(true);
+
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+
+        try {
+            await setDoc(doc(firestore, 'users', user.uid, 'subscriptions', 'main'), {
+                active: true,
+                subscribedAt: serverTimestamp(),
+                expiresAt: expiresAt,
+                paymentMethod: paymentMethod,
+            }, { merge: true });
+
+            toast({
+                variant: 'success',
+                title: t.subscription.successTitle,
+                description: t.subscription.successDescription,
+            });
+
+        } catch (error: any) {
+            console.error("Subscription failed:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: error.message || 'Failed to update subscription.',
+            })
+        } finally {
+            setIsProcessing(false);
+            setIsDialogOpen(false);
+            setStep(1);
+        }
+    };
+    
+    const renderDialogContent = () => {
+        if (step === 1) {
+            return (
+                <>
+                    <DialogHeader>
+                        <DialogTitle>{t.subscription.dialogConfirmTitle}</DialogTitle>
+                        <DialogDescription>{t.subscription.dialogConfirmDescription}</DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 space-y-2">
+                        <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                            <span className="font-medium">{t.subscription.term}</span>
+                            <span className="font-bold">{t.subscription.price}</span>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t.subscription.cancel}</Button>
+                        <Button onClick={handleConfirm}>{t.subscription.buttonSubscribe}</Button>
+                    </DialogFooter>
+                </>
+            );
+        }
+        if (step === 2) {
+             return (
+                <>
+                    <DialogHeader>
+                        <DialogTitle>{t.subscription.dialogPaymentTitle}</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                        <RadioGroup defaultValue={paymentMethod} onValueChange={(value: PaymentMethod) => setPaymentMethod(value)}>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="upi" id="upi" />
+                                <Label htmlFor="upi">{t.payment.upi}</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="card" id="card" />
+                                <Label htmlFor="card">{t.payment.card}</Label>
+                            </div>
+                             <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="netbanking" id="netbanking" />
+                                <Label htmlFor="netbanking">{t.payment.netbanking}</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="ghost" onClick={() => setStep(1)}>{t.subscription.back}</Button>
+                        <Button onClick={handlePayNow}>{t.subscription.payNow}</Button>
+                    </DialogFooter>
+                </>
+            );
+        }
+        if (step === 3) {
+            return (
+                <>
+                    <DialogHeader>
+                        <DialogTitle>{t.subscription.dialogPaymentTitle}</DialogTitle>
+                    </DialogHeader>
+                    <div className="py-8 text-center">
+                        <p>{t.subscription.completePayment}...</p>
+                    </div>
+                    <DialogFooter>
+                        <Button 
+                            className="w-full"
+                            onClick={handleCompletePayment}
+                            disabled={isProcessing}
+                        >
+                            {isProcessing ? t.common.loading : t.subscription.completePayment}
+                        </Button>
+                    </DialogFooter>
+                </>
+            )
+        }
+    };
+
 
     return (
-        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-gradient-to-br from-accent/10 via-transparent to-transparent">
-            <CardHeader className="p-8 pb-4">
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-accent/10 rounded-lg">
-                        <Star className="w-6 h-6 text-accent" />
+        <>
+            <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-gradient-to-br from-accent/10 via-transparent to-transparent">
+                <CardHeader className="p-8 pb-4">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-accent/10 rounded-lg">
+                            <Star className="w-6 h-6 text-accent" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+                            {t.subscription.title}
+                        </CardTitle>
                     </div>
-                    <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-                        {t.title}
-                    </CardTitle>
-                </div>
-                <CardDescription>{t.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="p-8 pt-0">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <span className="font-medium">{t.benefit}</span>
+                    <CardDescription>{t.subscription.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 pt-0">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <span className="font-medium">{t.subscription.benefit}</span>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-4xl font-bold">{t.subscription.price}</span>
+                            <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
+                            <span className="text-muted-foreground">{t.subscription.duration}</span>
+                        </div>
+                        {isSubscribed ? (
+                            <Badge variant="success" className="w-full text-center justify-center text-lg py-2">
+                                {t.subscription.statusSubscribed}
+                            </Badge>
+                        ) : (
+                            <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick} disabled={isSubscriptionLoading}>
+                                {t.subscription.buttonSubscribe}
+                            </Button>
+                        )}
                     </div>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold">{t.price}</span>
-                        <span className="text-lg text-muted-foreground line-through">{t.originalPrice}</span>
-                        <span className="text-muted-foreground">{t.duration}</span>
-                    </div>
-                    <Button size="lg" variant="destructive" className="w-full">
-                        {t.buttonSubscribe}
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent>
+                    {renderDialogContent()}
+                </DialogContent>
+            </Dialog>
+        </>
     );
+}
+
+// Add a new variant to the badge component
+declare module "@/components/ui/badge" {
+    interface BadgeProps {
+        variant: "default" | "secondary" | "destructive" | "outline" | "success";
+    }
 }
