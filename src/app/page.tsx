@@ -9,12 +9,12 @@ import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { Gem, Wallet, CreditCard, Landmark, ArrowLeft } from 'lucide-react';
+import { Gem, Wallet, CreditCard, Landmark, ArrowLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { setDocumentNonBlocking } from '@/firebase';
 
@@ -37,44 +37,35 @@ export default function Home() {
     return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
   }, [firestore, user]);
 
+  const { data: subscriptionData, isLoading: isSubscriptionLoading } = useDoc<Subscription>(userSubscriptionRef);
+
   useEffect(() => {
-    if (!user || !userSubscriptionRef) {
+    if (isSubscriptionLoading) return;
+    if (!user || !subscriptionData) {
       setIsSubscribed(false);
       return;
     }
-
-    const checkSubscription = async () => {
-      try {
-        const docSnap = await getDoc(userSubscriptionRef);
-        if (docSnap.exists()) {
-          const subData = docSnap.data() as Subscription;
-          if (subData.active && subData.expiresAt) {
-            const expiryDate = subData.expiresAt.toDate();
-            if (isBefore(new Date(), expiryDate)) {
-              setIsSubscribed(true);
-            } else {
-              setIsSubscribed(false);
-              // Optionally update the status in Firestore
-              setDocumentNonBlocking(userSubscriptionRef, { active: false }, { merge: true });
-              toast({
-                title: 'Subscription Expired',
-                description: 'Your ad-free subscription has ended. Please subscribe again.',
-              });
-            }
-          } else {
-            setIsSubscribed(false);
-          }
-        } else {
-          setIsSubscribed(false);
-        }
-      } catch (error) {
-        console.error("Error checking subscription:", error);
+  
+    if (subscriptionData.active && subscriptionData.expiresAt) {
+      const expiryDate = subscriptionData.expiresAt.toDate();
+      if (isBefore(new Date(), expiryDate)) {
+        setIsSubscribed(true);
+      } else {
         setIsSubscribed(false);
+        // Check if the subscription is marked as active before updating
+        if (subscriptionData.active && userSubscriptionRef) {
+          setDocumentNonBlocking(userSubscriptionRef, { active: false }, { merge: true });
+          toast({
+            title: 'Subscription Expired',
+            description: 'Your ad-free subscription has ended. Please subscribe again.',
+          });
+        }
       }
-    };
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [user, subscriptionData, isSubscriptionLoading, userSubscriptionRef, toast]);
 
-    checkSubscription();
-  }, [user, userSubscriptionRef, toast]);
 
   const handleSubscription = async () => {
     if (!userSubscriptionRef) {
@@ -87,13 +78,13 @@ export default function Home() {
     }
 
     const expiryDate = addDays(new Date(), 30);
-    const subscriptionData = {
+    const newSubscriptionData = {
       active: true,
       subscribedAt: serverTimestamp(),
       expiresAt: expiryDate,
     };
     
-    setDocumentNonBlocking(userSubscriptionRef, subscriptionData, { merge: true });
+    setDocumentNonBlocking(userSubscriptionRef, newSubscriptionData, { merge: true });
 
     setIsSubscribed(true);
     setIsDialogOpen(false);
@@ -141,7 +132,9 @@ export default function Home() {
                         ₹50 for one month
                         </p>
                     </div>
-                    {isSubscribed ? (
+                    {isSubscriptionLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin"/>
+                    ) : isSubscribed ? (
                        <Badge variant="secondary">Subscribed</Badge>
                     ) : (
                       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
@@ -230,3 +223,5 @@ export default function Home() {
     </main>
   );
 }
+
+    
