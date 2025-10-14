@@ -25,6 +25,8 @@ import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useUser, useDoc, useFirestore } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 
 const formSchema = z.object({
@@ -60,10 +62,18 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
 
 export function YoutubeDownloaderInput() {
     const [isGenerating, setIsGenerating] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
+    const [showAd, setShowAd] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
     const router = useRouter();
     const { toast } = useToast();
+    const { user } = useUser();
+    const firestore = useFirestore();
+
+    const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+    const { data: subscription } = useDoc(subscriptionRef);
+    const isSubscribed = subscription?.active === true;
   
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -71,6 +81,11 @@ export function YoutubeDownloaderInput() {
     });
   
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+      if (!isSubscribed) {
+        setClickCount(prev => prev + 1);
+        setShowAd(true);
+      }
+
       setIsGenerating(true);
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
   
@@ -139,7 +154,7 @@ export function YoutubeDownloaderInput() {
                     </Button>
                 </form>
                 </Form>
-                 <AdPlaceholder />
+                 <AdPlaceholder showAd={showAd && !isSubscribed} />
             </CardContent>
         </Card>
     );
@@ -306,6 +321,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
   const { locale } = useLanguage();
   const t = translations[locale];
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const subscriptionRef = user ? doc(firestore, 'users', user.uid, 'subscriptions', 'main') : null;
+  const { data: subscription } = useDoc(subscriptionRef);
+  const isSubscribed = subscription?.active === true;
+
 
   const { toast } = useToast();
 
@@ -570,6 +592,14 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             </div>
         )}
+
+        <div className="grid grid-cols-1 gap-4">
+            <AdvancedEditDialog
+                thumbnail={thumbnailUrl}
+                onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
+                onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
+            />
+        </div>
         
         {videoTitle && (
             <div className="space-y-2">
@@ -584,7 +614,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
             </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
                 <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
                 <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
@@ -596,14 +626,6 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                         <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
                     </SelectContent>
                 </Select>
-            </div>
-             <div className="space-y-2">
-                <Label>&nbsp;</Label>
-                <AdvancedEditDialog
-                    thumbnail={thumbnailUrl}
-                    onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
-                    onCropAndDownload={(url, aspect) => cropAndDownloadImage(url, `${videoId}_cropped_thumbnail.jpg`, aspect)}
-                />
             </div>
         </div>
         
@@ -620,7 +642,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 <span>{t.videoDownloader.tryAnother}</span>
             </Link>
         </Button>
-        <AdPlaceholder />
+        {!isSubscribed && <AdPlaceholder showAd={true} />}
         </CardContent>
     </Card>
   );
