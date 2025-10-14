@@ -221,7 +221,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" fill objectFit="cover" 
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" 
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
@@ -288,12 +288,12 @@ export function YoutubeTool() {
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-5 w-5" />
+                    <Instagram className="h-5 w-5 text-pink-500" />
                     </a>
                 </Button>
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-5 w-5" />
+                    <Youtube className="h-5 w-5 text-red-600" />
                     </a>
                 </Button>
             </div>
