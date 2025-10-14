@@ -221,7 +221,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" 
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" className="h-full w-full"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
