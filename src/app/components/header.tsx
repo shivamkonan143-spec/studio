@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu } from 'lucide-react';
+import { Download, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +20,7 @@ import {
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { HelpAndSupportDialog } from './help-and-support';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -93,6 +94,13 @@ export function Header() {
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
+                
+                <HelpAndSupportDialog>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <LifeBuoy className="mr-2 h-4 w-4" />
+                      <span>Help &amp; Support</span>
+                    </DropdownMenuItem>
+                </HelpAndSupportDialog>
 
                 {!user && (
                   <>
