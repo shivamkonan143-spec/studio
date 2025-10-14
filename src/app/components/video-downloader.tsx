@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Youtube, Download, RefreshCcw, Loader2, ArrowRight, Clipboard, Check } from 'lucide-react';
+import { Youtube, Download, RefreshCcw, Loader2, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -12,14 +12,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Textarea } from '@/components/ui/textarea';
-import { generateVideoScript } from '../actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid YouTube URL.' }),
 });
 
 type Step = 'input' | 'preview';
+type ThumbnailQuality = 'maxresdefault' | 'sddefault' | 'hqdefault' | 'mqdefault' | 'default';
+
+const qualityLabels: Record<ThumbnailQuality, string> = {
+    maxresdefault: 'Maximum',
+    sddefault: 'HD (720p)',
+    hqdefault: 'SD (480p)',
+    mqdefault: 'High (360p)',
+    default: 'Medium (120p)',
+};
 
 function getYouTubeVideoId(url: string): string | null {
   try {
@@ -43,9 +53,9 @@ export function YoutubeTool() {
   const [step, setStep] = useState<Step>('input');
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoId, setVideoId] = useState<string | null>(null);
-  const [script, setScript] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
+
 
   const { toast } = useToast();
 
@@ -54,39 +64,26 @@ export function YoutubeTool() {
     defaultValues: { url: '' },
   });
   
+  const updateThumbnailUrl = (id: string, newQuality: ThumbnailQuality) => {
+    setThumbnailUrl(`https://img.youtube.com/vi/${id}/${newQuality}.jpg`);
+  };
+
+  const handleQualityChange = (newQuality: ThumbnailQuality) => {
+      if (videoId) {
+          setQuality(newQuality);
+          updateThumbnailUrl(videoId, newQuality);
+      }
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
-    setScript(null);
     const extractedVideoId = getYouTubeVideoId(values.url);
     if (extractedVideoId) {
       setVideoId(extractedVideoId);
-      setThumbnailUrl(`https://img.youtube.com/vi/${extractedVideoId}/maxresdefault.jpg`);
+      const initialQuality = 'maxresdefault';
+      setQuality(initialQuality);
+      updateThumbnailUrl(extractedVideoId, initialQuality);
       setStep('preview');
-
-      try {
-        const formData = new FormData();
-        formData.append('url', values.url);
-        const result = await generateVideoScript(formData);
-        if (result.success) {
-          setScript(result.data.script);
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Script Generation Failed',
-            description: result.error,
-          });
-          setScript('Could not generate script for this video.');
-        }
-      } catch (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: 'An unexpected error occurred while generating the script.',
-        });
-        setScript('Could not generate script for this video.');
-      } finally {
-        setIsGenerating(false);
-      }
     } else {
       toast({
         variant: 'destructive',
@@ -95,8 +92,8 @@ export function YoutubeTool() {
       });
       setThumbnailUrl(null);
       setVideoId(null);
-      setIsGenerating(false);
     }
+    setIsGenerating(false);
   };
 
   const handleDownloadThumbnail = async () => {
@@ -112,56 +109,47 @@ export function YoutubeTool() {
     try {
       const response = await fetch(thumbnailUrl);
       if (!response.ok) {
-        const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        const fallbackResponse = await fetch(fallbackUrl);
-        if (!fallbackResponse.ok) throw new Error('Failed to fetch thumbnail image.');
-        
-        const blob = await fallbackResponse.blob();
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `${videoId}_thumbnail.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(downloadUrl);
-        return;
+        // Fallback for maxresdefault if it doesn't exist
+        if (quality === 'maxresdefault') {
+            const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+            const fallbackResponse = await fetch(fallbackUrl);
+            if (!fallbackResponse.ok) throw new Error('Failed to fetch thumbnail image.');
+            
+            const blob = await fallbackResponse.blob();
+            triggerDownload(blob, `${videoId}_hq_thumbnail.jpg`);
+            return;
+        }
+        throw new Error('Failed to fetch thumbnail image.');
       }
       
       const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = `${videoId}_thumbnail_hd.jpg`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(downloadUrl);
+      triggerDownload(blob, `${videoId}_${quality}_thumbnail.jpg`);
   
     } catch (error: any) {
       console.error('Download error:', error);
       toast({
         variant: 'destructive',
         title: 'Download Failed',
-        description: 'Could not download the thumbnail. Please check the URL and try again.',
+        description: 'Could not download the thumbnail. The selected quality may not be available.',
       });
     }
   };
 
-  const handleCopyScript = () => {
-    if (script) {
-      navigator.clipboard.writeText(script);
-      setIsCopied(true);
-      toast({ title: 'Script Copied!', description: 'The script has been copied to your clipboard.' });
-      setTimeout(() => setIsCopied(false), 2000);
-    }
-  };
+  const triggerDownload = (blob: Blob, fileName: string) => {
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+  }
 
   const handleReset = () => {
     setStep('input');
     setThumbnailUrl(null);
     setVideoId(null);
-    setScript(null);
     setIsGenerating(false);
     form.reset();
   };
@@ -174,7 +162,7 @@ export function YoutubeTool() {
             <Youtube className="h-5 w-5" />
             <span>Enter YouTube Video URL</span>
           </CardTitle>
-          <CardDescription>Paste the URL of the YouTube video to download its thumbnail and generate a script.</CardDescription>
+          <CardDescription>Paste the URL of the YouTube video to download its thumbnail.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -193,7 +181,7 @@ export function YoutubeTool() {
                 )}
               />
               <Button type="submit" className="w-full sm:w-auto" disabled={step !== 'input' || isGenerating}>
-                 {isGenerating ? <Loader2 className="animate-spin" /> : <span>Generate</span>}
+                 {isGenerating ? <Loader2 className="animate-spin" /> : <span>Get Thumbnail</span>}
                  {!isGenerating && <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </form>
@@ -205,57 +193,58 @@ export function YoutubeTool() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <span>Results</span>
+              <ImageIcon className="h-5 w-5" />
+              <span>Thumbnail Preview</span>
             </CardTitle>
-            <CardDescription>Download the thumbnail and copy the generated script below.</CardDescription>
+            <CardDescription>Select the desired quality and download the thumbnail.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {thumbnailUrl && (
-              <div>
-                <h3 className="mb-2 text-lg font-semibold">Thumbnail</h3>
-                <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border">
-                  <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
-                    onError={() => {
-                      if (videoId) setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`)
-                    }}
-                  />
-                </div>
-                <Button onClick={handleDownloadThumbnail} className="w-full">
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Thumbnail
-                </Button>
+            {thumbnailUrl ? (
+              <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg border">
+                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" 
+                  onError={() => {
+                    // If maxres fails, fall back to hq
+                    if (quality === 'maxresdefault' && videoId) {
+                      setQuality('hqdefault');
+                      updateThumbnailUrl(videoId, 'hqdefault');
+                      toast({
+                          variant: 'default',
+                          title: 'Quality not available',
+                          description: "Maximum quality isn't available for this video. Switched to High quality.",
+                      })
+                    }
+                  }}
+                />
               </div>
+            ) : (
+                <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <span>Loading thumbnail...</span>
+                    </div>
+                </div>
             )}
             
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">Generated Script</h3>
-              {isGenerating ? (
-                <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <span>Generating script...</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="relative">
-                  <Textarea
-                    readOnly
-                    value={script || ''}
-                    placeholder="Script will appear here..."
-                    className="min-h-[200px] w-full"
-                  />
-                  {script && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-2"
-                      onClick={handleCopyScript}
-                    >
-                      {isCopied ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
-                    </Button>
-                  )}
-                </div>
-              )}
+            <div className="grid w-full gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="quality">Quality</Label>
+                <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
+                    <SelectTrigger id="quality">
+                        <SelectValue placeholder="Select quality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {Object.entries(qualityLabels).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </div>
+               <div className="space-y-2 self-end">
+                 <Button onClick={handleDownloadThumbnail} className="w-full">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Thumbnail
+                </Button>
+               </div>
             </div>
 
             <Button onClick={handleReset} className="w-full" size="lg" variant="outline" disabled={isGenerating}>

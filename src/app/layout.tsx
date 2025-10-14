@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'YouTube Thumbnail & Script Generator',
-  description: 'Download thumbnails and generate scripts from any YouTube video.',
+  title: 'YouTube Thumbnail Downloader',
+  description: 'Download thumbnails from any YouTube video.',
 };
 
 export default function RootLayout({
