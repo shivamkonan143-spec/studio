@@ -35,7 +35,7 @@ const prompt = ai.definePrompt({
   Based on the video URL, analyze the URL to determine the source of the video and recommend the most appropriate download tool.
   Explain your reasoning for selecting the tool.
 
-  If the URL contains 'youtube.com' or 'youtu.be', you MUST recommend 'youtube-dl', regardless of any other parameters in the URL.
+  If the URL contains 'youtube.com' or 'youtu.be', you MUST recommend 'youtube-dl', regardless of any other parameters or text in the URL.
 
   Available download tools:
   - youtube-dl
