@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2 } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
+import { useToast } from '@/hooks/use-toast';
 
 export function Header() {
   const { user, isUserLoading } = useUser();
@@ -29,6 +30,7 @@ export function Header() {
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
+  const { toast } = useToast();
 
   const handleLogout = async () => {
     if (auth) {
@@ -44,6 +46,26 @@ export function Header() {
   };
 
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
+  
+  const handleShare = async () => {
+    const shareData = {
+      title: t.title,
+      text: t.share.text,
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      toast({
+        title: t.share.notSupportedTitle,
+        description: t.share.notSupportedDescription,
+      });
+    }
+  };
 
 
   return (
@@ -100,6 +122,11 @@ export function Header() {
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
+
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  <span>{t.header.shareApp}</span>
+                </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                   <a href={mailtoHref}>

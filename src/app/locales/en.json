@@ -11,6 +11,7 @@
         "english": "English",
         "hindi": "Hindi",
         "helpAndSupport": "Help & Support",
+        "shareApp": "Share App",
         "logout": "Log out",
         "login": "Log In",
         "register": "Register",
@@ -117,6 +118,11 @@
     },
     "ad": {
         "placeholder": "Advertisement"
+    },
+    "share": {
+        "text": "Check out this amazing Thumbnail Downloader app!",
+        "notSupportedTitle": "Sharing Not Supported",
+        "notSupportedDescription": "Your browser does not support the share feature."
     },
     "common": {
         "error": "Error",
