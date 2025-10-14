@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Auth, // Import Auth type for type hinting
@@ -7,18 +8,19 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   AuthError,
+  User,
   // Assume getAuth and app are initialized elsewhere
 } from 'firebase/auth';
 
-type AuthCallback = (error: AuthError | null) => void;
+type AuthCallback = (user: User | null, error: AuthError | null) => void;
 
 
 /** Initiate anonymous sign-in (non-blocking). */
 export function initiateAnonymousSignIn(authInstance: Auth, callback?: AuthCallback): void {
   // CRITICAL: Call signInAnonymously directly. Do NOT use 'await signInAnonymously(...)'.
   signInAnonymously(authInstance)
-    .then(() => callback && callback(null))
-    .catch((error) => callback && callback(error));
+    .then((userCredential) => callback && callback(userCredential.user, null))
+    .catch((error) => callback && callback(null, error));
   // Code continues immediately. Auth state change is handled by onAuthStateChanged listener.
 }
 
@@ -26,8 +28,8 @@ export function initiateAnonymousSignIn(authInstance: Auth, callback?: AuthCallb
 export function initiateEmailSignUp(authInstance: Auth, email: string, password: string, callback?: AuthCallback): void {
   // CRITICAL: Call createUserWithEmailAndPassword directly. Do NOT use 'await createUserWithEmailAndPassword(...)'.
   createUserWithEmailAndPassword(authInstance, email, password)
-    .then(() => callback && callback(null))
-    .catch((error) => callback && callback(error));
+    .then((userCredential) => callback && callback(userCredential.user, null))
+    .catch((error) => callback && callback(null, error));
   // Code continues immediately. Auth state change is handled by onAuthStateChanged listener.
 }
 
@@ -35,8 +37,8 @@ export function initiateEmailSignUp(authInstance: Auth, email: string, password:
 export function initiateEmailSignIn(authInstance: Auth, email: string, password: string, callback?: AuthCallback): void {
   // CRITICAL: Call signInWithEmailAndPassword directly. Do NOT use 'await signInWithEmailAndPassword(...)'.
   signInWithEmailAndPassword(authInstance, email, password)
-    .then(() => callback && callback(null))
-    .catch((error) => callback && callback(error));
+    .then((userCredential) => callback && callback(userCredential.user, null))
+    .catch((error) => callback && callback(null, error));
   // Code continues immediately. Auth state change is handled by onAuthStateChanged listener.
 }
 
@@ -45,7 +47,7 @@ export function initiateGoogleSignIn(authInstance: Auth, callback?: AuthCallback
     const provider = new GoogleAuthProvider();
     // CRITICAL: Call signInWithPopup directly. Do NOT use 'await signInWithPopup(...)'.
     signInWithPopup(authInstance, provider)
-      .then(() => callback && callback(null))
-      .catch((error) => callback && callback(error));
+      .then((userCredential) => callback && callback(userCredential.user, null))
+      .catch((error) => callback && callback(null, error));
     // Code continues immediately. Auth state change is handled by onAuthStateChanged listener.
 }

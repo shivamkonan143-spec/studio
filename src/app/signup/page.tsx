@@ -70,47 +70,40 @@ export default function SignUpPage() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (!isUserLoading && user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, isUserLoading, router]);
 
-  const handleAuthChange = (isSignUp: boolean) => {
-    if(!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if(user){
-            toast({ title: isSignUp ? 'Account Created' : 'Login Successful', description: 'You have been successfully signed in.' });
-            router.push('/');
-        }
-        setIsLoading(false);
-        setIsGoogleLoading(false);
-        unsubscribe();
-      },
-      (error) => {
-        setIsLoading(false);
-        setIsGoogleLoading(false);
-        toast({
-          variant: 'destructive',
-          title: isSignUp ? 'Sign Up Failed' : 'Login Failed',
-          description: error.message || 'An unexpected error occurred.',
-        });
-        unsubscribe();
-      }
-    );
-  }
+  const handleAuthSuccess = () => {
+    toast({ title: 'Account Created', description: 'You have been successfully signed in.' });
+    router.push('/');
+  };
+
+  const handleAuthError = (error: any, provider: 'email' | 'google') => {
+    const title = provider === 'google' ? 'Google Sign-In Failed' : 'Sign Up Failed';
+    const description = provider === 'google' 
+      ? 'Could not sign in with Google. Please try again.'
+      : 'This email might already be in use.';
+      
+    toast({
+      variant: 'destructive',
+      title: title,
+      description: error.message || description,
+    });
+    setIsLoading(false);
+    setIsGoogleLoading(false);
+  };
+
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
     setIsLoading(true);
-    handleAuthChange(true);
-    initiateEmailSignUp(auth, values.email, values.password, (error) => {
-       if(error) {
-           setIsLoading(false);
-           toast({
-              variant: 'destructive',
-              title: 'Sign Up Failed',
-              description: 'This email might already be in use.',
-            });
+    initiateEmailSignUp(auth, values.email, values.password, (user, error) => {
+       if (user) {
+        handleAuthSuccess();
+       } else if (error) {
+        handleAuthError(error, 'email');
        }
     });
   };
@@ -118,16 +111,12 @@ export default function SignUpPage() {
   const handleGoogleSignIn = () => {
     if (!auth) return;
     setIsGoogleLoading(true);
-    handleAuthChange(false); // Can be either sign up or login
-    initiateGoogleSignIn(auth, (error) => {
-        if(error) {
-            setIsGoogleLoading(false);
-            toast({
-                variant: 'destructive',
-                title: 'Google Sign-In Failed',
-                description: 'Could not sign in with Google. Please try again.',
-            });
-        }
+    initiateGoogleSignIn(auth, (user, error) => {
+      if (user) {
+        handleAuthSuccess();
+      } else if (error) {
+        handleAuthError(error, 'google');
+      }
     })
   }
 

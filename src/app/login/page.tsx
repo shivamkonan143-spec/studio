@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -68,47 +69,39 @@ export default function LoginPage() {
   });
   
   useEffect(() => {
-    if (user) {
+    if (!isUserLoading && user) {
       router.push('/');
     }
-  }, [user, router]);
-  
-  const handleAuthChange = () => {
-    if(!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if(user){
-          toast({ title: 'Login Successful', description: `Welcome back!` });
-          router.push('/');
-        }
-        setIsLoading(false);
-        setIsGoogleLoading(false);
-        unsubscribe();
-      },
-      (error) => {
-        setIsLoading(false);
-        setIsGoogleLoading(false);
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: error.message || 'An unexpected error occurred.',
-        });
-        unsubscribe();
-      }
-    );
-  }
+  }, [user, isUserLoading, router]);
+
+  const handleAuthSuccess = () => {
+    toast({ title: 'Login Successful', description: `Welcome back!` });
+    router.push('/');
+  };
+
+  const handleAuthError = (error: any, provider: 'email' | 'google') => {
+    const title = provider === 'google' ? 'Google Sign-In Failed' : 'Login Failed';
+    const description = provider === 'google' 
+      ? 'Could not sign in with Google. Please try again.'
+      : 'Please check your email and password.';
+      
+    toast({
+      variant: 'destructive',
+      title: title,
+      description: error.message || description,
+    });
+    setIsLoading(false);
+    setIsGoogleLoading(false);
+  };
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
     setIsLoading(true);
-    handleAuthChange();
-    initiateEmailSignIn(auth, values.email, values.password, (error) => {
-      if (error) {
-        setIsLoading(false);
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: 'Please check your email and password.',
-        });
+    initiateEmailSignIn(auth, values.email, values.password, (user, error) => {
+      if (user) {
+        handleAuthSuccess();
+      } else if (error) {
+        handleAuthError(error, 'email');
       }
     });
   };
@@ -116,16 +109,12 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     if (!auth) return;
     setIsGoogleLoading(true);
-    handleAuthChange();
-    initiateGoogleSignIn(auth, (error) => {
-        if(error) {
-            setIsGoogleLoading(false);
-            toast({
-                variant: 'destructive',
-                title: 'Google Sign-In Failed',
-                description: 'Could not sign in with Google. Please try again.',
-            });
-        }
+    initiateGoogleSignIn(auth, (user, error) => {
+      if (user) {
+        handleAuthSuccess();
+      } else if (error) {
+        handleAuthError(error, 'google');
+      }
     })
   }
 
@@ -136,7 +125,6 @@ export default function LoginPage() {
       </div>
     );
   }
-
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4">
