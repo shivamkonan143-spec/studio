@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Youtube, Sparkles, Download, Check, Clapperboard, RefreshCcw, Loader2, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -28,11 +29,30 @@ const defaultAiResponse: AutomaticDownloadToolSelectionOutput = {
   reasoning: 'This tool is recommended for all YouTube video downloads for best compatibility.'
 };
 
+function getYouTubeVideoId(url: string): string | null {
+  try {
+    const urlObj = new URL(url);
+    if (urlObj.hostname === 'youtu.be') {
+      return urlObj.pathname.slice(1);
+    }
+    if (urlObj.hostname === 'www.youtube.com' || urlObj.hostname === 'youtube.com') {
+      if (urlObj.pathname === '/watch') {
+        return urlObj.searchParams.get('v');
+      }
+    }
+  } catch (e) {
+    console.error('Invalid URL for video ID extraction', e);
+    return null;
+  }
+  return null;
+}
+
 export function VideoDownloader() {
   const [step, setStep] = useState<Step>('input');
   const [aiResponse, setAiResponse] = useState<AutomaticDownloadToolSelectionOutput | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const { toast } = useToast();
@@ -43,7 +63,12 @@ export function VideoDownloader() {
   });
   
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // Skip analysis and go directly to quality selection
+    const videoId = getYouTubeVideoId(values.url);
+    if (videoId) {
+      setThumbnailUrl(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+    } else {
+      setThumbnailUrl(null);
+    }
     setAiResponse(defaultAiResponse);
     setStep('quality');
   };
@@ -86,13 +111,11 @@ export function VideoDownloader() {
       a.remove();
       window.URL.revokeObjectURL(downloadUrl);
       
-      // This is a rough simulation, as we don't have real progress from this method
       setDownloadProgress(50);
       setTimeout(() => {
         setDownloadProgress(100);
         setStep('complete');
       }, 500);
-
 
     } catch (error: any) {
       console.error('Download error:', error);
@@ -110,6 +133,7 @@ export function VideoDownloader() {
     setAiResponse(null);
     setSelectedQuality(null);
     setDownloadProgress(0);
+    setThumbnailUrl(null);
     form.reset();
   };
 
@@ -167,6 +191,11 @@ export function VideoDownloader() {
       {step === 'quality' && (
         <Card>
           <CardHeader>
+             {thumbnailUrl && (
+              <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg">
+                <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" />
+              </div>
+            )}
             <CardTitle className="flex items-center gap-2">
               <Clapperboard className="h-5 w-5" />
               <span>Select Video Quality</span>
