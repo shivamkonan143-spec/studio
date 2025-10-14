@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -86,6 +86,8 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
     closeMenu?.();
   };
 
+  const whatsAppShareUrl = `https://wa.me/?text=${encodeURIComponent(`${t.share.text} https://6000-firebase-studio-1760436580721.cluster-osvg2nzmmzhzqqjio6oojllbg4.cloudworkstations.dev/`)}`;
+
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
     closeMenu?.();
@@ -140,6 +142,14 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           <Share2 className="mr-2 h-4 w-4" />
           <span>{t.header.shareApp}</span>
         </Button>
+        
+        <Button variant="ghost" asChild className="w-full justify-start">
+            <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
+              <MessageCircle className="mr-2 h-4 w-4" />
+              <span>Share on WhatsApp</span>
+            </a>
+        </Button>
+
 
         <Button variant="ghost" asChild className="w-full justify-start">
           <a href={mailtoHref} onClick={() => closeMenu?.()}>
@@ -270,7 +280,3 @@ export function Header() {
     </header>
   );
 }
-
-    
-
-    
