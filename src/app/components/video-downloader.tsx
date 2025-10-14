@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -15,10 +15,12 @@ import { Form, FormControl, FormField, FormMessage, FormItem } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
+import { editThumbnail } from '@/ai/flows/edit-thumbnail-flow';
+import { Textarea } from '@/components/ui/textarea';
 
 
 const formSchema = z.object({
@@ -51,6 +53,88 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
     return { id: null, isShort: false };
   }
   return { id: null, isShort: false };
+}
+
+function AiEditDialog({ thumbnail, onDownload }: { thumbnail: string | null, onDownload: (url: string) => void }) {
+    const [prompt, setPrompt] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [editedThumbnail, setEditedThumbnail] = useState<string | null>(null);
+    const { toast } = useToast();
+
+    const handleGenerate = async () => {
+        if (!prompt || !thumbnail) return;
+        setIsGenerating(true);
+        setEditedThumbnail(null);
+        try {
+            const result = await editThumbnail({ image: thumbnail, prompt });
+            if (result.editedImage) {
+                setEditedThumbnail(result.editedImage);
+            } else {
+                throw new Error("AI did not return an image.");
+            }
+        } catch (error) {
+            console.error("AI editing failed:", error);
+            toast({
+                variant: 'destructive',
+                title: "Editing Failed",
+                description: "The AI could not process your request. Please try a different prompt.",
+            });
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Edit with AI
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Thumbnail with AI</DialogTitle>
+                    <DialogDescription>
+                        Describe the changes you want to make to the thumbnail. For example, "make it more vibrant" or "add the text 'New Video!' at the bottom".
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                        {isGenerating && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                                <Loader2 className="h-8 w-8 animate-spin text-white" />
+                            </div>
+                        )}
+                        <Image
+                            src={editedThumbnail || thumbnail || ''}
+                            alt="Thumbnail"
+                            layout="fill"
+                            objectFit="contain"
+                        />
+                    </div>
+                    <Textarea
+                        placeholder="e.g., increase brightness, add a red border, crop to a square"
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        disabled={isGenerating}
+                    />
+                </div>
+                <DialogFooter>
+                    {editedThumbnail && (
+                         <Button onClick={() => onDownload(editedThumbnail)}>
+                            <Download className="mr-2 h-4 w-4" />
+                            Download Edited
+                        </Button>
+                    )}
+                    <Button onClick={handleGenerate} disabled={isGenerating || !prompt}>
+                        {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Generate
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
 
 export function YoutubeTool() {
@@ -135,6 +219,30 @@ export function YoutubeTool() {
     a.remove();
     window.URL.revokeObjectURL(downloadUrl);
   }
+
+    const downloadImageFromUrl = async (url: string, fileName: string) => {
+        try {
+            // For data URIs, we need to convert them to a blob first
+            if (url.startsWith('data:')) {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                triggerDownload(blob, fileName);
+            } else {
+                // For regular URLs, fetch and create a blob
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok.');
+                const blob = await response.blob();
+                triggerDownload(blob, fileName);
+            }
+        } catch (error) {
+            console.error('Download error:', error);
+            toast({
+                variant: 'destructive',
+                title: "Download Failed",
+                description: "Could not download the edited image.",
+            });
+        }
+    };
 
   const cropAndDownloadImage = (imageUrl: string, fileName: string) => {
     const img = new window.Image();
@@ -372,11 +480,12 @@ export function YoutubeTool() {
                     </SelectContent>
                 </Select>
               </div>
-               <div className="space-y-2 self-end">
-                 <Button onClick={handleDownloadThumbnail} className="w-full">
-                    <Download className="mr-2 h-4 w-4" />
-                    {t.videoDownloader.downloadThumbnail}
-                </Button>
+               <div className="space-y-2 self-end grid grid-cols-2 gap-2">
+                    <AiEditDialog thumbnail={thumbnailUrl} onDownload={(url) => downloadImageFromUrl(url, `${videoId}_edited_thumbnail.png`)} />
+                    <Button onClick={handleDownloadThumbnail}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {t.videoDownloader.downloadThumbnail}
+                    </Button>
                </div>
             </div>
 
@@ -390,3 +499,5 @@ export function YoutubeTool() {
     </div>
   );
 }
+
+    
