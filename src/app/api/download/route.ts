@@ -29,22 +29,19 @@ export async function GET(req: NextRequest) {
       mimeType = 'audio/mpeg';
     } else {
       // Video download logic
-      const qualities: ytdl.Filter[] = [
-        (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
-        'videoandaudio',
-        'video',
-      ];
-      if (quality !== 'highest') {
-        qualities.unshift((f) => f.container === 'mp4' && f.qualityLabel === quality && f.hasAudio);
-      }
-      
-      for (const q of qualities) {
-        format = ytdl.chooseFormat(info.formats, { 
-          quality: quality,
-          filter: q,
+      format = ytdl.chooseFormat(info.formats, {
+        quality: quality,
+        filter: (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
+      });
+
+      // Fallback to highest quality if the selected quality is not available with audio
+      if (!format) {
+        format = ytdl.chooseFormat(info.formats, {
+            quality: 'highest',
+            filter: (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
         });
-        if (format) break;
       }
+
       if (format) {
         fileExtension = format.container || 'mp4';
         mimeType = format.mimeType || 'video/mp4';
@@ -53,7 +50,7 @@ export async function GET(req: NextRequest) {
 
 
     if (!format) {
-      return NextResponse.json({ error: 'Could not find a suitable format.' }, { status: 400 });
+      return NextResponse.json({ error: 'Could not find a suitable format for this video.' }, { status: 400 });
     }
 
     const videoStream = ytdl(url, { format });
