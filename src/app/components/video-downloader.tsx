@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormMessage, FormItem } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -23,14 +23,11 @@ const formSchema = z.object({
 });
 
 type Step = 'input' | 'preview';
-type ThumbnailQuality = 'maxresdefault' | 'sddefault' | 'hqdefault' | 'mqdefault' | 'default';
+type ThumbnailQuality = 'maxresdefault' | 'hqdefault';
 
 const qualityLabels: Record<ThumbnailQuality, string> = {
     maxresdefault: 'High',
-    sddefault: 'HD (720p)',
-    hqdefault: 'SD (480p)',
-    mqdefault: 'Low',
-    default: 'Medium (120p)',
+    hqdefault: 'Low',
 };
 
 function getYouTubeVideoId(url: string): string | null {
