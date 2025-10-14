@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormMessage, FormItem, FormLabel } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/firebase';
+import { useLanguage } from '@/app/context/language-context';
+import { translations } from '@/app/locales/translations';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -25,6 +27,8 @@ export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const auth = useAuth();
   const { toast } = useToast();
+  const { locale } = useLanguage();
+  const t = translations[locale];
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,15 +43,15 @@ export default function ForgotPasswordPage() {
         setIsSubmitted(true);
         setIsLoading(false);
         toast({
-          title: 'Check your email',
-          description: `A password reset link has been sent to ${values.email}.`,
+          title: t.forgotPassword.checkEmailToast,
+          description: t.forgotPassword.resetLinkSent.replace('{email}', values.email),
         });
       })
       .catch((error: AuthError) => {
         setIsLoading(false);
         toast({
           variant: 'destructive',
-          title: 'Reset Failed',
+          title: t.forgotPassword.failedToast,
           description: error.message || 'An unexpected error occurred. Please try again.',
         });
       });
@@ -57,11 +61,11 @@ export default function ForgotPasswordPage() {
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Forgot Password</CardTitle>
+          <CardTitle>{t.forgotPassword.title}</CardTitle>
           <CardDescription>
             {isSubmitted 
-              ? "You can close this page now."
-              : "Enter your email to receive a password reset link."
+              ? t.forgotPassword.descriptionSubmitted
+              : t.forgotPassword.description
             }
           </CardDescription>
         </CardHeader>
@@ -69,15 +73,15 @@ export default function ForgotPasswordPage() {
           {isSubmitted ? (
             <div className="flex flex-col items-center justify-center text-center space-y-4 py-8">
               <Mail className="h-16 w-16 text-primary" />
-              <h3 className="text-xl font-semibold">Check Your Inbox</h3>
+              <h3 className="text-xl font-semibold">{t.forgotPassword.submittedTitle}</h3>
               <p className="text-muted-foreground">
-                We've sent a password reset link to{' '}
+                {t.forgotPassword.submittedDescription}{' '}
                 <span className="font-medium text-foreground">{form.getValues('email')}</span>.
               </p>
               <Button asChild variant="outline">
                 <Link href="/login">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Log In
+                  {t.forgotPassword.backToLogin}
                 </Link>
               </Button>
             </div>
@@ -89,25 +93,25 @@ export default function ForgotPasswordPage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t.forgotPassword.emailLabel}</FormLabel>
                       <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder={t.forgotPassword.emailPlaceholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="animate-spin" /> : 'Send Reset Link'}
+                  {isLoading ? <Loader2 className="animate-spin" /> : t.forgotPassword.button}
                 </Button>
               </form>
             </Form>
           )}
           {!isSubmitted && (
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Remember your password?{' '}
+              {t.forgotPassword.rememberPassword}{' '}
               <Link href="/login" className="font-medium text-primary hover:underline">
-                Log In
+                {t.login.title}
               </Link>
             </p>
           )}

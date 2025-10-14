@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useLanguage } from '@/app/context/language-context';
+import { translations } from '@/app/locales/translations';
 
 
 const formSchema = z.object({
@@ -49,7 +51,8 @@ export function YoutubeTool() {
   const [videoId, setVideoId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
-
+  const { locale } = useLanguage();
+  const t = translations[locale];
 
   const { toast } = useToast();
 
@@ -81,8 +84,8 @@ export function YoutubeTool() {
     } else {
       toast({
         variant: 'destructive',
-        title: 'Invalid URL',
-        description: 'Could not extract a YouTube video ID from the URL. Please try another link.',
+        title: t.videoDownloader.invalidUrlTitle,
+        description: t.videoDownloader.invalidUrlDescription,
       });
       setThumbnailUrl(null);
       setVideoId(null);
@@ -94,7 +97,7 @@ export function YoutubeTool() {
     if (!thumbnailUrl || !videoId) {
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: t.common.error,
         description: 'Thumbnail URL not found.'
       });
       return;
@@ -107,8 +110,8 @@ export function YoutubeTool() {
         if (quality === 'maxresdefault') {
             toast({
                 variant: 'destructive',
-                title: 'Download Failed',
-                description: 'High quality is not available. Please select another quality.',
+                title: t.videoDownloader.downloadFailedTitle,
+                description: t.videoDownloader.downloadFailedDescription,
             });
             return;
         }
@@ -122,8 +125,8 @@ export function YoutubeTool() {
       console.error('Download error:', error);
       toast({
         variant: 'destructive',
-        title: 'Download Failed',
-        description: 'Could not download the thumbnail. The selected quality may not be available.',
+        title: t.videoDownloader.downloadFailedTitle,
+        description: t.videoDownloader.downloadErrorDescription,
       });
     }
   };
@@ -151,7 +154,7 @@ export function YoutubeTool() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardDescription>Paste the URL of the video to download its thumbnail.</CardDescription>
+          <CardDescription>{t.videoDownloader.pasteUrl}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -164,7 +167,7 @@ export function YoutubeTool() {
                     <div className="relative">
                       <FormControl>
                         <Input
-                          placeholder="Enter your video URL"
+                          placeholder={t.videoDownloader.urlPlaceholder}
                           {...field}
                           disabled={step !== 'input'}
                           className="h-12 w-full rounded-lg border-2 border-muted/40 bg-muted/40 pr-10 text-base transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
@@ -192,7 +195,7 @@ export function YoutubeTool() {
                 size="lg"
                 disabled={step !== 'input' || isGenerating}
               >
-                 {isGenerating ? <Loader2 className="animate-spin" /> : <>Get Thumbnail <ArrowRight className="ml-2" /></>}
+                 {isGenerating ? <Loader2 className="animate-spin" /> : <>{t.videoDownloader.getThumbnail} <ArrowRight className="ml-2" /></>}
               </Button>
             </form>
           </Form>
@@ -204,9 +207,9 @@ export function YoutubeTool() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
-              <span>Thumbnail Preview</span>
+              <span>{t.videoDownloader.previewTitle}</span>
             </CardTitle>
-            <CardDescription>Click the image to zoom. Select quality and download.</CardDescription>
+            <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {thumbnailUrl ? (
@@ -220,8 +223,8 @@ export function YoutubeTool() {
                           updateThumbnailUrl(videoId, 'hqdefault');
                           toast({
                               variant: 'default',
-                              title: 'Quality not available',
-                              description: "High quality isn't available for this video. Switched to High (360p) quality.",
+                              title: t.videoDownloader.qualityUnavailableTitle,
+                              description: t.videoDownloader.qualityUnavailableDescription,
                           })
                         }
                       }}
@@ -230,7 +233,7 @@ export function YoutubeTool() {
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl p-2 sm:p-4">
                   <DialogHeader>
-                    <DialogTitle>Thumbnail Preview</DialogTitle>
+                    <DialogTitle>{t.videoDownloader.previewTitle}</DialogTitle>
                   </DialogHeader>
                   {thumbnailUrl && 
                     <div className="relative aspect-video w-full">
@@ -243,35 +246,35 @@ export function YoutubeTool() {
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-8 w-8 animate-spin" />
-                    <span>Loading thumbnail...</span>
+                    <span>{t.videoDownloader.loadingThumbnail}</span>
                     </div>
                 </div>
             )}
             
             <div className="grid w-full gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="quality">Quality</Label>
+                <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
                 <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
                     <SelectTrigger id="quality">
                         <SelectValue placeholder="Select quality" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="maxresdefault">High</SelectItem>
-                        <SelectItem value="hqdefault">High (360p)</SelectItem>
+                        <SelectItem value="maxresdefault">{t.videoDownloader.qualityHigh}</SelectItem>
+                        <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
                     </SelectContent>
                 </Select>
               </div>
                <div className="space-y-2 self-end">
                  <Button onClick={handleDownloadThumbnail} className="w-full">
                     <Download className="mr-2 h-4 w-4" />
-                    Download Thumbnail
+                    {t.videoDownloader.downloadThumbnail}
                 </Button>
                </div>
             </div>
 
             <Button onClick={handleReset} className="w-full" size="lg" variant="outline" disabled={isGenerating}>
               <RefreshCcw className="mr-2 h-4 w-4" />
-              <span>Try Another</span>
+              <span>{t.videoDownloader.tryAnother}</span>
             </Button>
           </CardContent>
         </Card>
@@ -279,7 +282,7 @@ export function YoutubeTool() {
 
       <Card>
         <CardContent className="flex flex-col items-center gap-4 pt-6">
-            <p className="text-sm font-medium text-red-500">Subscribe now</p>
+            <p className="text-sm font-medium text-red-500">{t.videoDownloader.subscribeNow}</p>
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">

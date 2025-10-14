@@ -28,6 +28,7 @@ export function Header() {
   const auth = useAuth();
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
+  const t = translations[locale];
 
   const handleLogout = async () => {
     if (auth) {
@@ -57,27 +58,27 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                <DropdownMenuLabel>{t.header.menu}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                     <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span>Theme</span>
+                    <span>{t.header.theme}</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
                       <DropdownMenuItem onClick={() => setTheme('light')}>
                         <Sun className="mr-2 h-4 w-4" />
-                        <span>Light</span>
+                        <span>{t.header.light}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setTheme('dark')}>
                         <Moon className="mr-2 h-4 w-4" />
-                        <span>Dark</span>
+                        <span>{t.header.dark}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setTheme('system')}>
                         <Laptop className="mr-2 h-4 w-4" />
-                        <span>System</span>
+                        <span>{t.header.system}</span>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
@@ -86,15 +87,15 @@ export function Header() {
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <Languages className="mr-2 h-4 w-4" />
-                    <span>Language</span>
+                    <span>{t.header.language}</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
                       <DropdownMenuItem onClick={() => changeLocale('en')}>
-                        <span>English</span>
+                        <span>{t.header.english}</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => changeLocale('hi')}>
-                        <span>Hindi</span>
+                        <span>{t.header.hindi}</span>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
@@ -103,7 +104,7 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <a href={mailtoHref}>
                     <LifeBuoy className="mr-2 h-4 w-4" />
-                    <span>Help &amp; Support</span>
+                    <span>{t.header.helpAndSupport}</span>
                   </a>
                 </DropdownMenuItem>
 
@@ -112,7 +113,7 @@ export function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t.header.logout}</span>
                     </DropdownMenuItem>
                     </>
                 )}
@@ -123,13 +124,13 @@ export function Header() {
                      <DropdownMenuItem asChild>
                         <Link href="/login">
                           <LogIn className="mr-2 h-4 w-4" />
-                          <span>Log In</span>
+                          <span>{t.header.login}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href="/signup">
                           <UserPlus className="mr-2 h-4 w-4" />
-                          <span>Register</span>
+                          <span>{t.header.register}</span>
                         </Link>
                       </DropdownMenuItem>
                   </>
@@ -167,7 +168,7 @@ export function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
+                      <span>{t.header.logout}</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -177,7 +178,7 @@ export function Header() {
         </div>
       </div>
       <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-        {translations[locale].title}
+        {t.title}
       </h1>
     </header>
   );

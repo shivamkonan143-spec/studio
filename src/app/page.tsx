@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useUser, useFirestore, useMemoFirebase, useDoc, setDocumentNonBlocking } from '@/firebase';
 import { doc, setDoc, getDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { useLanguage } from '@/app/context/language-context';
+import { translations } from '@/app/locales/translations';
 
 
 type Subscription = {
@@ -33,6 +35,8 @@ export default function Home() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
+  const { locale } = useLanguage();
+  const t = translations[locale];
 
 
   const userSubscriptionRef = useMemoFirebase(() => {
@@ -58,23 +62,23 @@ export default function Home() {
         if (subscriptionData.active && userSubscriptionRef) {
           setDocumentNonBlocking(userSubscriptionRef, { active: false }, { merge: true });
           toast({
-            title: 'Subscription Expired',
-            description: 'Your ad-free subscription has ended. Please subscribe again.',
+            title: t.subscription.expiredTitle,
+            description: t.subscription.expiredDescription,
           });
         }
       }
     } else {
       setIsSubscribed(false);
     }
-  }, [user, subscriptionData, isSubscriptionLoading, userSubscriptionRef, toast]);
+  }, [user, subscriptionData, isSubscriptionLoading, userSubscriptionRef, toast, t]);
 
 
   const handleSubscription = async () => {
     if (!userSubscriptionRef) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to subscribe.",
+        title: t.common.error,
+        description: t.subscription.errorDescription,
       });
       return;
     }
@@ -92,8 +96,8 @@ export default function Home() {
     setIsDialogOpen(false);
     setPaymentStep('confirm');
     toast({
-      title: 'Subscription Successful!',
-      description: 'Thank you for subscribing. Enjoy an ad-free experience for 30 days.',
+      title: t.subscription.successTitle,
+      description: t.subscription.successDescription,
     });
   };
 
@@ -127,40 +131,40 @@ export default function Home() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Gem className="h-5 w-5 text-primary"/>
-                    <span>Premium Subscription</span>
+                    <span>{t.subscription.title}</span>
                 </CardTitle>
                 <CardDescription>
-                    Subscribe to remove all ads and support the developer.
+                    {t.subscription.description}
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="flex items-center justify-between rounded-md border p-4">
                     <div className="space-y-1">
                         <p className="text-sm font-medium leading-none">
-                        Ad-Free Experience
+                        {t.subscription.benefit}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                        <span className="font-bold text-foreground text-base mr-2">₹49</span>
-                        <span className="line-through">₹249</span> for 1 Month
+                        <span className="font-bold text-foreground text-base mr-2">{t.subscription.price}</span>
+                        <span className="line-through">{t.subscription.originalPrice}</span> {t.subscription.duration}
                         </p>
                     </div>
                     {isSubscriptionLoading ? (
                       <Loader2 className="h-5 w-5 animate-spin"/>
                     ) : isSubscribed ? (
-                       <Badge variant="secondary">Subscribed</Badge>
+                       <Badge variant="secondary">{t.subscription.statusSubscribed}</Badge>
                     ) : (
                       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
                         <DialogTrigger asChild>
-                          <Button onClick={handleSubscribeClick}>Subscribe</Button>
+                          <Button onClick={handleSubscribeClick}>{t.subscription.buttonSubscribe}</Button>
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
                             <DialogTitle>
-                              {paymentStep === 'confirm' ? 'Confirm Subscription' : 'Choose Payment Method'}
+                              {paymentStep === 'confirm' ? t.subscription.dialogConfirmTitle : t.subscription.dialogPaymentTitle}
                             </DialogTitle>
                             {paymentStep === 'confirm' && (
                                 <DialogDescription>
-                                    You are about to subscribe for an ad-free experience.
+                                    {t.subscription.dialogConfirmDescription}
                                 </DialogDescription>
                             )}
                           </DialogHeader>
@@ -169,16 +173,16 @@ export default function Home() {
                             <>
                               <div className="py-4">
                                 <div className="flex justify-between items-baseline p-4 rounded-lg bg-muted">
-                                    <span className="font-medium">1 Month Subscription</span>
+                                    <span className="font-medium">{t.subscription.term}</span>
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-2xl font-bold">₹49</span>
-                                        <span className="text-lg font-medium line-through text-muted-foreground">₹249</span>
+                                        <span className="text-2xl font-bold">{t.subscription.price}</span>
+                                        <span className="text-lg font-medium line-through text-muted-foreground">{t.subscription.originalPrice}</span>
                                     </div>
                                 </div>
                               </div>
                               <DialogFooter>
-                                <Button variant="outline" onClick={() => handleDialogClose(false)}>Cancel</Button>
-                                <Button onClick={() => setPaymentStep('methods')}>Pay Now</Button>
+                                <Button variant="outline" onClick={() => handleDialogClose(false)}>{t.subscription.cancel}</Button>
+                                <Button onClick={() => setPaymentStep('methods')}>{t.subscription.payNow}</Button>
                               </DialogFooter>
                             </>
                           ) : (
@@ -191,7 +195,7 @@ export default function Home() {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <Wallet className="h-6 w-6" />
-                                                <span className="font-medium">UPI</span>
+                                                <span className="font-medium">{t.payment.upi}</span>
                                             </div>
                                             <RadioGroupItem value="upi" id="upi" />
                                         </Label>
@@ -201,7 +205,7 @@ export default function Home() {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <CreditCard className="h-6 w-6" />
-                                                <span className="font-medium">Credit/Debit Card</span>
+                                                <span className="font-medium">{t.payment.card}</span>
                                             </div>
                                             <RadioGroupItem value="card" id="card" />
                                         </Label>
@@ -211,7 +215,7 @@ export default function Home() {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <Landmark className="h-6 w-6" />
-                                                <span className="font-medium">Net Banking</span>
+                                                <span className="font-medium">{t.payment.netbanking}</span>
                                             </div>
                                             <RadioGroupItem value="netbanking" id="netbanking" />
                                         </Label>
@@ -220,9 +224,9 @@ export default function Home() {
                               <DialogFooter className="sm:justify-between">
                                 <Button variant="outline" onClick={() => setPaymentStep('confirm')}>
                                     <ArrowLeft className="mr-2 h-4 w-4"/>
-                                    Back
+                                    {t.subscription.back}
                                 </Button>
-                                <Button onClick={handleSubscription}>Complete Payment</Button>
+                                <Button onClick={handleSubscription}>{t.subscription.completePayment}</Button>
                               </DialogFooter>
                             </>
                           )}

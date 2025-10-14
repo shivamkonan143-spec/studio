@@ -17,6 +17,8 @@ import { initiateEmailSignIn, initiateGoogleSignIn } from '@/firebase/non-blocki
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
 import { AuthError } from 'firebase/auth';
+import { useLanguage } from '@/app/context/language-context';
+import { translations } from '@/app/locales/translations';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -55,6 +57,8 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { locale } = useLanguage();
+  const t = translations[locale];
   
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
@@ -73,26 +77,26 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   const handleAuthSuccess = () => {
-    toast({ title: 'Login Successful', description: `Welcome back!` });
+    toast({ title: t.login.successTitle, description: t.login.welcomeBack });
     router.push('/');
   };
 
   const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
-    let title = 'Login Failed';
+    let title = t.login.failedTitle;
     let description = 'An unexpected error occurred. Please try again.';
 
     if (provider === 'email') {
         if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
             form.setError('password', {
                 type: 'manual',
-                message: 'Wrong password. Please try again.',
+                message: t.login.wrongPassword,
             });
-            description = 'Wrong password. Please try again.';
+            description = t.login.wrongPassword;
         } else {
-            description = 'Please check your email and password.';
+            description = t.login.checkCredentials;
         }
     } else if (provider === 'google') {
-        title = 'Google Sign-In Failed';
+        title = t.login.googleFailed;
         description = 'Could not sign in with Google. Please try again.';
     }
       
@@ -147,8 +151,8 @@ export default function LoginPage() {
             </Button>
         </Link>
         <CardHeader>
-          <CardTitle>Log In</CardTitle>
-          <CardDescription>Enter your email and password to log in.</CardDescription>
+          <CardTitle>{t.login.title}</CardTitle>
+          <CardDescription>{t.login.description}</CardDescription>
         </CardHeader>
         <CardContent>
             <Form {...form}>
@@ -158,9 +162,9 @@ export default function LoginPage() {
                     name="email"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t.login.emailLabel}</FormLabel>
                         <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder={t.login.emailPlaceholder} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -172,22 +176,22 @@ export default function LoginPage() {
                     render={({ field }) => (
                     <FormItem>
                         <div className="flex items-center justify-between">
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t.login.passwordLabel}</FormLabel>
                             <Link href="/forgot-password"
                                 className="text-sm font-medium text-primary hover:underline"
                             >
-                                Forgot password?
+                                {t.login.forgotPassword}
                             </Link>
                         </div>
                         <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder={t.login.passwordPlaceholder} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                     )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                    {isLoading ? <Loader2 className="animate-spin" /> : 'Log In'}
+                    {isLoading ? <Loader2 className="animate-spin" /> : t.login.button}
                 </Button>
                 </form>
             </Form>
@@ -198,20 +202,20 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
+                {t.login.continueWith}
                 </span>
             </div>
           </div>
 
           <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
             {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-            Sign in with Google
+            {t.login.google}
           </Button>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
+            {t.login.noAccount}{' '}
             <Link href="/signup" className="font-medium text-primary hover:underline">
-              Register
+              {t.login.registerLink}
             </Link>
           </p>
         </CardContent>
