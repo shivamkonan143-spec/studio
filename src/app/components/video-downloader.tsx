@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Youtube, Download, RefreshCcw, Loader2, ArrowRight, Image as ImageIcon, Instagram } from 'lucide-react';
+import { Youtube, Download, RefreshCcw, Loader2, Image as ImageIcon, Instagram, ArrowRight, X } from 'lucide-react';
 import Image from 'next/image';
 
 import { Button } from '@/components/ui/button';
@@ -169,28 +169,39 @@ export function YoutubeTool() {
                 name="url"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="relative flex w-full items-center rounded-lg border-2 border-transparent bg-muted/40 transition-all focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+                    <div className="relative">
                       <FormControl>
-                        <Input 
-                          placeholder="Enter your video URL" 
-                          {...field} 
+                        <Input
+                          placeholder="Enter your video URL"
+                          {...field}
                           disabled={step !== 'input'}
-                          className="h-12 flex-1 border-0 bg-transparent pl-4 pr-2 text-base placeholder:text-muted-foreground/80 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="h-12 w-full rounded-lg border-2 border-muted/40 bg-muted/40 pr-10 text-base transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
                         />
                       </FormControl>
-                      <Button 
-                        type="submit" 
-                        size="icon"
-                        className="mr-2 h-9 w-14 shrink-0" 
-                        disabled={step !== 'input' || isGenerating}
-                      >
-                         {isGenerating ? <Loader2 className="animate-spin" /> : <ArrowRight />}
-                      </Button>
+                      {field.value && (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => form.reset({ url: '' })}
+                          className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
+                        >
+                          <X className="h-5 w-5" />
+                        </Button>
+                      )}
                     </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <Button 
+                type="submit" 
+                className="w-full"
+                size="lg"
+                disabled={step !== 'input' || isGenerating}
+              >
+                 {isGenerating ? <Loader2 className="animate-spin" /> : <>Get Thumbnail <ArrowRight className="ml-2" /></>}
+              </Button>
             </form>
           </Form>
         </CardContent>
