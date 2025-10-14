@@ -49,11 +49,11 @@ export default function SignUpPage() {
     setIsLoading(true);
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setIsLoading(false);
         if(user){
             toast({ title: 'Account Created', description: 'You have been successfully signed up.' });
             router.push('/');
         }
+        setIsLoading(false);
         unsubscribe(); // Clean up listener
       },
       (error) => {
@@ -68,8 +68,8 @@ export default function SignUpPage() {
     );
 
     initiateEmailSignUp(auth, values.email, values.password, (error) => {
-       setIsLoading(false);
        if(error) {
+           setIsLoading(false);
            toast({
               variant: 'destructive',
               title: 'Sign Up Failed',
@@ -84,7 +84,7 @@ export default function SignUpPage() {
       <div className="flex min-h-screen w-full flex-col items-center justify-center">
         <Loader2 className="animate-spin h-8 w-8"/>
       </div>
-    )
+    );
   }
 
   return (
@@ -120,7 +120,7 @@ export default function SignUpPage() {
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
-                  </formItem>
+                  </FormItem>
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>

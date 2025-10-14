@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages } from 'lucide-react';
+import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,15 +40,15 @@ export function Header() {
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
           {!isUserLoading && (
-            <>
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Settings className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {user ? (
+                  <>
                     <DropdownMenuLabel>
                       <div className="flex items-center gap-2">
                         <UserIcon className="h-4 w-4" />
@@ -56,63 +56,79 @@ export function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                        <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                        <span>Theme</span>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuItem onClick={() => setTheme('light')}>
-                            <Sun className="mr-2 h-4 w-4" />
-                            <span>Light</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setTheme('dark')}>
-                            <Moon className="mr-2 h-4 w-4" />
-                            <span>Dark</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setTheme('system')}>
-                            <Laptop className="mr-2 h-4 w-4" />
-                            <span>System</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuSub>
-                       <DropdownMenuSubTrigger>
-                        <Languages className="mr-2 h-4 w-4" />
-                        <span>Language</span>
-                       </DropdownMenuSubTrigger>
-                       <DropdownMenuPortal>
-                         <DropdownMenuSubContent>
-                           <DropdownMenuItem>
-                             <span>English</span>
-                           </DropdownMenuItem>
-                           <DropdownMenuItem>
-                             <span>Hindi</span>
-                           </DropdownMenuItem>
-                         </DropdownMenuSubContent>
-                       </DropdownMenuPortal>
-                    </DropdownMenuSub>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuLabel>Guest Menu</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <Link href="/login" passHref>
+                      <DropdownMenuItem>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        <span>Log In</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href="/signup" passHref>
+                      <DropdownMenuItem>
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        <span>Sign Up</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span>Theme</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setTheme('light')}>
+                        <Sun className="mr-2 h-4 w-4" />
+                        <span>Light</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme('dark')}>
+                        <Moon className="mr-2 h-4 w-4" />
+                        <span>Dark</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setTheme('system')}>
+                        <Laptop className="mr-2 h-4 w-4" />
+                        <span>System</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Languages className="mr-2 h-4 w-4" />
+                    <span>Language</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem>
+                        <span>English</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <span>Hindi</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                {user && (
+                  <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <>
-                  <Button asChild variant="ghost">
-                    <Link href="/login">Log In</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/signup">Sign Up</Link>
-                  </Button>
-                </>
-              )}
-            </>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

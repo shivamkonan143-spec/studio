@@ -48,14 +48,11 @@ export default function LoginPage() {
     setIsLoading(true);
     
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-        setIsLoading(false);
         if(user){
           toast({ title: 'Login Successful', description: `Welcome back!` });
           router.push('/');
-        } else {
-           // This might be too eager, as the listener fires on logout too.
-           // A more robust way is to use the promise from signInWithEmailAndPassword
         }
+        setIsLoading(false);
         unsubscribe(); // Clean up listener
       },
       (error) => {
@@ -71,8 +68,8 @@ export default function LoginPage() {
 
     initiateEmailSignIn(auth, values.email, values.password, (error) => {
       // This callback handles sign-in specific errors
-      setIsLoading(false);
       if (error) {
+        setIsLoading(false);
         toast({
           variant: 'destructive',
           title: 'Login Failed',
@@ -87,7 +84,7 @@ export default function LoginPage() {
       <div className="flex min-h-screen w-full flex-col items-center justify-center">
         <Loader2 className="animate-spin h-8 w-8"/>
       </div>
-    )
+    );
   }
 
 
