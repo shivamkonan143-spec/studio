@@ -184,8 +184,6 @@ function AdvancedEditDialog({
   const [grayscale, setGrayscale] = useState(0);
   const [invert, setInvert] = useState(0);
 
-  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-
   const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
 
   const resetFilters = () => {
@@ -200,7 +198,7 @@ function AdvancedEditDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full">
+        <Button variant="outline" className="w-full" onClick={() => setIsOpen(true)}>
           <SlidersHorizontal className="mr-2 h-4 w-4" />
           Customize
         </Button>
@@ -220,7 +218,7 @@ function AdvancedEditDialog({
                         src={thumbnail}
                         alt="Thumbnail preview"
                         layout="fill"
-                        objectFit="contain"
+                        objectFit="cover"
                         className="absolute top-0 left-0 w-full h-full"
                         style={{ filter: filters }}
                         unoptimized
@@ -629,17 +627,3 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
