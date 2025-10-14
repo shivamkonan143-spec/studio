@@ -7,7 +7,7 @@ export function Header() {
         <Clapperboard className="h-6 w-6 text-primary" />
       </div>
       <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-        Video Grabber
+        download videoba
       </h1>
     </header>
   );

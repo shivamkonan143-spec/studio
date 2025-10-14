@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'Video Grabber',
+  title: 'download videoba',
   description: 'Download videos from any URL.',
 };
 
