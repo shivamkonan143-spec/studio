@@ -15,6 +15,8 @@ import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
+
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -24,7 +26,7 @@ const formSchema = z.object({
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -45,19 +47,14 @@ export default function SignUpPage() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
     setIsLoading(true);
-    initiateEmailSignUp(auth, values.email, values.password);
-     auth.onAuthStateChanged(
-      (user) => {
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
         setIsLoading(false);
         if(user){
             toast({ title: 'Account Created', description: 'You have been successfully signed up.' });
-        } else {
-            toast({
-              variant: 'destructive',
-              title: 'Sign Up Failed',
-              description: 'This email might already be in use.',
-            });
+            router.push('/');
         }
+        unsubscribe(); // Clean up listener
       },
       (error) => {
         setIsLoading(false);
@@ -66,9 +63,29 @@ export default function SignUpPage() {
           title: 'Sign Up Failed',
           description: error.message || 'An unexpected error occurred.',
         });
+        unsubscribe(); // Clean up listener
       }
     );
+
+    initiateEmailSignUp(auth, values.email, values.password, (error) => {
+       setIsLoading(false);
+       if(error) {
+           toast({
+              variant: 'destructive',
+              title: 'Sign Up Failed',
+              description: 'This email might already be in use.',
+            });
+       }
+    });
   };
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center">
+        <Loader2 className="animate-spin h-8 w-8"/>
+      </div>
+    )
+  }
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4">
@@ -103,7 +120,7 @@ export default function SignUpPage() {
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>
+                  </formItem>
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>

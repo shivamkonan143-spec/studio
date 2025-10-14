@@ -15,6 +15,7 @@ import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -24,7 +25,7 @@ const formSchema = z.object({
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const auth = useAuth();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -45,21 +46,17 @@ export default function LoginPage() {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
     setIsLoading(true);
-    initiateEmailSignIn(auth, values.email, values.password);
-    // The onAuthStateChanged listener in FirebaseProvider will handle the redirect
-    // We can add a catch here for immediate errors like network issues
-    auth.onAuthStateChanged(
-      (user) => {
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
         setIsLoading(false);
         if(user){
           toast({ title: 'Login Successful', description: `Welcome back!` });
+          router.push('/');
         } else {
-           toast({
-             variant: 'destructive',
-             title: 'Login Failed',
-             description: 'Please check your email and password.',
-           });
+           // This might be too eager, as the listener fires on logout too.
+           // A more robust way is to use the promise from signInWithEmailAndPassword
         }
+        unsubscribe(); // Clean up listener
       },
       (error) => {
         setIsLoading(false);
@@ -68,9 +65,31 @@ export default function LoginPage() {
           title: 'Login Failed',
           description: error.message || 'An unexpected error occurred.',
         });
+        unsubscribe(); // Clean up listener
       }
     );
+
+    initiateEmailSignIn(auth, values.email, values.password, (error) => {
+      // This callback handles sign-in specific errors
+      setIsLoading(false);
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: 'Please check your email and password.',
+        });
+      }
+    });
   };
+
+  if (isUserLoading || user) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center">
+        <Loader2 className="animate-spin h-8 w-8"/>
+      </div>
+    )
+  }
+
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-background px-4">
