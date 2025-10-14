@@ -9,6 +9,7 @@ import { translations } from '@/app/locales/translations';
 import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -30,6 +31,7 @@ export function SubscriptionCard() {
     const { user } = useUser();
     const { toast } = useToast();
     const firestore = useFirestore();
+    const router = useRouter();
 
     const subscriptionRef = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -46,11 +48,7 @@ export function SubscriptionCard() {
 
     const handleSubscribeClick = () => {
         if (!user) {
-            toast({
-                variant: 'destructive',
-                title: t.common.error,
-                description: t.subscription.errorDescription,
-            });
+            router.push('/login');
             return;
         }
         setIsDialogOpen(true);
