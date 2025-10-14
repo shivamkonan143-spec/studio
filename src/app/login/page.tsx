@@ -77,7 +77,7 @@ export default function LoginPage() {
   }, [user, isUserLoading, router]);
 
   const handleAuthSuccess = () => {
-    toast({ title: t.login.successTitle, description: t.login.welcomeBack });
+    toast({ variant: 'success', title: t.login.successTitle, description: t.login.welcomeBack });
     router.push('/');
   };
 
