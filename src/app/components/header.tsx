@@ -35,7 +35,8 @@ export function Header() {
   const getInitials = (email: string | null | undefined) => {
     if (!email) return 'U';
     const parts = email.split('@')[0];
-    return (parts[0] || '').toUpperCase();
+    if (!parts) return 'U';
+    return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
   };
 
   return (
@@ -50,23 +51,8 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {user ? (
-                  <>
-                    <DropdownMenuLabel>
-                      <div className="flex items-center gap-2">
-                        <UserIcon className="h-4 w-4" />
-                        <span>{user.email}</span>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuLabel>Guest Menu</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
-
+                <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -108,15 +94,6 @@ export function Header() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
 
-                {user && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -146,47 +123,6 @@ export function Header() {
                             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                         </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                            <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                            <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                            <span>Theme</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                            <DropdownMenuItem onClick={() => setTheme('light')}>
-                                <Sun className="mr-2 h-4 w-4" />
-                                <span>Light</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setTheme('dark')}>
-                                <Moon className="mr-2 h-4 w-4" />
-                                <span>Dark</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setTheme('system')}>
-                                <Laptop className="mr-2 h-4 w-4" />
-                                <span>System</span>
-                            </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
-
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                            <Languages className="mr-2 h-4 w-4" />
-                            <span>Language</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                            <DropdownMenuItem>
-                                <span>English</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <span>Hindi</span>
-                            </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
