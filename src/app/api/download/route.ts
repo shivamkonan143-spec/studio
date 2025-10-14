@@ -16,15 +16,15 @@ export async function GET(req: NextRequest) {
     const title = info.videoDetails.title.replace(/[^\x00-\x7F]/g, ""); // Sanitize title
 
     let format = ytdl.chooseFormat(info.formats, { 
-      quality: 'highestvideo',
+      quality: quality,
       filter: (format) => format.container === 'mp4' && format.hasAudio,
     });
     
-    // Fallback if no combined format is found
+    // Fallback if no combined format is found, get the best video-only stream
     if (!format) {
       format = ytdl.chooseFormat(info.formats, { 
-        quality: 'highest',
-        filter: (format) => format.container === 'mp4',
+        quality: quality,
+        filter: (format) => format.container === 'mp4' && !format.hasAudio,
        });
     }
 
