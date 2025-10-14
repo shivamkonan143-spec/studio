@@ -1,0 +1,93 @@
+/**
+ * @fileoverview Firestore Security Rules for Video Grabber application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model. Each user can only access their own profile data and the video download records associated with their account.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information.
+ * - /users/{userId}/videoDownloads/{downloadId}: Stores video download records associated with the user.
+ *
+ * Key Security Decisions:
+ * - Users can only create their own profile.
+ * - Users can only read, update, and delete their own video download records.
+ * - Listing all users is disallowed.
+ *
+ * Denormalization for Authorization:
+ * The 'userId' is embedded in the path for videoDownloads, enabling direct authorization checks without needing to read the parent document.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Enforces user-ownership for user profiles. Only the authenticated user can read and write their own profile.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' creates their profile.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data.id: 'user123'
+     * @allow (get) User with ID 'user123' reads their profile.
+     *   - auth.uid: 'user123'
+     * @allow (update) User with ID 'user123' updates their profile.
+     *   - auth.uid: 'user123'
+     * @allow (delete) User with ID 'user123' deletes their profile.
+     *   - auth.uid: 'user123'
+     * @deny (create) User with ID 'user123' attempts to create profile for user 'user456'.
+     *   - auth.uid: 'user123'
+     *   - request.resource.data.id: 'user456'
+     * @deny (get) User with ID 'user123' attempts to read profile of user 'user456'.
+     *   - auth.uid: 'user123'
+     * @principle Enforces document ownership for all operations on user profiles.
+     */
+    match /users/{userId} {
+      // Check if the user is signed in.
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false; // Listing all users is not permitted.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Enforces user-ownership for video download records. Only the authenticated user can manage their own video downloads.
+     * @path /users/{userId}/videoDownloads/{downloadId}
+     * @allow (create) User with ID 'user123' creates a video download record.
+     *   - auth.uid: 'user123'
+     * @allow (get) User with ID 'user123' reads their video download record.
+     *   - auth.uid: 'user123'
+     * @allow (update) User with ID 'user123' updates their video download record.
+     *   - auth.uid: 'user123'
+     * @allow (delete) User with ID 'user123' deletes their video download record.
+     *   - auth.uid: 'user123'
+     * @deny (create) User with ID 'user123' attempts to create a video download record for user 'user456'.
+     *   - auth.uid: 'user123'
+     * @deny (get) User with ID 'user123' attempts to read a video download record of user 'user456'.
+     *   - auth.uid: 'user123'
+     * @principle Restricts access to a user's own video download records.
+     */
+    match /users/{userId}/videoDownloads/{downloadId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isExistingOwner(userId);
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    // --- Helper Functions ---
+
+    // Checks if the user is signed in.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Checks if the request is made by the owner of the document.
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Checks if the request is made by the owner of the existing document.
+    function isExistingOwner(userId) {
+      return isSignedIn() && isOwner(userId) && resource != null;
+    }
+  }
+}

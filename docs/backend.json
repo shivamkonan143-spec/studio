@@ -1,0 +1,125 @@
+{
+  "entities": {
+    "VideoDownload": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VideoDownload",
+      "type": "object",
+      "description": "Represents a video download initiated by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the video download entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who initiated the download. (Relationship: User 1:N VideoDownload)"
+        },
+        "videoUrl": {
+          "type": "string",
+          "description": "The URL of the video being downloaded.",
+          "format": "uri"
+        },
+        "quality": {
+          "type": "string",
+          "description": "The selected video quality (e.g., 720p, 1080p)."
+        },
+        "downloadedAt": {
+          "type": "string",
+          "description": "The date and time when the download was completed.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the download (e.g., pending, in progress, completed, failed)."
+        },
+        "filePath": {
+          "type": "string",
+          "description": "The local file path where the video is saved on the device."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "videoUrl",
+        "quality",
+        "downloadedAt",
+        "status",
+        "filePath"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Video Grabber application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "The date and time when the user registered.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "registrationDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Includes standard user information like email and registration date.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/videoDownloads/{downloadId}",
+        "definition": {
+          "entityName": "VideoDownload",
+          "schema": {
+            "$ref": "#/backend/entities/VideoDownload"
+          },
+          "description": "Stores video download information for each user. Includes details such as video URL, quality, download status, and file path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "downloadId",
+              "description": "The unique identifier for the video download."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence and support secure list operations (QAPs). User data is stored under `/users/{userId}`. Video downloads associated with a user are stored in a subcollection `/users/{userId}/videoDownloads/{downloadId}`. This structure maintains a clear ownership model.  Authorization independence is achieved because the `videoDownloads` subcollection does not depend on parent document attributes for authorization; access control is directly based on the `userId` encoded in the path.  This structure also enforces that rules are not filters, as all video downloads under a specific user path have the same access control requirements."
+  }
+}
