@@ -11,7 +11,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormMessage, FormItem } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -220,8 +220,8 @@ export function YoutubeTool() {
             {thumbnailUrl ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <div className="relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" width={1280} height={720} className="mx-auto w-full h-auto object-contain"
+                  <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
+                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" className="mx-auto"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
@@ -240,7 +240,11 @@ export function YoutubeTool() {
                   <DialogHeader>
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
-                  {thumbnailUrl && <Image src={thumbnailUrl} alt="Video thumbnail zoomed" width={1280} height={720} className="mx-auto rounded-md object-contain" />}
+                  {thumbnailUrl && 
+                    <div className="relative aspect-video w-full">
+                        <Image src={thumbnailUrl} alt="Video thumbnail zoomed" layout="fill" objectFit="contain" className="mx-auto rounded-md" />
+                    </div>
+                  }
                 </DialogContent>
               </Dialog>
             ) : (
