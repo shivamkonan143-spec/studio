@@ -279,24 +279,6 @@ export function YoutubeTool() {
           </CardContent>
         </Card>
       )}
-
-      <Card>
-        <CardContent className="flex flex-col items-center gap-4 pt-6">
-            <p className="text-sm font-medium text-red-500">{t.videoDownloader.subscribeNow}</p>
-            <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" asChild>
-                    <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-6 w-6 text-pink-500" />
-                    </a>
-                </Button>
-                <Button variant="outline" size="icon" asChild>
-                    <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
-                    <Youtube className="h-6 w-6 text-red-600" />
-                    </a>
-                </Button>
-            </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

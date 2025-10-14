@@ -10,7 +10,7 @@ import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { Gem, Wallet, CreditCard, Landmark, ArrowLeft, Loader2 } from 'lucide-react';
+import { Gem, Wallet, CreditCard, Landmark, ArrowLeft, Loader2, Instagram, Youtube } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -26,6 +26,32 @@ type Subscription = {
   expiresAt: Timestamp | null;
   subscribedAt: Timestamp;
 }
+
+const SocialFollowCard = () => {
+  const { locale } = useLanguage();
+  const t = translations[locale];
+
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-center gap-4 pt-6">
+        <p className="text-sm font-medium text-red-500">{t.videoDownloader.subscribeNow}</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" asChild>
+            <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
+              <Instagram className="h-6 w-6 text-pink-500" />
+            </a>
+          </Button>
+          <Button variant="outline" size="icon" asChild>
+            <a href="https://youtube.com/@onlyp4x?si=B1oI7iefbToLvw1e" target="_blank" rel="noopener noreferrer">
+              <Youtube className="h-6 w-6 text-red-600" />
+            </a>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 
 export default function Home() {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -236,6 +262,8 @@ export default function Home() {
                 </div>
             </CardContent>
         </Card>
+        
+        <SocialFollowCard />
 
         {!isSubscribed && <AdPlaceholder />}
       </div>
