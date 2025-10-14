@@ -58,6 +58,11 @@ export function Header() {
         await navigator.share(shareData);
       } catch (error) {
         console.error('Error sharing:', error);
+        toast({
+            variant: 'destructive',
+            title: t.share.shareFailedTitle,
+            description: t.share.shareFailedDescription,
+        });
       }
     } else {
       toast({

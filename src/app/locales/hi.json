@@ -122,7 +122,9 @@
     "share": {
         "text": "यह अद्भुत थंबनेल डाउनलोडर ऐप देखें!",
         "notSupportedTitle": "शेयरिंग समर्थित नहीं है",
-        "notSupportedDescription": "आपका ब्राउज़र शेयर सुविधा का समर्थन नहीं करता है।"
+        "notSupportedDescription": "आपका ब्राउज़र शेयर सुविधा का समर्थन नहीं करता है।",
+        "shareFailedTitle": "शेयरिंग विफल",
+        "shareFailedDescription": "ऐप को साझा नहीं किया जा सका। कृपया पुन: प्रयास करें।"
     },
     "common": {
         "error": "त्रुटि",
