@@ -333,6 +333,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const firestore = useFirestore();
   const [isRatingOpen, setIsRatingOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const subscriptionRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -357,6 +358,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     updateThumbnailUrl(videoId, initialQuality);
     
     setIsTitleLoading(true);
+    setVideoTitle('');
     const fetchVideoInfo = async () => {
         try {
             const oembedUrl = `https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=${videoId}&format=json`;
@@ -364,9 +366,12 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
             if(response.ok) {
                 const data: OembedResponse = await response.json();
                 setVideoTitle(data.title);
+            } else {
+                setVideoTitle('Title not available');
             }
         } catch (error) {
             console.error("Failed to fetch video title", error);
+            setVideoTitle('Title not available');
         } finally {
             setIsTitleLoading(false);
         }
@@ -375,6 +380,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     fetchVideoInfo();
 
   }, [videoId]);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [videoTitle])
   
   const updateThumbnailUrl = (id: string, newQuality: ThumbnailQuality) => {
     // Add a timestamp to bypass browser cache
@@ -625,28 +637,22 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               />
           </div>
           
-          {videoTitle ? (
-              <div className="space-y-2">
-                  <Label>{t.videoDownloader.videoTitle}</Label>
-                  <div className="relative flex items-center gap-2">
-                      <Input value={videoTitle} readOnly className="pr-12 bg-muted/40"/>
-                      <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
-                          <Clipboard className="h-4 w-4" />
-                          <span className="sr-only">{t.videoDownloader.copyTitle}</span>
-                      </Button>
-                  </div>
+          <div className="space-y-2">
+              <Label>{t.videoDownloader.videoTitle}</Label>
+              <div className="relative flex items-start gap-2">
+                  <Textarea
+                      ref={textareaRef}
+                      value={isTitleLoading ? t.common.loading : videoTitle}
+                      readOnly
+                      className="pr-12 bg-muted/40 resize-none overflow-hidden min-h-[40px]"
+                      rows={2}
+                  />
+                  <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0" disabled={isTitleLoading}>
+                      {isTitleLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Clipboard className="h-4 w-4" />}
+                      <span className="sr-only">{t.videoDownloader.copyTitle}</span>
+                  </Button>
               </div>
-          ) : isTitleLoading && (
-            <div className="space-y-2">
-                <Label>{t.videoDownloader.videoTitle}</Label>
-                <div className="relative flex items-center gap-2">
-                    <Input value={t.common.loading} readOnly className="pr-12 bg-muted/40"/>
-                    <Button size="icon" variant="outline" className="shrink-0" disabled>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                    </Button>
-                </div>
-            </div>
-          )}
+          </div>
 
           <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
@@ -689,4 +695,3 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
-
