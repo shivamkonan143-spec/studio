@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, ArrowLeft } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Youtube, Sparkles, SlidersHorizontal, Trash2, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormMessage, FormItem } from '@/component
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { editThumbnail } from '@/ai/flows/edit-thumbnail-flow';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 
 const formSchema = z.object({
@@ -145,143 +146,26 @@ export function YoutubeDownloaderInput() {
     );
 }
 
-function AiEditDialog({
+function AdvancedEditDialog({
     thumbnail,
     onDownload,
   }: {
     thumbnail: string | null;
-    onDownload: (url: string) => void;
+    onDownload: (url: string, filters?: React.CSSProperties['filter']) => void;
   }) {
-    const [prompt, setPrompt] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [editedImage, setEditedImage] = useState<string | null>(null);
-    const { toast } = useToast();
-  
-    const handleGenerate = async () => {
-      if (!prompt || !thumbnail) return;
-  
-      setIsGenerating(true);
-      setEditedImage(null);
-  
-      try {
-        const toDataURL = (url: string) => fetch(url)
-          .then(response => response.blob())
-          .then(blob => new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          }));
-  
-        const dataUrl = await toDataURL(thumbnail);
-  
-        const result = await editThumbnail({ imageUrl: dataUrl, prompt });
-        setEditedImage(result.editedImageUrl);
-      } catch (error) {
-        console.error('AI generation failed:', error);
-        toast({
-          variant: 'destructive',
-          title: 'AI Edit Failed',
-          description: 'Could not generate the image. Please try again.',
-        });
-      } finally {
-        setIsGenerating(false);
-      }
-    };
-  
-    return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="w-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0">
-            <Sparkles className="mr-2 h-4 w-4" />
-            AI Magic Edit
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>AI Magic Edit</DialogTitle>
-            <DialogDescription>
-              Describe the changes you want to make to the thumbnail.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-            <div className="space-y-4">
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-                    <Image
-                        src={thumbnail || ''}
-                        alt="Original Thumbnail"
-                        layout="fill"
-                        objectFit="contain"
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <span className="text-white font-semibold text-lg">Original</span>
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="prompt">Your Edit Prompt</Label>
-                    <Textarea
-                        id="prompt"
-                        placeholder="e.g., 'Make this thumbnail more vibrant and add a sense of mystery'"
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        className="min-h-[100px]"
-                    />
-                </div>
-                 <Button onClick={handleGenerate} disabled={isGenerating || !prompt} className="w-full">
-                    {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    Generate
-                </Button>
-            </div>
-            <div className="space-y-4">
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted/20">
-                    {isGenerating ? (
-                        <div className="flex items-center justify-center h-full flex-col gap-2 text-muted-foreground">
-                            <Loader2 className="h-8 w-8 animate-spin" />
-                            <p>Generating new image...</p>
-                        </div>
-                    ): editedImage ? (
-                        <Image
-                            src={editedImage}
-                            alt="Edited Thumbnail"
-                            layout="fill"
-                            objectFit="contain"
-                        />
-                    ) : (
-                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                           <p>Your AI-generated image will appear here.</p>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                         <span className="text-white font-semibold text-lg">Edited</span>
-                    </div>
-                </div>
-                <Button onClick={() => editedImage && onDownload(editedImage)} disabled={!editedImage} className="w-full" variant="destructive">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Edited Image
-                </Button>
-            </div>
-
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-
-function ManualEditDialog({
-    thumbnail,
-    onDownload,
-  }: {
-    thumbnail: string | null;
-    onDownload: (url: string, filters: React.CSSProperties['filter']) => void;
-  }) {
+    // Filter states
     const [brightness, setBrightness] = useState(100);
     const [contrast, setContrast] = useState(100);
     const [saturate, setSaturate] = useState(100);
     const [sepia, setSepia] = useState(0);
     const [grayscale, setGrayscale] = useState(0);
     const [invert, setInvert] = useState(0);
-  
+    
+    // AI Edit states
+    const [isRemovingObject, setIsRemovingObject] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+
     const filters = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturate}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`;
   
     const resetFilters = () => {
@@ -292,6 +176,18 @@ function ManualEditDialog({
       setGrayscale(0);
       setInvert(0);
     };
+
+    const handleAddImageClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            // TODO: Implement logic to add the image to the canvas
+            console.log("Image selected:", file.name);
+        }
+    };
   
     return (
       <Dialog>
@@ -301,57 +197,92 @@ function ManualEditDialog({
             Customize
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Edit Thumbnail</DialogTitle>
+            <DialogTitle>Advanced Thumbnail Editor</DialogTitle>
             <DialogDescription>
-              Adjust the sliders to change the appearance of the thumbnail.
+              Use filters for basic adjustments or AI tools for advanced editing.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
-              <Image
-                src={thumbnail || ''}
-                alt="Thumbnail"
-                layout="fill"
-                objectFit="contain"
-                style={{ filter: filters }}
-              />
+          <Tabs defaultValue="filters" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="filters">Filters</TabsTrigger>
+                <TabsTrigger value="ai">AI Edit</TabsTrigger>
+            </TabsList>
+            <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-lg border">
+                {/* This will be replaced by a canvas for interactive editing */}
+                <Image
+                    src={thumbnail || ''}
+                    alt="Thumbnail"
+                    layout="fill"
+                    objectFit="contain"
+                    style={{ filter: filters }}
+                />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label>Brightness ({brightness}%)</Label>
-                    <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
+            <TabsContent value="filters">
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                    <div className="space-y-2">
+                        <Label>Brightness ({brightness}%)</Label>
+                        <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Contrast ({contrast}%)</Label>
+                        <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Saturation ({saturate}%)</Label>
+                        <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Sepia ({sepia}%)</Label>
+                        <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Grayscale ({grayscale}%)</Label>
+                        <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Invert ({invert}%)</Label>
+                        <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
+                    </div>
                 </div>
-                <div className="space-y-2">
-                    <Label>Contrast ({contrast}%)</Label>
-                    <Slider value={[contrast]} onValueChange={(v) => setContrast(v[0])} max={200} step={1} />
+                 <DialogFooter className="pt-6">
+                    <Button variant="outline" onClick={resetFilters}>Reset</Button>
+                    <Button onClick={() => thumbnail && onDownload(thumbnail, filters)}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download with Filters
+                    </Button>
+                </DialogFooter>
+            </TabsContent>
+            <TabsContent value="ai">
+                 <div className="flex justify-center gap-2 pt-4">
+                    <Button variant={isRemovingObject ? "destructive" : "outline"} onClick={() => setIsRemovingObject(!isRemovingObject)}>
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {isRemovingObject ? "Cancel" : "Remove Object"}
+                    </Button>
+                    <Button variant="outline" onClick={handleAddImageClick}>
+                        <ImagePlus className="mr-2 h-4 w-4" />
+                        Add Image
+                    </Button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                    />
                 </div>
-                <div className="space-y-2">
-                    <Label>Saturation ({saturate}%)</Label>
-                    <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
-                </div>
-                <div className="space-y-2">
-                    <Label>Sepia ({sepia}%)</Label>
-                    <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
-                </div>
-                <div className="space-y-2">
-                    <Label>Grayscale ({grayscale}%)</Label>
-                    <Slider value={[grayscale]} onValueChange={(v) => setGrayscale(v[0])} max={100} step={1} />
-                </div>
-                <div className="space-y-2">
-                    <Label>Invert ({invert}%)</Label>
-                    <Slider value={[invert]} onValueChange={(v) => setInvert(v[0])} max={100} step={1} />
-                </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={resetFilters}>Reset</Button>
-            <Button onClick={() => thumbnail && onDownload(thumbnail, filters)}>
-              <Download className="mr-2 h-4 w-4" />
-              Download Edited
-            </Button>
-          </DialogFooter>
+                <p className="text-center text-sm text-muted-foreground mt-2">
+                    {isRemovingObject ? "Tap on the object you want to remove." : "Use AI to make advanced edits."}
+                </p>
+                <DialogFooter className="pt-6">
+                    <Button>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download AI Edited Image
+                    </Button>
+                </DialogFooter>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     );
@@ -627,9 +558,9 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
                 </div>
             )}
             
-            <ManualEditDialog
+            <AdvancedEditDialog
                 thumbnail={thumbnailUrl}
-                onDownload={(url, filters) => downloadEditedImage(url, filters, `${videoId}_custom_edited_thumbnail.png`)}
+                onDownload={(url, filters) => downloadEditedImage(url, filters!, `${videoId}_custom_edited_thumbnail.png`)}
             />
 
             {videoTitle && (
@@ -680,4 +611,5 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
 
 
 
+    
     
