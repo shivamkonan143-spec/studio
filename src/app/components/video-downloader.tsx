@@ -31,25 +31,25 @@ interface OembedResponse {
     title: string;
 }
 
-function getYouTubeVideoId(url: string): string | null {
+function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean } {
   try {
     const urlObj = new URL(url);
     if (urlObj.hostname === 'youtu.be') {
-      return urlObj.pathname.slice(1).split('?')[0];
+      return { id: urlObj.pathname.slice(1).split('?')[0], isShort: false };
     }
     if (urlObj.hostname === 'www.youtube.com' || urlObj.hostname === 'youtube.com') {
       if (urlObj.pathname === '/watch') {
-        return urlObj.searchParams.get('v');
+        return { id: urlObj.searchParams.get('v'), isShort: false };
       }
       if (urlObj.pathname.startsWith('/shorts/')) {
-        return urlObj.pathname.split('/shorts/')[1].split('?')[0];
+        return { id: urlObj.pathname.split('/shorts/')[1].split('?')[0], isShort: true };
       }
     }
   } catch (e) {
     console.error('Invalid URL for video ID extraction', e);
-    return null;
+    return { id: null, isShort: false };
   }
-  return null;
+  return { id: null, isShort: false };
 }
 
 export function YoutubeTool() {
@@ -59,6 +59,7 @@ export function YoutubeTool() {
   const [videoId, setVideoId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
+  const [isShort, setIsShort] = useState<boolean>(false);
   const { locale } = useLanguage();
   const t = translations[locale];
 
@@ -83,7 +84,8 @@ export function YoutubeTool() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsGenerating(true);
     setVideoTitle('');
-    const extractedVideoId = getYouTubeVideoId(values.url);
+    const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
+    setIsShort(isShortVideo);
 
     if (extractedVideoId) {
       setVideoId(extractedVideoId);
@@ -177,6 +179,7 @@ export function YoutubeTool() {
     setVideoId(null);
     setVideoTitle('');
     setIsGenerating(false);
+    setIsShort(false);
     form.reset();
   };
 
@@ -246,7 +249,10 @@ export function YoutubeTool() {
             {thumbnailUrl ? (
               <Dialog>
                 <DialogTrigger asChild>
-                  <div className="relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border aspect-video">
+                  <div className={cn(
+                      "relative mb-4 w-full cursor-zoom-in overflow-hidden rounded-lg border",
+                      isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
+                  )}>
                     <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
