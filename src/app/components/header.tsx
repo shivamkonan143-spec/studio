@@ -94,6 +94,24 @@ export function Header() {
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
 
+                {!user && (
+                  <>
+                    <DropdownMenuSeparator />
+                     <DropdownMenuItem asChild>
+                        <Link href="/login">
+                          <LogIn className="mr-2 h-4 w-4" />
+                          <span>Log In</span>
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/signup">
+                          <UserIcon className="mr-2 h-4 w-4" />
+                          <span>Register</span>
+                        </Link>
+                      </DropdownMenuItem>
+                  </>
+                )}
+
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -131,14 +149,7 @@ export function Header() {
                 </DropdownMenuContent>
             </DropdownMenu>
            ) : (
-             <>
-                <Button variant="ghost" asChild>
-                    <Link href="/login">Log In</Link>
-                </Button>
-                <Button asChild>
-                    <Link href="/signup">Register</Link>
-                </Button>
-             </>
+             null
            )}
         </div>
       </div>
