@@ -276,9 +276,16 @@ export function Header() {
           </MenuContainer>
         </div>
         <div className="flex flex-1 justify-center">
-          <div className="relative">
-             <Image src="/logo.png" alt="App Logo" width={32} height={32} />
-          </div>
+            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" rx="8" fill="url(#paint0_linear_1_2)"/>
+                <path d="M26.25 23.125V26.25H13.75V23.125H26.25ZM25 18.125L20 23.125L15 18.125H18.125V13.75H21.875V18.125H25Z" fill="white"/>
+                <defs>
+                <linearGradient id="paint0_linear_1_2" x1="20" y1="0" x2="20" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#F43F5E"/>
+                <stop offset="1" stopColor="#E11D48"/>
+                </linearGradient>
+                </defs>
+            </svg>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
            {isUserLoading ? (
@@ -318,6 +325,8 @@ export function Header() {
     </header>
   );
 }
+    
+
     
 
     
