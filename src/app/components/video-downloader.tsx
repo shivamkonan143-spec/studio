@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -265,7 +266,7 @@ export function YoutubeTool() {
 
       <Card>
         <CardContent className="flex flex-col items-center gap-4 pt-6">
-            <p className="text-sm font-medium text-red-500">Subscribe</p>
+            <p className="text-sm font-medium text-red-500">Subscribe now</p>
             <div className="flex items-center gap-4">
                 <Button variant="outline" size="icon" asChild>
                     <a href="https://www.instagram.com/lootbuy_india?igsh=MTk5Ynd1OW82ejY2ag==" target="_blank" rel="noopener noreferrer">
