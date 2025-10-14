@@ -1,16 +1,15 @@
-
 'use server';
 
 import {
-  automaticDownloadToolSelection,
-  type AutomaticDownloadToolSelectionInput,
-  type AutomaticDownloadToolSelectionOutput,
-} from '@/ai/flows/automatic-download-tool-selection';
+  generateVideoScript as generateVideoScriptFlow,
+  type GenerateVideoScriptInput,
+  type GenerateVideoScriptOutput,
+} from '@/ai/flows/generate-video-script';
 
 
-export async function getVideoTool(
+export async function generateVideoScript(
   formData: FormData
-): Promise<{ success: true; data: AutomaticDownloadToolSelectionOutput } | { success: false; error: string }> {
+): Promise<{ success: true; data: GenerateVideoScriptOutput } | { success: false; error: string }> {
   const url = formData.get('url') as string;
 
   if (!url) {
@@ -18,12 +17,11 @@ export async function getVideoTool(
   }
 
   try {
-    const input: AutomaticDownloadToolSelectionInput = { videoUrl: url };
-    const result = await automaticDownloadToolSelection(input);
+    const input: GenerateVideoScriptInput = { videoUrl: url };
+    const result = await generateVideoScriptFlow(input);
     return { success: true, data: result };
   } catch (e) {
     console.error('AI Error:', e);
-    return { success: false, error: 'Failed to analyze URL with AI. Please check the link or try again.' };
+    return { success: false, error: 'Failed to generate script with AI. Please check the link or try again.' };
   }
 }
-
