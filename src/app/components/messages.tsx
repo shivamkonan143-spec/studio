@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollectionData, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, Timestamp } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import {
@@ -16,6 +15,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageSquare } from 'lucide-react';
+import { useMemo } from 'react';
 
 type Message = {
   id: string;
@@ -32,7 +32,14 @@ export function Messages({ children }: { children: React.ReactNode }) {
     return query(collection(firestore, 'messages'), orderBy('createdAt', 'desc'));
   }, [firestore]);
 
-  const { data: messages, isLoading } = useCollection<Message>(messagesQuery);
+  const { data: messages, isLoading } = useCollectionData<Message>(messagesQuery);
+  
+  const sortedMessages = useMemo(() => {
+    if (!messages) return [];
+    // The query now handles sorting, but if for any reason it doesn't,
+    // we can sort on the client as a fallback.
+    return messages.sort((a, b) => b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime());
+  }, [messages]);
 
   return (
     <Dialog>
@@ -53,8 +60,8 @@ export function Messages({ children }: { children: React.ReactNode }) {
                 <MessageSkeleton />
               </>
             )}
-            {!isLoading && messages && messages.length > 0 ? (
-              messages.map((message, index) => (
+            {!isLoading && sortedMessages && sortedMessages.length > 0 ? (
+              sortedMessages.map((message, index) => (
                 <div key={message.id}>
                   <div className="space-y-1">
                     <h4 className="font-medium">{message.title}</h4>
@@ -65,7 +72,7 @@ export function Messages({ children }: { children: React.ReactNode }) {
                       {formatDistanceToNow(message.createdAt.toDate(), { addSuffix: true })}
                     </p>
                   </div>
-                  {index < messages.length - 1 && <Separator className="my-4" />}
+                  {index < sortedMessages.length - 1 && <Separator className="my-4" />}
                 </div>
               ))
             ) : (

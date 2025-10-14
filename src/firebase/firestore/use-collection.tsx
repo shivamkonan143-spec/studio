@@ -112,3 +112,52 @@ export function useCollection<T = any>(
   }
   return { data, isLoading, error };
 }
+
+
+/**
+ * A simplified hook to get real-time data from a Firestore query.
+ * @template T Type of the document data.
+ * @param {Query<DocumentData> | null | undefined} query - The Firestore Query. If null, does nothing.
+ * @returns An object with data, isLoading, and error.
+ */
+export function useCollectionData<T = any>(
+  query: Query<DocumentData> | null | undefined,
+) {
+  const [data, setData] = useState<WithId<T>[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<FirestoreError | null>(null);
+
+  useEffect(() => {
+    if (!query) {
+      setData(null);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    const unsubscribe = onSnapshot(
+      query,
+      (snapshot) => {
+        const docs = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as WithId<T>)
+        );
+        setData(docs);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error('useCollectionData Error:', err);
+        setError(err);
+        setIsLoading(false);
+        const contextualError = new FirestorePermissionError({
+          operation: 'list',
+          path: (query as unknown as InternalQuery)._query.path.canonicalString(),
+        })
+        errorEmitter.emit('permission-error', contextualError);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [query]);
+
+  return { data, isLoading, error };
+}
