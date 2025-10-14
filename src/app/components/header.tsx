@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2 } from 'lucide-react';
+import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,15 +17,32 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { useTheme } from 'next-themes';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
+import React, { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
 
-export function Header() {
-  const { user, isUserLoading } = useUser();
+function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
+  const { user } = useUser();
   const auth = useAuth();
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
@@ -36,13 +53,7 @@ export function Header() {
     if (auth) {
       await auth.signOut();
     }
-  };
-
-  const getInitials = (email: string | null | undefined) => {
-    if (!email) return 'U';
-    const parts = email.split('@')[0];
-    if (!parts) return 'U';
-    return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
+    closeMenu?.();
   };
 
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
@@ -70,106 +81,146 @@ export function Header() {
         description: t.share.notSupportedDescription,
       });
     }
+    closeMenu?.();
   };
 
+  const handleLanguageChange = (newLocale: 'en' | 'hi') => {
+    changeLocale(newLocale);
+    closeMenu?.();
+  };
+
+  return (
+    <div className="flex flex-col gap-1 p-2">
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span>{t.header.theme}</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onClick={() => { setTheme('light'); closeMenu?.(); }}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>{t.header.light}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { setTheme('dark'); closeMenu?.(); }}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>{t.header.dark}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { setTheme('system'); closeMenu?.(); }}>
+              <Laptop className="mr-2 h-4 w-4" />
+              <span>{t.header.system}</span>
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
+
+      <DropdownMenuSub>
+        <DropdownMenuSubTrigger>
+          <Languages className="mr-2 h-4 w-4" />
+          <span>{t.header.language}</span>
+        </DropdownMenuSubTrigger>
+        <DropdownMenuPortal>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+              <span>{t.header.english}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLanguageChange('hi')}>
+              <span>{t.header.hindi}</span>
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuPortal>
+      </DropdownMenuSub>
+
+      <DropdownMenuItem onClick={handleShare}>
+        <Share2 className="mr-2 h-4 w-4" />
+        <span>{t.header.shareApp}</span>
+      </DropdownMenuItem>
+
+      <DropdownMenuItem asChild>
+        <a href={mailtoHref} onClick={() => closeMenu?.()}>
+          <LifeBuoy className="mr-2 h-4 w-4" />
+          <span>{t.header.helpAndSupport}</span>
+        </a>
+      </DropdownMenuItem>
+
+      <Separator className="my-1" />
+
+      {user ? (
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>{t.header.logout}</span>
+          </DropdownMenuItem>
+      ) : (
+        <>
+          <DropdownMenuItem asChild>
+            <Link href="/login" onClick={() => closeMenu?.()}>
+              <LogIn className="mr-2 h-4 w-4" />
+              <span>{t.header.login}</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/signup" onClick={() => closeMenu?.()}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>{t.header.register}</span>
+            </Link>
+          </DropdownMenuItem>
+        </>
+      )}
+    </div>
+  );
+}
+
+
+export function Header() {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const { locale } = useLanguage();
+  const t = translations[locale];
+  const isMobile = useIsMobile();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const getInitials = (email: string | null | undefined) => {
+    if (!email) return 'U';
+    const parts = email.split('@')[0];
+    if (!parts) return 'U';
+    return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
+  };
+
+  const handleLogout = async () => {
+    if (auth) {
+      await auth.signOut();
+    }
+  };
+
+  const MenuContainer = isMobile ? Sheet : Dialog;
+  const MenuTrigger = isMobile ? SheetTrigger : DialogTrigger;
+  const MenuContentContainer = isMobile ? SheetContent : DialogContent;
+  const MenuHeader = isMobile ? SheetHeader : DialogHeader;
+  const MenuTitle = isMobile ? SheetTitle : DialogTitle;
 
   return (
     <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
       <div className="flex w-full items-center justify-between">
         <div className="flex-1">
          {!isUserLoading && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuLabel>{t.header.menu}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span>{t.header.theme}</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => setTheme('light')}>
-                        <Sun className="mr-2 h-4 w-4" />
-                        <span>{t.header.light}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setTheme('dark')}>
-                        <Moon className="mr-2 h-4 w-4" />
-                        <span>{t.header.dark}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setTheme('system')}>
-                        <Laptop className="mr-2 h-4 w-4" />
-                        <span>{t.header.system}</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <Languages className="mr-2 h-4 w-4" />
-                    <span>{t.header.language}</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => changeLocale('en')}>
-                        <span>{t.header.english}</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => changeLocale('hi')}>
-                        <span>{t.header.hindi}</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-
-                <DropdownMenuItem onClick={handleShare}>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  <span>{t.header.shareApp}</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <a href={mailtoHref}>
-                    <LifeBuoy className="mr-2 h-4 w-4" />
-                    <span>{t.header.helpAndSupport}</span>
-                  </a>
-                </DropdownMenuItem>
-
-                {user && (
-                    <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t.header.logout}</span>
-                    </DropdownMenuItem>
-                    </>
-                )}
-
-                {!user && (
-                  <>
-                    <DropdownMenuSeparator />
-                     <DropdownMenuItem asChild>
-                        <Link href="/login">
-                          <LogIn className="mr-2 h-4 w-4" />
-                          <span>{t.header.login}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/signup">
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          <span>{t.header.register}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                  </>
-                )}
-
-              </DropdownMenuContent>
-            </DropdownMenu>
+           <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <MenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </MenuTrigger>
+            <MenuContentContainer
+              side="left"
+              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-lg"}
+            >
+              <MenuHeader>
+                  <MenuTitle className="p-4 pb-0">{t.header.menu}</MenuTitle>
+                  {!isMobile && <Separator />}
+              </MenuHeader>
+              <MenuContent closeMenu={() => setIsMenuOpen(false)} />
+            </MenuContentContainer>
+          </MenuContainer>
           )}
         </div>
         <div className="flex flex-1 justify-center">
@@ -215,3 +266,5 @@ export function Header() {
     </header>
   );
 }
+
+    
