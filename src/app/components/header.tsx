@@ -310,7 +310,7 @@ export function Header() {
   const MenuTitle = isMobile ? SheetTitle : DialogTitle;
 
   return (
-    <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
+    <header className="flex w-full flex-col items-center gap-2 py-4">
       <div className="w-full flex items-center justify-between">
         <div className="flex-1">
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -332,16 +332,9 @@ export function Header() {
           </MenuContainer>
         </div>
         <div className="flex flex-1 justify-center">
-            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="40" height="40" rx="8" fill="url(#paint0_linear_1_2_header)"/>
-                <path d="M26.25 23.125V26.25H13.75V23.125H26.25ZM25 18.125L20 23.125L15 18.125H18.125V13.75H21.875V18.125H25Z" fill="white"/>
-                <defs>
-                <linearGradient id="paint0_linear_1_2_header" x1="20" y1="0" x2="20" y2="40" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#F43F5E"/>
-                <stop offset="1" stopColor="#E11D48"/>
-                </linearGradient>
-                </defs>
-            </svg>
+            <h1 className="text-xl font-bold tracking-tight text-foreground font-headline">
+                {t.title}
+            </h1>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
            {isUserLoading ? (
@@ -371,14 +364,13 @@ export function Header() {
                 </DropdownMenuContent>
             </DropdownMenu>
            ) : (
-             null
+             <div className="h-8 w-8"></div>
            )}
         </div>
       </div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl font-headline">
-        {t.title}
-      </h1>
     </header>
   );
 }
+    
+
     
