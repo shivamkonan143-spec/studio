@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn } from 'lucide-react';
+import { Play, LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu } from 'lucide-react';
 import { useUser, useAuth } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,21 +32,15 @@ export function Header() {
   return (
     <header className="flex w-full flex-col items-center gap-3 py-8 sm:py-12">
       <div className="flex w-full items-center justify-between">
-        <div className="flex-1"></div>
-        <div className="flex flex-1 justify-center">
-          <div className="rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-2 shadow-lg">
-            <Play className="h-5 w-5 fill-white text-white" />
-          </div>
-        </div>
-        <div className="flex flex-1 items-center justify-end gap-2">
-          {!isUserLoading && (
+        <div className="flex-1">
+         {!isUserLoading && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
-                  <Settings className="h-5 w-5" />
+                  <Menu className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="start">
                 {user ? (
                   <>
                     <DropdownMenuLabel>
@@ -130,6 +124,13 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+        </div>
+        <div className="flex flex-1 justify-center">
+          <div className="rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 p-2 shadow-lg">
+            <Play className="h-5 w-5 fill-white text-white" />
+          </div>
+        </div>
+        <div className="flex flex-1 items-center justify-end gap-2">
         </div>
       </div>
       <h1 className="font-headline text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
