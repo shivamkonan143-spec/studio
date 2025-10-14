@@ -331,6 +331,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
   const { user } = useUser();
   const firestore = useFirestore();
   const [isRatingOpen, setIsRatingOpen] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const subscriptionRef = useMemoFirebase(() => {
     if (!user || !firestore) return null;
@@ -345,6 +346,10 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
 
   useEffect(() => {
     if (!videoId) return;
+
+    if (previewRef.current) {
+        previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     
     const initialQuality = 'maxresdefault';
     setQuality(initialQuality);
@@ -559,7 +564,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     
   return (
     <>
-      <Card>
+      <Card ref={previewRef}>
           <CardHeader>
           <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
@@ -677,6 +682,8 @@ export function YoutubeDownloaderPreview({ videoId, isShort }: { videoId: string
     </>
   );
 }
+
+    
 
     
 
