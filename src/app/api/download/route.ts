@@ -17,35 +17,33 @@ export async function GET(req: NextRequest) {
     const title = info.videoDetails.title.replace(/[^\x00-\x7F]/g, "") || 'download';
 
     let format;
-    let fileExtension = 'mp4';
-    let mimeType = 'video/mp4';
+    let fileExtension;
+    let mimeType;
 
     if (type === 'audio') {
-      format = ytdl.chooseFormat(info.formats, { 
+      const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
+       format = ytdl.chooseFormat(audioFormats, { 
         quality: quality === 'highest' ? 'highestaudio' : 'lowestaudio',
-        filter: 'audioonly' 
       });
       fileExtension = 'mp3';
       mimeType = 'audio/mpeg';
     } else {
       // Video download logic
-      format = ytdl.chooseFormat(info.formats, {
+      let videoFormats = ytdl.filterFormats(info.formats, (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo);
+
+      format = ytdl.chooseFormat(videoFormats, {
         quality: quality,
-        filter: (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
       });
 
       // Fallback to highest quality if the selected quality is not available with audio
       if (!format) {
-        format = ytdl.chooseFormat(info.formats, {
+        format = ytdl.chooseFormat(videoFormats, {
             quality: 'highest',
-            filter: (f) => f.container === 'mp4' && f.hasAudio && f.hasVideo,
         });
       }
-
-      if (format) {
-        fileExtension = format.container || 'mp4';
-        mimeType = format.mimeType || 'video/mp4';
-      }
+      
+      fileExtension = 'mp4';
+      mimeType = 'video/mp4';
     }
 
 
