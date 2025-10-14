@@ -73,7 +73,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
     try {
         await deleteDoc(subscriptionRef);
         toast({
-            variant: 'success',
+            variant: 'destructive',
             title: t.subscription.cancelledTitle,
             description: t.subscription.cancelledDescription,
         });
