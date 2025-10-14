@@ -107,13 +107,13 @@ export function YoutubeDownloaderInput() {
   
     return (
         <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.1),rgba(255,0,0,0.0))]">
-            <CardContent className="p-8 pt-12 text-center">
+            <CardContent className="p-8 pt-8 text-center">
                 <div className="inline-flex items-center justify-center rounded-xl mb-6">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="40" height="40" rx="8" fill="url(#paint0_linear_1_2)"/>
+                        <rect width="40" height="40" rx="8" fill="url(#paint0_linear_1_2_downloader)"/>
                         <path d="M26.25 23.125V26.25H13.75V23.125H26.25ZM25 18.125L20 23.125L15 18.125H18.125V13.75H21.875V18.125H25Z" fill="white"/>
                         <defs>
-                        <linearGradient id="paint0_linear_1_2" x1="20" y1="0" x2="20" y2="40" gradientUnits="userSpaceOnUse">
+                        <linearGradient id="paint0_linear_1_2_downloader" x1="20" y1="0" x2="20" y2="40" gradientUnits="userSpaceOnUse">
                         <stop stopColor="#F43F5E"/>
                         <stop offset="1" stopColor="#E11D48"/>
                         </linearGradient>
