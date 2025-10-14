@@ -221,7 +221,7 @@ export function YoutubeTool() {
               <Dialog>
                 <DialogTrigger asChild>
                   <div className="relative mb-4 aspect-video w-full cursor-zoom-in overflow-hidden rounded-lg border">
-                    <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="contain" className="h-full w-full"
+                    <Image src={thumbnailUrl} alt="Video thumbnail" fill className="h-full w-full object-contain"
                       onError={() => {
                         if (quality === 'maxresdefault' && videoId) {
                           setQuality('hqdefault');
@@ -240,7 +240,7 @@ export function YoutubeTool() {
                   <DialogHeader>
                     <DialogTitle>Thumbnail Preview</DialogTitle>
                   </DialogHeader>
-                  {thumbnailUrl && <Image src={thumbnailUrl} alt="Video thumbnail zoomed" width={1280} height={720} className="mx-auto rounded-md" />}
+                  {thumbnailUrl && <Image src={thumbnailUrl} alt="Video thumbnail zoomed" width={1280} height={720} className="mx-auto rounded-md object-contain" />}
                 </DialogContent>
               </Dialog>
             ) : (
