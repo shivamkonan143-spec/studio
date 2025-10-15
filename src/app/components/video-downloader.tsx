@@ -29,6 +29,7 @@ import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
 import { useAuthModal } from '@/app/context/auth-modal-context';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 
 const formSchema = z.object({
@@ -210,10 +211,12 @@ function AdvancedEditDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl p-6">
         <DialogHeader>
-          <DialogTitle>Customize Thumbnail</DialogTitle>
-          <DialogDescription>
-            Apply filters to your image.
-          </DialogDescription>
+          <VisuallyHidden>
+            <DialogTitle>Customize Thumbnail</DialogTitle>
+            <DialogDescription>
+              Apply filters to your image.
+            </DialogDescription>
+          </VisuallyHidden>
         </DialogHeader>
         <div className="flex flex-col md:flex-row gap-8">
             <div className="flex-1 flex items-center justify-center bg-muted/20 p-4 rounded-lg">
@@ -636,6 +639,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
 
 
