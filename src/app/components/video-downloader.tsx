@@ -180,19 +180,14 @@ function AdvancedEditDialog({
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturate, setSaturate] = useState(100);
-  const [sepia, setSepia] = useState(0);
   const [grayscale, setGrayscale] = useState(0);
   const [invert, setInvert] = useState(0);
-  const [sharpen, setSharpen] = useState(0);
-  const [clear, setClear] = useState(0);
-  const [smooth, setSmooth] = useState(0);
 
 
   const filters = `
-    brightness(${brightness + (sharpen * 0.1) + (clear * 0.05)}%) 
-    contrast(${contrast + (sharpen * 0.25) - (smooth * 0.1)}%) 
-    saturate(${saturate + (clear * 0.1)}%) 
-    sepia(${sepia}%) 
+    brightness(${brightness}%) 
+    contrast(${contrast}%) 
+    saturate(${saturate}%) 
     grayscale(${grayscale}%) 
     invert(${invert}%)
   `;
@@ -201,12 +196,8 @@ function AdvancedEditDialog({
     setBrightness(100);
     setContrast(100);
     setSaturate(100);
-    setSepia(0);
     setGrayscale(0);
     setInvert(0);
-    setSharpen(0);
-    setClear(0);
-    setSmooth(0);
   };
   
   return (
@@ -242,18 +233,6 @@ function AdvancedEditDialog({
             <div className="w-full md:w-64 space-y-4">
                 <h3 className="font-semibold">Filters</h3>
                 <div className="space-y-2">
-                    <Label className="text-xs">Sharpen ({sharpen}%)</Label>
-                    <Slider value={[sharpen]} onValueChange={(v) => setSharpen(v[0])} max={100} step={1} />
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs">Clear ({clear}%)</Label>
-                    <Slider value={[clear]} onValueChange={(v) => setClear(v[0])} max={100} step={1} />
-                </div>
-                <div className="space-y-2">
-                    <Label className="text-xs">Smooth ({smooth}%)</Label>
-                    <Slider value={[smooth]} onValueChange={(v) => setSmooth(v[0])} max={100} step={1} />
-                </div>
-                <div className="space-y-2">
                     <Label className="text-xs">Brightness ({brightness}%)</Label>
                     <Slider value={[brightness]} onValueChange={(v) => setBrightness(v[0])} max={200} step={1} />
                 </div>
@@ -264,10 +243,6 @@ function AdvancedEditDialog({
                 <div className="space-y-2">
                     <Label className="text-xs">Saturation ({saturate}%)</Label>
                     <Slider value={[saturate]} onValueChange={(v) => setSaturate(v[0])} max={200} step={1} />
-                </div>
-                 <div className="space-y-2">
-                    <Label className="text-xs">Sepia ({sepia}%)</Label>
-                    <Slider value={[sepia]} onValueChange={(v) => setSepia(v[0])} max={100} step={1} />
                 </div>
                  <div className="space-y-2">
                     <Label className="text-xs">Grayscale ({grayscale}%)</Label>
@@ -661,5 +636,6 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
 
