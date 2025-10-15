@@ -345,9 +345,7 @@ export function Header() {
             </h1>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
-           {isUserLoading ? (
-            <Skeleton className="h-8 w-8 rounded-full" />
-           ) : user ? (
+           {isUserLoading ? null : user ? (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
