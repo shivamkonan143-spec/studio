@@ -33,7 +33,7 @@
         "loadingThumbnail": "थंबनेल लोड हो रहा है...",
         "quality": "गुणवत्ता",
         "qualityHigh": "उच्च",
-        "qualityHigh360": "उच्च (360p)",
+        "qualityLow": "कम",
         "downloadThumbnail": "गैलरी में सहेजें",
         "tryAnother": "दूसरा प्रयास करें",
         "subscribeNow": "अभी सब्सक्राइब करें",
@@ -43,7 +43,7 @@
         "downloadFailedDescription": "उच्च गुणवत्ता उपलब्ध नहीं है। कृपया कोई अन्य गुणवत्ता चुनें।",
         "downloadErrorDescription": "थंबनेल डाउनलोड नहीं किया जा सका। चयनित गुणवत्ता उपलब्ध नहीं हो सकती है।",
         "qualityUnavailableTitle": "गुणवत्ता उपलब्ध नहीं है",
-        "qualityUnavailableDescription": "इस वीडियो के लिए उच्च गुणवत्ता उपलब्ध नहीं है। उच्च (360p) गुणवत्ता पर स्विच किया गया।",
+        "qualityUnavailableDescription": "इस वीडियो के लिए उच्च गुणवत्ता उपलब्ध नहीं है। कम गुणवत्ता पर स्विच किया गया।",
         "videoTitle": "वीडियो शीर्षक",
         "copyTitle": "शीर्षक कॉपी करें",
         "titleCopied": "शीर्षक क्लिपबोर्ड पर कॉपी किया गया!"

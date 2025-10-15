@@ -33,7 +33,7 @@
         "loadingThumbnail": "Loading thumbnail...",
         "quality": "Quality",
         "qualityHigh": "High",
-        "qualityHigh360": "High (360p)",
+        "qualityLow": "Low",
         "downloadThumbnail": "Save to Gallery",
         "tryAnother": "Try Another",
         "subscribeNow": "Subscribe now",
@@ -43,7 +43,7 @@
         "downloadFailedDescription": "High quality is not available. Please select another quality.",
         "downloadErrorDescription": "Could not download the thumbnail. The selected quality may not be available.",
         "qualityUnavailableTitle": "Quality not available",
-        "qualityUnavailableDescription": "High quality isn't available for this video. Switched to High (360p) quality.",
+        "qualityUnavailableDescription": "High quality isn't available for this video. Switched to Low quality.",
         "videoTitle": "Video Title",
         "copyTitle": "Copy Title",
         "titleCopied": "Title copied to clipboard!"

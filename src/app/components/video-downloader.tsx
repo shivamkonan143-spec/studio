@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop, Sepia } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -609,7 +609,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
                       </SelectTrigger>
                       <SelectContent>
                           <SelectItem value="maxresdefault">{t.videoDownloader.qualityHigh}</SelectItem>
-                          <SelectItem value="hqdefault">{t.videoDownloader.qualityHigh360}</SelectItem>
+                          <SelectItem value="hqdefault">{t.videoDownloader.qualityLow}</SelectItem>
                       </SelectContent>
                   </Select>
               </div>
@@ -639,6 +639,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
 
 
