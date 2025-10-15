@@ -275,7 +275,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState<string>('');
   const [isTitleLoading, setIsTitleLoading] = useState(true);
-  const [quality, setQuality] = useState<ThumbnailQuality>('hqdefault');
+  const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
   const { locale } = useLanguage();
   const t = translations[locale];
   const { user } = useUser();
@@ -302,7 +302,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
         previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
-    const initialQuality = 'hqdefault';
+    const initialQuality = 'maxresdefault';
     setQuality(initialQuality);
     updateThumbnailUrl(videoId, initialQuality);
     
@@ -639,6 +639,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
 
 
