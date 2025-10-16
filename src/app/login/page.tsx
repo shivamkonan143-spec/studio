@@ -183,7 +183,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                         </div>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
+                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
@@ -224,11 +224,6 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <div className="text-center space-y-4">
                         <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
                         <div className="flex flex-col space-y-2">
-                             <a href="https://mail.google.com/mail/#spam" target="_blank" rel="noopener noreferrer">
-                                <Button className="w-full font-bold">
-                                    {t.forgotPassword.openGmailSpam}
-                                </Button>
-                            </a>
                             <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
                             </Button>
