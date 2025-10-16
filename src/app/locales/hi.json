@@ -28,7 +28,20 @@
         "noHistoryDescription": "आपने अभी तक कोई थंबनेल डाउनलोड नहीं किया है। होम पेज पर शुरू करें!",
         "backToHome": "होम पर वापस जाएं",
         "loginRequiredTitle": "लॉगिन आवश्यक है",
-        "loginRequiredDescription": "अपना डाउनलोड इतिहास देखने के लिए कृपया लॉग इन करें।"
+        "loginRequiredDescription": "अपना डाउनलोड इतिहास देखने के लिए कृपया लॉग इन करें।",
+        "select": "चुनें",
+        "cancel": "रद्द करें",
+        "delete": "हटाएं",
+        "deleteAll": "सभी हटाएं",
+        "confirmDeleteTitle": "क्या आप निश्चित हैं?",
+        "confirmDeleteDescription": "यह चयनित {count} आइटम को स्थायी रूप से हटा देगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+        "confirmDeleteAllTitle": "पूरा इतिहास हटाएं?",
+        "confirmDeleteAllDescription": "यह आपके पूरे डाउनलोड इतिहास को स्थायी रूप से हटा देगा। यह क्रिया पूर्ववत नहीं की जा सकती।",
+        "deleteSuccessTitle": "आइटम हटा दिए गए",
+        "deleteSuccessDescription": "{count} आइटम सफलतापूर्वक हटा दिए गए।",
+        "deleteAllSuccessTitle": "इतिहास साफ़ किया गया",
+        "deleteAllSuccessDescription": "आपका पूरा डाउनलोड इतिहास साफ़ कर दिया गया है।",
+        "deleteErrorDescription": "आइटम हटाने में विफल। कृपया फिर से प्रयास करें।"
     },
     "about": {
         "description": "यह Next.js और Firebase के साथ बनाया गया एक थंबनेल डाउनलोडर ऐप है।",
@@ -57,7 +70,10 @@
         "qualityUnavailableDescription": "इस वीडियो के लिए उच्च गुणवत्ता उपलब्ध नहीं है। कम गुणवत्ता पर स्विच किया गया।",
         "videoTitle": "वीडियो शीर्षक",
         "copyTitle": "शीर्षक कॉपी करें",
-        "titleCopied": "शीर्षक क्लिपबोर्ड पर कॉपी किया गया!"
+        "titleCopied": "शीर्षक क्लिपबोर्ड पर कॉपी किया गया!",
+        "aiTitle": "AI द्वारा उत्पन्न शीर्षक",
+        "aiButton": "AI से शीर्षक उत्पन्न करें",
+        "aiLoading": "शीर्षक उत्पन्न हो रहे हैं..."
     },
     "subscription": {
         "title": "प्रीमियम सदस्यता",
@@ -182,5 +198,3 @@
         "user": "उपयोगकर्ता"
     }
 }
-
-    

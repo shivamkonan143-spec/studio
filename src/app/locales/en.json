@@ -28,7 +28,20 @@
         "noHistoryDescription": "You haven't downloaded any thumbnails yet. Get started on the home page!",
         "backToHome": "Back to Home",
         "loginRequiredTitle": "Login Required",
-        "loginRequiredDescription": "Please log in to view your download history."
+        "loginRequiredDescription": "Please log in to view your download history.",
+        "select": "Select",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleteAll": "Delete All",
+        "confirmDeleteTitle": "Are you sure?",
+        "confirmDeleteDescription": "This will permanently delete the selected {count} item(s). This action cannot be undone.",
+        "confirmDeleteAllTitle": "Delete all history?",
+        "confirmDeleteAllDescription": "This will permanently delete your entire download history. This action cannot be undone.",
+        "deleteSuccessTitle": "Items Deleted",
+        "deleteSuccessDescription": "Successfully deleted {count} item(s).",
+        "deleteAllSuccessTitle": "History Cleared",
+        "deleteAllSuccessDescription": "Your entire download history has been cleared.",
+        "deleteErrorDescription": "Failed to delete items. Please try again."
     },
     "about": {
         "description": "This is a thumbnail downloader app built with Next.js and Firebase.",
@@ -57,7 +70,10 @@
         "qualityUnavailableDescription": "High quality isn't available for this video. Switched to Low quality.",
         "videoTitle": "Video Title",
         "copyTitle": "Copy Title",
-        "titleCopied": "Title copied to clipboard!"
+        "titleCopied": "Title copied to clipboard!",
+        "aiTitle": "AI Generated Titles",
+        "aiButton": "Generate Titles with AI",
+        "aiLoading": "Generating titles..."
     },
     "subscription": {
         "title": "Premium Subscription",
@@ -182,5 +198,3 @@
         "user": "User"
     }
 }
-
-    
