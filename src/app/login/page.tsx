@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   sendPasswordResetEmail,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   AuthError,
   User,
   signInWithEmailAndPassword,
@@ -46,7 +47,6 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
         case 'auth/invalid-email':
             return 'Please enter a valid email address.';
         case 'auth/popup-closed-by-user':
-            return 'Sign-in window was closed. Please try again.';
         case 'auth/cancelled-popup-request':
             return 'Sign-in was cancelled. Please try again.';
         case 'auth/unauthorized-domain':
@@ -56,8 +56,7 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
     }
 };
 
-function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
-    const { toast } = useToast();
+function LoginView({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) => void, onAuthError: (error: any) => void }) {
     const { locale } = useLanguage();
     const t = translations[locale];
     const [isLoading, setIsLoading] = useState(false);
@@ -66,33 +65,14 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-    const handleAuthSuccess = useCallback((user: User) => {
-        toast({
-            variant: 'success',
-            title: t.login.successTitle,
-            description: t.login.welcomeBack,
-        });
-        onAuthSuccess();
-    }, [onAuthSuccess, t.login.successTitle, t.login.welcomeBack, toast]);
-
-    const handleAuthError = useCallback((error: any) => {
-        setIsLoading(false);
-        const errorCode = error.code || 'unknown';
-        toast({
-            variant: 'destructive',
-            title: t.login.failedTitle,
-            description: getAuthErrorMessage(errorCode, locale),
-        });
-    }, [locale, t.login.failedTitle, toast]);
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            handleAuthSuccess(userCredential.user);
+            onAuthSuccess(userCredential.user);
         } catch (error) {
-            handleAuthError(error);
+            onAuthError(error);
         } finally {
             setIsLoading(false);
         }
@@ -102,12 +82,10 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
         const provider = new GoogleAuthProvider();
         setIsLoading(true);
         try {
-            const result = await signInWithPopup(auth, provider);
-            handleAuthSuccess(result.user);
+            await signInWithRedirect(auth, provider);
         } catch (error) {
-            handleAuthError(error as AuthError);
-        } finally {
-            setIsLoading(false);
+             onAuthError(error);
+             setIsLoading(false);
         }
     };
 
@@ -163,8 +141,7 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     );
 }
 
-function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
-    const { toast } = useToast();
+function SignupView({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) => void, onAuthError: (error: any) => void }) {
     const { locale } = useLanguage();
     const t = translations[locale];
     const [isLoading, setIsLoading] = useState(false);
@@ -172,33 +149,14 @@ function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     
-    const handleAuthSuccess = useCallback((user: User) => {
-        toast({
-            variant: 'success',
-            title: t.register.successTitle,
-            description: t.register.successDescription,
-        });
-        onAuthSuccess();
-    }, [onAuthSuccess, t.register.successTitle, t.register.successDescription, toast]);
-    
-    const handleAuthError = useCallback((error: any) => {
-        setIsLoading(false);
-        const errorCode = error.code || 'unknown';
-        toast({
-            variant: 'destructive',
-            title: t.register.failedTitle,
-            description: getAuthErrorMessage(errorCode, locale),
-        });
-    }, [locale, t.register.failedTitle, toast]);
-
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            handleAuthSuccess(userCredential.user);
+            onAuthSuccess(userCredential.user);
         } catch (error) {
-            handleAuthError(error);
+            onAuthError(error);
         } finally {
             setIsLoading(false);
         }
@@ -208,11 +166,9 @@ function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
         const provider = new GoogleAuthProvider();
         setIsLoading(true);
         try {
-            const result = await signInWithPopup(auth, provider);
-            handleAuthSuccess(result.user);
+            await signInWithRedirect(auth, provider);
         } catch (error) {
-            handleAuthError(error as AuthError);
-        } finally {
+            onAuthError(error as AuthError);
             setIsLoading(false);
         }
     };
@@ -330,25 +286,58 @@ function ForgotPasswordView({ onBack }: { onBack: () => void }) {
 }
 
 export default function LoginPage() {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading: isAuthLoading } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { locale } = useLanguage();
     const t = translations[locale];
+    const { toast } = useToast();
+    const [isRedirecting, setIsRedirecting] = useState(true);
+
+    const handleAuthSuccess = useCallback((user: User, successTitle: string, successDescription: string) => {
+        toast({
+            variant: 'success',
+            title: successTitle,
+            description: successDescription,
+        });
+        const redirectUrl = searchParams.get('redirect') || '/';
+        router.replace(redirectUrl);
+    }, [toast, searchParams, router]);
+
+    const handleAuthError = useCallback((error: any, failureTitle: string) => {
+        const errorCode = error.code || 'unknown';
+        toast({
+            variant: 'destructive',
+            title: failureTitle,
+            description: getAuthErrorMessage(errorCode, locale),
+        });
+    }, [toast, locale]);
+
 
     useEffect(() => {
-        if (!isLoading && user) {
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    handleAuthSuccess(result.user, t.login.successTitle, t.login.welcomeBack);
+                } else {
+                     setIsRedirecting(false);
+                }
+            })
+            .catch((error) => {
+                handleAuthError(error, t.login.failedTitle);
+                setIsRedirecting(false);
+            });
+    }, [auth, handleAuthSuccess, handleAuthError, t]);
+    
+
+    useEffect(() => {
+        if (!isAuthLoading && user && !isRedirecting) {
             const redirectUrl = searchParams.get('redirect') || '/';
             router.replace(redirectUrl);
         }
-    }, [user, isLoading, router, searchParams]);
+    }, [user, isAuthLoading, router, searchParams, isRedirecting]);
 
-    const handleAuthSuccess = () => {
-        const redirectUrl = searchParams.get('redirect') || '/';
-        router.replace(redirectUrl);
-    };
-
-    if (isLoading || user) {
+    if (isAuthLoading || user || isRedirecting) {
         return (
             <div className="flex min-h-screen w-full items-center justify-center bg-background">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -377,15 +366,19 @@ export default function LoginPage() {
                     </CardHeader>
 
                     <TabsContent value="login">
-                        <LoginView onAuthSuccess={handleAuthSuccess} />
+                        <LoginView 
+                            onAuthSuccess={(user) => handleAuthSuccess(user, t.login.successTitle, t.login.welcomeBack)}
+                            onAuthError={(error) => handleAuthError(error, t.login.failedTitle)}
+                        />
                     </TabsContent>
                     <TabsContent value="register">
-                        <SignupView onAuthSuccess={handleAuthSuccess} />
+                        <SignupView 
+                            onAuthSuccess={(user) => handleAuthSuccess(user, t.register.successTitle, t.register.successDescription)}
+                            onAuthError={(error) => handleAuthError(error, t.register.failedTitle)}
+                        />
                     </TabsContent>
                 </Card>
             </Tabs>
         </div>
     );
 }
-
-    
