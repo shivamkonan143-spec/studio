@@ -12,13 +12,14 @@ function HomeComponent() {
   const searchParams = useSearchParams();
   const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
 
+  const videoId = searchParams.get('videoId');
+  const isShort = searchParams.get('isShort') === 'true';
+
   useEffect(() => {
-    const videoId = searchParams.get('videoId');
-    const isShort = searchParams.get('isShort') === 'true';
     if (videoId) {
       setPreview({ id: videoId, isShort });
     }
-  }, [searchParams]);
+  }, [videoId, isShort]);
 
   const handleGetThumbnail = (id: string, isShort: boolean) => {
     setPreview({ id, isShort });
