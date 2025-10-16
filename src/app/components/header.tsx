@@ -1,8 +1,7 @@
-
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -51,6 +50,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { user } = useUser();
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
+  const whatsappHref = `https://wa.me/917488530499`;
   
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
@@ -152,6 +152,12 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             </DialogContent>
         </Dialog>
 
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            <span>{t.header.whatsappSupport}</span>
+          </a>
+        </Button>
 
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
           <a href={mailtoHref} onClick={() => closeMenu?.()}>
