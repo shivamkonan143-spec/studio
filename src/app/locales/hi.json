@@ -30,6 +30,7 @@
         "loginRequiredTitle": "लॉगिन आवश्यक है",
         "loginRequiredDescription": "अपना डाउनलोड इतिहास देखने के लिए कृपया लॉग इन करें।",
         "select": "चुनें",
+        "selectAll": "सभी चुनें",
         "cancel": "रद्द करें",
         "delete": "हटाएं",
         "deleteAll": "सभी हटाएं",

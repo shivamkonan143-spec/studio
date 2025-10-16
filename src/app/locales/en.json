@@ -30,6 +30,7 @@
         "loginRequiredTitle": "Login Required",
         "loginRequiredDescription": "Please log in to view your download history.",
         "select": "Select",
+        "selectAll": "Select All",
         "cancel": "Cancel",
         "delete": "Delete",
         "deleteAll": "Delete All",

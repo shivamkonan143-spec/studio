@@ -116,6 +116,18 @@ export default function HistoryPage() {
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
+  
+  const handleSelectAll = () => {
+    if (history) {
+      if (selectedIds.length === history.length) {
+        // If all are selected, deselect all
+        setSelectedIds([]);
+      } else {
+        // Otherwise, select all
+        setSelectedIds(history.map(item => item.id));
+      }
+    }
+  };
 
   const handleDeleteSelected = async () => {
     if (!user || !firestore || selectedIds.length === 0) return;
@@ -247,6 +259,9 @@ export default function HistoryPage() {
 
         {isSelectionActive && hasHistory && (
              <div className="flex justify-end items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                <Button variant="ghost" onClick={handleSelectAll}>
+                  {t.history.selectAll}
+                </Button>
                 {selectedIds.length > 0 ? (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
