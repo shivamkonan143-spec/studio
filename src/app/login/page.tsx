@@ -145,11 +145,11 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="login-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" />
+                           <Input id="login-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                         </div>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" />
+                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
@@ -179,11 +179,11 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <form onSubmit={handleRegister} className="space-y-6">
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="register-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" />
+                           <Input id="register-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                         </div>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" />
+                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
@@ -207,7 +207,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                         </p>
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="reset-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" />
+                           <Input id="reset-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
                         </div>
                         <Button type="submit" className="w-full font-bold" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.forgotPassword.button}
@@ -224,6 +224,11 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <div className="text-center space-y-4">
                         <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
                         <div className="flex flex-col space-y-2">
+                             <a href="https://mail.google.com/mail/#spam" target="_blank" rel="noopener noreferrer">
+                                <Button className="w-full font-bold">
+                                    {t.forgotPassword.openGmailSpam}
+                                </Button>
+                            </a>
                             <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
                             </Button>
@@ -242,7 +247,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                                 value={password} 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 required 
-                                className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary transition" 
+                                className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" 
                             />
                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -374,7 +379,7 @@ function AuthPage() {
             <AuthForm 
                 onAuthSuccess={handleAuthSuccess}
                 onAuthError={handleAuthError}
-                initialView={mode === 'resetPassword' ? 'reset-password' : 'login'}
+                initialView={mode === 'resetPassword' ? 'reset-password' : 'register'}
                 oobCode={oobCode}
             />
         </div>
@@ -389,5 +394,3 @@ export default function LoginPage() {
     // However, this structure provides the `useAuth` hook with the necessary context.
     return <AuthPage />;
 }
-
-    
