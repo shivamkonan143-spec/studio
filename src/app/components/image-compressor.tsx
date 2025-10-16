@@ -217,11 +217,11 @@ export function ImageCompressor() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Button onClick={handleDownload} disabled={!compressedImage || isCompressing}>
-                        <Download className="mr-2" />
+                        <Download className="mr-2 h-4 w-4" />
                         Download
                     </Button>
                      <Button onClick={handleReset} variant="outline">
-                        <RefreshCw className="mr-2" />
+                        <RefreshCw className="mr-2 h-4 w-4" />
                         Reset
                     </Button>
                 </div>
