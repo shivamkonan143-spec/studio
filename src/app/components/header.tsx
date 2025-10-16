@@ -238,7 +238,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 }
 
 function AccountButton() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
@@ -249,6 +249,12 @@ function AccountButton() {
       auth.signOut();
     }
   };
+
+  if (isUserLoading) {
+    // Render a placeholder or nothing while auth state is loading
+    return <div className="h-8 w-8" />;
+  }
+
 
   if (user) {
     return (
