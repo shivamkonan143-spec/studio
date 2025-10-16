@@ -30,7 +30,7 @@ export function SubscriptionCard() {
     const { toast } = useToast();
     const { user } = useUser();
     const router = useRouter();
-    const { activateSubscription } = useSubscription();
+    const { activateSubscription, isSubscribed } = useSubscription();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -158,21 +158,28 @@ export function SubscriptionCard() {
                         <DialogTitle>{t.subscription.dialogPaymentTitle}</DialogTitle>
                     </DialogHeader>
                     <div className="py-8 text-center">
-                        <p>{t.subscription.completePayment}...</p>
+                        <p className="text-green-600 font-semibold">Payment Method Coming Soon...</p>
                     </div>
                     <DialogFooter>
                         <Button 
+                            variant="outline"
                             className="w-full"
-                            onClick={handleCompletePayment}
-                            disabled={isProcessing}
+                            onClick={() => {
+                                setIsDialogOpen(false);
+                                setStep(1);
+                            }}
                         >
-                            {isProcessing ? t.common.loading : t.subscription.completePayment}
+                           Close
                         </Button>
                     </DialogFooter>
                 </>
             )
         }
     };
+
+    if (isSubscribed) {
+        return null;
+    }
 
 
     return (
@@ -214,5 +221,3 @@ export function SubscriptionCard() {
         </>
     );
 }
-
-    

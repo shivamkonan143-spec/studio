@@ -12,8 +12,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 function HomeComponent() {
   const searchParams = useSearchParams();
   const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
-  const { isSubscribed } = useSubscription();
-
+  
   const videoId = searchParams.get('videoId');
   const isShort = searchParams.get('isShort') === 'true';
 
@@ -48,7 +47,7 @@ function HomeComponent() {
           )}
         </div>
 
-        {!preview && !isSubscribed && <SubscriptionCard />}
+        {!preview && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>
