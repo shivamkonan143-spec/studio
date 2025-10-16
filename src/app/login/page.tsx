@@ -346,12 +346,10 @@ export default function LoginPage() {
                 <Card>
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl">{t.header.myAccount}</CardTitle>
-                        <CardDescription>
-                            <TabsList className="grid w-full grid-cols-2 mt-4">
-                                <TabsTrigger value="login">{t.header.login}</TabsTrigger>
-                                <TabsTrigger value="register">{t.header.register}</TabsTrigger>
-                            </TabsList>
-                        </CardDescription>
+                        <TabsList className="grid w-full grid-cols-2 mt-4">
+                            <TabsTrigger value="login">{t.header.login}</TabsTrigger>
+                            <TabsTrigger value="register">{t.header.register}</TabsTrigger>
+                        </TabsList>
                     </CardHeader>
 
                     <TabsContent value="login">
