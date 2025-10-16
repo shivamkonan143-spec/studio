@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop, Sepia } from 'lucide-react';
+import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipboard, Sparkles, SlidersHorizontal, Trash2, ImagePlus, Crop, Sepia, Youtube, Instagram, Check } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -41,6 +41,8 @@ interface OembedResponse {
     title: string;
 }
 
+const SOCIAL_LOCK_KEY = 'social-lock-confirmed';
+
 function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean } {
   try {
     const urlObj = new URL(url);
@@ -62,16 +64,63 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
   return { id: null, isShort: false };
 }
 
+function SocialLockDialog({ isOpen, onOpenChange, onConfirm }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onConfirm: () => void }) {
+    const { locale } = useLanguage();
+    const t = translations[locale];
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{t.socialLock.title}</DialogTitle>
+                    <DialogDescription>{t.socialLock.description}</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <Button asChild className="w-full" variant="destructive">
+                        <a href="https://youtube.com/@onlyp4x" target="_blank" rel="noopener noreferrer">
+                            <Youtube className="mr-2 h-5 w-5" />
+                            {t.socialLock.subscribeYoutube}
+                        </a>
+                    </Button>
+                    <Button asChild className="w-full" style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)' }}>
+                        <a href="https://instagram.com/techythief" target="_blank" rel="noopener noreferrer">
+                            <Instagram className="mr-2 h-5 w-5" />
+                            {t.socialLock.followInstagram}
+                        </a>
+                    </Button>
+                </div>
+                <DialogFooter>
+                    <Button onClick={onConfirm} className="w-full">
+                        <Check className="mr-2 h-5 w-5" />
+                        {t.socialLock.confirm}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id: string, isShort: boolean) => void }) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAd, setShowAd] = useState(false);
+    const [isSocialLockOpen, setIsSocialLockOpen] = useState(false);
+    const [isSocialLockConfirmed, setIsSocialLockConfirmed] = useState(true);
     const { locale } = useLanguage();
     const t = translations[locale];
     const { toast } = useToast();
     
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-      setShowAd(true);
+    useEffect(() => {
+        try {
+            const confirmed = localStorage.getItem(SOCIAL_LOCK_KEY) === 'true';
+            setIsSocialLockConfirmed(confirmed);
+        } catch (error) {
+            console.error('Could not read from local storage', error);
+            setIsSocialLockConfirmed(true); // Default to confirmed if LS is unavailable
+        }
+    }, []);
 
+    const proceedWithGetThumbnail = (values: z.infer<typeof formSchema>) => {
+      setShowAd(true);
       setIsGenerating(true);
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
   
@@ -86,6 +135,26 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
       }
       setIsGenerating(false);
     };
+
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        if (!isSocialLockConfirmed) {
+            setIsSocialLockOpen(true);
+            return;
+        }
+        proceedWithGetThumbnail(values);
+    };
+
+    const handleSocialLockConfirm = () => {
+        try {
+            localStorage.setItem(SOCIAL_LOCK_KEY, 'true');
+        } catch (error) {
+            console.error('Could not write to local storage', error);
+        }
+        setIsSocialLockConfirmed(true);
+        setIsSocialLockOpen(false);
+        // Automatically submit the form after confirmation
+        form.handleSubmit(proceedWithGetThumbnail)();
+    };
   
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
@@ -93,58 +162,65 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
     });
   
     return (
-        <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(22_3,200,242,0.1),rgba(255,0,0,0.0))]">
-            <CardContent className="p-8 pt-8 text-center">
-                <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
-                    {t.title}
-                </h2>
-                <p className="text-muted-foreground mb-6">{t.videoDownloader.pasteUrl}</p>
-                
-                <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
-                    <FormField
-                    control={form.control}
-                    name="url"
-                    render={({ field }) => (
-                        <FormItem>
-                        <div className="relative">
-                            <FormControl>
-                            <Input
-                                placeholder={t.videoDownloader.urlPlaceholder}
-                                {...field}
-                                disabled={isGenerating}
-                                className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
-                            />
-                            </FormControl>
-                            {field.value && (
-                            <Button
-                                type="button"
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => form.reset({ url: '' })}
-                                className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
-                            )}
-                        </div>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <Button 
-                    type="submit" 
-                    className="w-full"
-                    size="lg"
-                    disabled={isGenerating}
-                    >
-                    {isGenerating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
-                    </Button>
-                </form>
-                </Form>
-                 <AdPlaceholder showAd={showAd} />
-            </CardContent>
-        </Card>
+        <>
+            <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(22_3,200,242,0.1),rgba(255,0,0,0.0))]">
+                <CardContent className="p-8 pt-8 text-center">
+                    <h2 className="text-2xl font-bold tracking-tight text-foreground mb-2">
+                        {t.title}
+                    </h2>
+                    <p className="text-muted-foreground mb-6">{t.videoDownloader.pasteUrl}</p>
+                    
+                    <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto">
+                        <FormField
+                        control={form.control}
+                        name="url"
+                        render={({ field }) => (
+                            <FormItem>
+                            <div className="relative">
+                                <FormControl>
+                                <Input
+                                    placeholder={t.videoDownloader.urlPlaceholder}
+                                    {...field}
+                                    disabled={isGenerating}
+                                    className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                                />
+                                </FormControl>
+                                {field.value && (
+                                <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => form.reset({ url: '' })}
+                                    className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
+                                >
+                                    <X className="h-5 w-5" />
+                                </Button>
+                                )}
+                            </div>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <Button 
+                        type="submit" 
+                        className="w-full"
+                        size="lg"
+                        disabled={isGenerating}
+                        >
+                        {isGenerating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
+                        </Button>
+                    </form>
+                    </Form>
+                     <AdPlaceholder showAd={showAd} />
+                </CardContent>
+            </Card>
+            <SocialLockDialog 
+                isOpen={isSocialLockOpen} 
+                onOpenChange={setIsSocialLockOpen}
+                onConfirm={handleSocialLockConfirm}
+            />
+        </>
     );
 }
 
@@ -673,3 +749,5 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
+
+    

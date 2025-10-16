@@ -169,9 +169,18 @@
         "selectRatingTitle": "No Rating Selected",
         "selectRatingDescription": "Please select a star rating before submitting."
     },
+    "socialLock": {
+        "title": "Unlock Feature",
+        "description": "To use this feature, please support us by following our social channels.",
+        "subscribeYoutube": "Subscribe on YouTube",
+        "followInstagram": "Follow on Instagram",
+        "confirm": "I've Subscribed & Followed"
+    },
     "common": {
         "error": "Error",
         "loading": "Loading...",
         "user": "User"
     }
 }
+
+    
