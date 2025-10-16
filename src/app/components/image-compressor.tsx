@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ export function ImageCompressor() {
   const [quality, setQuality] = useState(80);
   const [fileName, setFileName] = useState<string>('');
   const [isCompressing, setIsCompressing] = useState(false);
+  const [imageType, setImageType] = useState<string>('image/jpeg');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -36,18 +37,19 @@ export function ImageCompressor() {
 
       setFileName(file.name.split('.')[0]);
       setOriginalFileSize(file.size);
+      setImageType(file.type);
       
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
         setOriginalImage(imageUrl);
-        compressImage(imageUrl, quality, file.type);
+        // Initial compression is handled by the useEffect below
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const compressImage = (imageUrl: string, qualityValue: number, imageType: string) => {
+  const compressImage = (imageUrl: string, qualityValue: number, type: string) => {
     setIsCompressing(true);
     const img = new window.Image();
     img.src = imageUrl;
@@ -56,39 +58,61 @@ export function ImageCompressor() {
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) {
+          setIsCompressing(false);
+          return;
+      };
       
       ctx.drawImage(img, 0, 0);
 
-      // Get compressed image data
       canvas.toBlob(
         (blob) => {
           if (blob) {
             setCompressedFileSize(blob.size);
+            if (compressedImage) {
+              URL.revokeObjectURL(compressedImage); // Clean up previous blob URL
+            }
             const compressedUrl = URL.createObjectURL(blob);
             setCompressedImage(compressedUrl);
           }
           setIsCompressing(false);
         },
-        imageType,
+        type,
         qualityValue / 100
       );
     };
-  };
-
-  const handleQualityChange = (value: number[]) => {
-    setQuality(value[0]);
-    if (originalImage && originalFileSize) {
-        const fileType = originalImage.substring(originalImage.indexOf(':') + 1, originalImage.indexOf(';'));
-        compressImage(originalImage, value[0], fileType);
+    img.onerror = () => {
+        setIsCompressing(false);
+        toast({
+            variant: 'destructive',
+            title: 'Image loading failed',
+            description: 'Could not load the image for compression.',
+        });
     }
+  };
+  
+  useEffect(() => {
+    if (originalImage) {
+        compressImage(originalImage, quality, imageType);
+    }
+  }, [originalImage, quality, imageType]);
+
+  const handleQualityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = parseInt(e.target.value, 10);
+    if (isNaN(value)) {
+        value = 0;
+    }
+    if (value < 0) value = 0;
+    if (value > 100) value = 100;
+    setQuality(value);
   };
 
   const handleDownload = () => {
     if (!compressedImage) return;
     const downloadLink = document.createElement('a');
     downloadLink.href = compressedImage;
-    downloadLink.download = `${fileName}-compressed.jpg`;
+    const extension = imageType.split('/')[1] || 'jpg';
+    downloadLink.download = `${fileName}-compressed.${extension}`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
@@ -100,10 +124,14 @@ export function ImageCompressor() {
 
   const handleReset = () => {
     setOriginalImage(null);
+    if (compressedImage) {
+        URL.revokeObjectURL(compressedImage);
+    }
     setCompressedImage(null);
     setOriginalFileSize(null);
     setCompressedFileSize(null);
     setFileName('');
+    setQuality(80);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -169,11 +197,22 @@ export function ImageCompressor() {
 
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-2">
                         <Label htmlFor="quality">Quality</Label>
-                        <span className="text-sm font-medium">{quality}%</span>
+                        <div className="relative w-24">
+                           <Input
+                                type="number"
+                                id="quality-input"
+                                value={quality}
+                                onChange={handleQualityInputChange}
+                                className="pr-8 text-center"
+                                min="0"
+                                max="100"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+                        </div>
                     </div>
-                    <Slider id="quality" value={[quality]} onValueChange={handleQualityChange} max={100} step={1} />
+                    <Slider id="quality" value={[quality]} onValueChange={(v) => setQuality(v[0])} max={100} step={1} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
