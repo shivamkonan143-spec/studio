@@ -65,7 +65,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { toast } = useToast();
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
-  const whatsappHref = `https://wa.me/917488530499?text=support%20thambnail%20downloader`;
+  const whatsappHref = `https://wa.me/917488530499?text=Support%20Request%20for%20Thumbnail%20Downloader!`;
   
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
@@ -319,6 +319,8 @@ export function Header() {
     </header>
   );
 }
+    
+
     
 
     
