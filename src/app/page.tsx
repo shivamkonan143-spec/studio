@@ -6,25 +6,9 @@ import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput, YoutubeDownloaderPreview } from '@/app/components/video-downloader';
 import { SubscriptionCard } from '@/app/components/subscription-card';
 import { SocialLinks } from '@/app/components/social-links';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
-
 
 export default function Home() {
-  const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
   const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
-
-
-  const subscriptionRef = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-  }, [firestore, user]);
-
-  const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
-  const isSubscribed = subscription?.active === true;
-  
-  const showSubscriptionCard = !isUserLoading && !isSubscriptionLoading && !isSubscribed;
 
   const handleGetThumbnail = (id: string, isShort: boolean) => {
     setPreview({ id, isShort });
@@ -46,7 +30,7 @@ export default function Home() {
             onTryAnother={handleTryAnother}
           />
         )}
-        {showSubscriptionCard && !preview && <SubscriptionCard />}
+        {!preview && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>

@@ -17,6 +17,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAuthModal } from '@/app/context/auth-modal-context';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
 
@@ -26,18 +27,64 @@ interface PaymentMethod {
 }
 
 
+function SubscriptionCardSkeleton() {
+    return (
+        <Card className="overflow-hidden">
+            <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-3 mb-2">
+                    <Skeleton className="w-10 h-10 rounded-lg" />
+                    <Skeleton className="h-7 w-48" />
+                </div>
+                <Skeleton className="h-4 w-full mt-1" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="p-8 pt-0">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                         <Skeleton className="w-5 h-5 rounded-full" />
+                         <Skeleton className="h-5 w-32" />
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                         <Skeleton className="h-10 w-24" />
+                         <Skeleton className="h-6 w-20" />
+                    </div>
+                    <Skeleton className="h-12 w-full rounded-md" />
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 export function SubscriptionCard() {
     const { locale } = useLanguage();
     const t = translations[locale];
-    const { user } = useUser();
-    const { toast } = useToast();
+    const { user, isUserLoading } = useUser();
     const firestore = useFirestore();
+    const { toast } = useToast();
     const { openModal } = useAuthModal();
 
+    const subscriptionRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
+    }, [firestore, user]);
+
+    const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
+    
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi', upiId: '' });
     const [isProcessing, setIsProcessing] = useState(false);
+
+    const isSubscribed = subscription?.active === true;
+    const showSkeleton = isUserLoading || (user && isSubscriptionLoading);
+
+    if (showSkeleton) {
+        return <SubscriptionCardSkeleton />;
+    }
+
+    if (isSubscribed) {
+        return null; // Don't show the card if user is already subscribed
+    }
 
     const handleSubscribeClick = () => {
         if (!user) {
