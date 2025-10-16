@@ -209,7 +209,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                         </Button>
                          <p className="text-center text-sm text-gray-300">
                             <Button type="button" variant="link" className="p-0 h-auto text-sm text-blue-400 hover:text-blue-300" onClick={() => setView('login')}>
-                                Back to Login
+                                {t.forgotPassword.backToLogin}
                             </Button>
                         </p>
                     </form>
@@ -218,9 +218,16 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                  return (
                     <div className="text-center space-y-4">
                         <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
-                        <Button variant="link" className="p-0 h-auto text-sm text-blue-400 hover:text-blue-300" onClick={() => setView('login')}>
-                            Back to Login
-                        </Button>
+                        <div className="flex flex-col space-y-2">
+                             <Button asChild className="w-full font-bold bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
+                                <a href="https://mail.google.com/mail/#spam" target="_blank" rel="noopener noreferrer">
+                                    {t.forgotPassword.openGmailSpam}
+                                </a>
+                            </Button>
+                            <Button variant="link" className="p-0 h-auto text-sm text-blue-400 hover:text-blue-300" onClick={() => setView('login')}>
+                                {t.forgotPassword.backToLogin}
+                            </Button>
+                        </div>
                     </div>
                 );
             case 'reset-password':
@@ -277,7 +284,7 @@ function AuthPage() {
 
     const handleAuthSuccess = useCallback((user: User | null) => {
         // Special handling for password reset success
-        if (user === null) {
+        if (user === null && mode === 'resetPassword') {
              toast({
                 variant: 'success',
                 title: t.forgotPassword.successTitle,
@@ -294,7 +301,7 @@ function AuthPage() {
         });
         const redirectUrl = searchParams.get('redirect') || '/';
         router.replace(redirectUrl);
-    }, [toast, searchParams, router, t]);
+    }, [toast, searchParams, router, t, mode]);
 
     const handleAuthError = useCallback((error: any) => {
         const errorCode = error.code || 'unknown';
@@ -346,7 +353,7 @@ function AuthPage() {
         );
     }
 
-    if (user) {
+    if (user && mode !== 'resetPassword') {
          return (
             <div className="flex min-h-screen w-full items-center justify-center login-background">
                 <Loader2 className="h-8 w-8 animate-spin text-white" />
