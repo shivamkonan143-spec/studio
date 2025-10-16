@@ -195,7 +195,7 @@ export function SubscriptionCard() {
                             <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
                             <span className="text-muted-foreground">{t.subscription.duration}</span>
                         </div>
-                        <Button size="lg" variant="destructive" className="w-full" onClick={handleSubscribeClick}>
+                        <Button size="lg" variant="default" className="w-full" onClick={handleSubscribeClick}>
                             {t.subscription.buttonSubscribe}
                         </Button>
                     </div>
