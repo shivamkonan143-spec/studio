@@ -123,12 +123,6 @@
       "required": ["title", "content", "createdAt"]
     }
   },
-  "auth": {
-    "providers": [
-      "password",
-      "google.com"
-    ]
-  },
   "firestore": {
     "structure": [
       {

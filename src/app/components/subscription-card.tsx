@@ -1,3 +1,4 @@
+
 'use client';
 
 import { CheckCircle, Gem } from 'lucide-react';
@@ -5,15 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
-import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { Input } from '@/components/ui/input';
-import { useAuthModal } from '@/app/context/auth-modal-context';
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
 
@@ -25,35 +23,14 @@ interface PaymentMethod {
 export function SubscriptionCard() {
     const { locale } = useLanguage();
     const t = translations[locale];
-    const { user, isUserLoading } = useUser();
-    const firestore = useFirestore();
     const { toast } = useToast();
-    const { openModal } = useAuthModal();
 
-    const subscriptionRef = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
-        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-    }, [firestore, user]);
-
-    const { data: subscription, isLoading: isSubscriptionLoading } = useDoc(subscriptionRef);
-    
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({ type: 'upi', upiId: '' });
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const isSubscribed = subscription?.active === true;
-    const shouldShowCard = !isUserLoading && user && !isSubscriptionLoading && !isSubscribed;
-
-    if (!shouldShowCard) {
-        return null;
-    }
-
     const handleSubscribeClick = () => {
-        if (!user) {
-            openModal('login');
-            return;
-        }
         setIsDialogOpen(true);
     };
 
@@ -74,39 +51,19 @@ export function SubscriptionCard() {
     };
 
     const handleCompletePayment = async () => {
-        if (!user || !firestore) return;
         setIsProcessing(true);
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        toast({
+            variant: 'success',
+            title: t.subscription.successTitle,
+            description: t.subscription.successDescription,
+        });
 
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 30);
-
-        try {
-            await setDoc(doc(firestore, 'users', user.uid, 'subscriptions', 'main'), {
-                active: true,
-                subscribedAt: serverTimestamp(),
-                expiresAt: expiresAt,
-                paymentMethod: paymentMethod.type,
-                ...(paymentMethod.type === 'upi' && { upiId: paymentMethod.upiId })
-            }, { merge: true });
-
-            toast({
-                variant: 'success',
-                title: t.subscription.successTitle,
-                description: t.subscription.successDescription,
-            });
-
-        } catch (error: any) {
-            console.error("Subscription failed:", error);
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: error.message || 'Failed to update subscription.',
-            })
-        } finally {
-            setIsProcessing(false);
-            setIsDialogOpen(false);
-            setStep(1);
-        }
+        setIsProcessing(false);
+        setIsDialogOpen(false);
+        setStep(1);
     };
     
     const renderDialogContent = () => {

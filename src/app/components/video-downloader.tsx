@@ -25,10 +25,7 @@ import { Slider } from "@/components/ui/slider"
 import { AdPlaceholder } from '@/app/components/ad-placeholder';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
 import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
-import { useAuthModal } from '@/app/context/auth-modal-context';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 
@@ -65,33 +62,13 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
 
 export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id: string, isShort: boolean) => void }) {
     const [isGenerating, setIsGenerating] = useState(false);
-    const [clickCount, setClickCount] = useState(0);
     const [showAd, setShowAd] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
     const { toast } = useToast();
-    const { user } = useUser();
-    const firestore = useFirestore();
-    const { openModal } = useAuthModal();
-
-    const subscriptionRef = useMemoFirebase(() => {
-        if (!user || !firestore) return null;
-        return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-    }, [firestore, user]);
-
-    const { data: subscription } = useDoc(subscriptionRef);
-    const isSubscribed = subscription?.active === true;
-  
+    
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-      if (!user) {
-        openModal('login');
-        return;
-      }
-      
-      if (!isSubscribed) {
-        setClickCount(prev => prev + 1);
-        setShowAd(true);
-      }
+      setShowAd(true);
 
       setIsGenerating(true);
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
@@ -163,7 +140,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                     </Button>
                 </form>
                 </Form>
-                 <AdPlaceholder showAd={showAd && !isSubscribed} />
+                 <AdPlaceholder showAd={showAd} />
             </CardContent>
         </Card>
     );
@@ -278,20 +255,9 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const [quality, setQuality] = useState<ThumbnailQuality>('maxresdefault');
   const { locale } = useLanguage();
   const t = translations[locale];
-  const { user } = useUser();
-  const firestore = useFirestore();
   const [isRatingOpen, setIsRatingOpen] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const subscriptionRef = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-  }, [firestore, user]);
-
-  const { data: subscription } = useDoc(subscriptionRef);
-  const isSubscribed = subscription?.active === true;
-
 
   const { toast } = useToast();
 
@@ -649,8 +615,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
 
           <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                  <Label htmlFor="quality">{t.videoDownloader.quality}</Label>
-                  <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
+                  <Label htmlFor="quality">{t.videoDownloader.quality}</Label>                  <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
                       <SelectTrigger id="quality">
                           <SelectValue placeholder="Select quality" />
                       </SelectTrigger>
@@ -673,24 +638,10 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               <RefreshCcw className="mr-2 h-4 w-4" />
               <span>{t.videoDownloader.tryAnother}</span>
           </Button>
-          {!isSubscribed && <AdPlaceholder showAd={true} />}
+          <AdPlaceholder showAd={true} />
           </CardContent>
       </Card>
       <RatingDialog isOpen={isRatingOpen} onOpenChange={setIsRatingOpen} />
     </>
   );
 }
-
-
-
-    
-
-    
-
-
-
-
-
-
-
-

@@ -2,17 +2,8 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Settings, Sun, Moon, Laptop, Languages, LogIn, Menu, LifeBuoy, UserPlus, Unplug, Download, Share2, X, ChevronDown, MessageCircle, Home, Info } from 'lucide-react';
-import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -28,20 +19,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { useTheme } from 'next-themes';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
@@ -53,99 +31,21 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { doc, deleteDoc } from 'firebase/firestore';
-import { useAuthModal } from '@/app/context/auth-modal-context';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
-  const { user } = useUser();
-  const auth = useAuth();
-  const firestore = useFirestore();
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
-  const { toast } = useToast();
-  const { openModal } = useAuthModal();
-
-  const subscriptionRef = useMemoFirebase(() => {
-    if (!user || !firestore) return null;
-    return doc(firestore, 'users', user.uid, 'subscriptions', 'main');
-  }, [firestore, user]);
-  const { data: subscription } = useDoc(subscriptionRef);
-  const isSubscribed = subscription?.active === true;
-
-
-  const handleLogout = async () => {
-    if (auth) {
-      await auth.signOut();
-    }
-    closeMenu?.();
-  };
-
-  const handleLoginClick = () => {
-    openModal('login');
-    closeMenu?.();
-  }
-
-  const handleSignupClick = () => {
-    openModal('signup');
-    closeMenu?.();
-  }
-
-  const handleCancelSubscription = async () => {
-    if (!subscriptionRef) return;
-    try {
-        await deleteDoc(subscriptionRef);
-        toast({
-            variant: 'destructive',
-            title: t.subscription.cancelledTitle,
-            description: t.subscription.cancelledDescription,
-        });
-    } catch (error) {
-        console.error("Failed to cancel subscription", error);
-        toast({
-            variant: 'destructive',
-            title: t.common.error,
-            description: t.subscription.cancelFailedDescription
-        });
-    }
-    closeMenu?.();
-  };
-
-  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader${user?.email ? `&body=From%20user:%20${user.email}` : ''}`;
   
-  const handleShare = async () => {
-    const shareData = {
-      title: t.title,
-      text: t.share.text,
-      url: 'https://6000-firebase-studio-1760436580721.cluster-osvg2nzmmzhzqqjio6oojllbg4.cloudworkstations.dev/',
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (error) {
-        console.error('Error sharing:', error);
-        toast({
-            variant: 'destructive',
-            title: t.share.shareFailedTitle,
-            description: t.share.shareFailedDescription,
-        });
-      }
-    } else {
-      toast({
-        title: t.share.notSupportedTitle,
-        description: t.share.notSupportedDescription,
-      });
-    }
-    closeMenu?.();
-  };
-
-  const whatsAppShareUrl = `https://wa.me/?text=${encodeURIComponent(`${t.share.text} https://6000-firebase-studio-1760436580721.cluster-osvg2nzmmzhzqqjio6oojllbg4.cloudworkstations.dev/`)}`;
-
+  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
+  
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
     closeMenu?.();
   };
+
+  const whatsAppShareUrl = `https://wa.me/?text=${encodeURIComponent(`${t.share.text} https://6000-firebase-studio-1760436580721.cluster-osvg2nzmmzhzqqjio6oojllbg4.cloudworkstations.dev/`)}`;
 
   return (
       <div className="flex flex-col gap-1 p-2">
@@ -239,77 +139,16 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <span>{t.header.helpAndSupport}</span>
           </a>
         </Button>
-        
-        <Separator className="my-1" />
-
-        {user ? (
-          <>
-            {isSubscribed && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-start">
-                    <Unplug className="mr-2 h-4 w-4" />
-                    <span>{t.subscription.cancelSubscription}</span>
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{t.subscription.cancelConfirmTitle}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t.subscription.cancelConfirmDescription}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{t.subscription.cancel}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCancelSubscription}>
-                      {t.subscription.confirm}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-            <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>{t.header.logout}</span>
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="ghost" className="w-full justify-start" onClick={handleLoginClick}>
-              <LogIn className="mr-2 h-4 w-4" />
-              <span>{t.header.login}</span>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={handleSignupClick}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              <span>{t.header.register}</span>
-            </Button>
-          </>
-        )}
       </div>
   );
 }
 
 
 export function Header() {
-  const { user, isUserLoading } = useUser();
-  const auth = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const getInitials = (email: string | null | undefined) => {
-    if (!email) return 'U';
-    const parts = email.split('@')[0];
-    if (!parts) return 'U';
-    return (parts[0] || '').toUpperCase() + (parts.length > 1 ? (parts[1] || '').toUpperCase() : '');
-  };
-
-  const handleLogout = async () => {
-    if (auth) {
-      await auth.signOut();
-    }
-  };
 
   const MenuContainer = isMobile ? Sheet : Dialog;
   const MenuTrigger = isMobile ? SheetTrigger : DialogTrigger;
@@ -345,43 +184,9 @@ export function Header() {
             </h1>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
-           {isUserLoading ? null : user ? (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.photoURL || ''} alt={user.displayName || user.email || ''} />
-                            <AvatarFallback>{getInitials(user.email)}</AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>
-                        <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">{user.displayName}</p>
-                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t.header.logout}</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-           ) : (
-             <div className="h-8 w-8"></div>
-           )}
+            <div className="h-8 w-8"></div>
         </div>
       </div>
     </header>
   );
 }
-    
-
-    
-
-
-
-
-    

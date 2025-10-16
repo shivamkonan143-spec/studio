@@ -1,11 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { FirebaseClientProvider } from '@/firebase';
 import { ThemeProvider } from '@/app/components/theme-provider';
 import { LanguageProvider } from '@/app/context/language-context';
-import { AuthModalProvider } from '@/app/context/auth-modal-context';
-import { AuthDialog } from '@/app/components/auth-dialog';
 
 export const metadata: Metadata = {
   title: 'Thumbnail Downloader',
@@ -36,15 +33,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <FirebaseClientProvider>
             <LanguageProvider>
-              <AuthModalProvider>
-                {children}
-                <AuthDialog />
-                <Toaster />
-              </AuthModalProvider>
+              {children}
+              <Toaster />
             </LanguageProvider>
-          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>
