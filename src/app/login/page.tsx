@@ -12,6 +12,9 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   confirmPasswordReset,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { useLanguage } from '@/app/context/language-context';
@@ -59,6 +62,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(true);
     const [oobCode, setOobCode] = useState(initialOobCode);
     const { toast } = useToast();
 
@@ -66,6 +70,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
         e.preventDefault();
         setIsLoading(true);
         try {
+            await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             onAuthSuccess(userCredential.user);
         } catch (error) {
@@ -151,7 +156,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                         </div>
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="remember-me" className="border-gray-400" />
+                                <Checkbox id="remember-me" className="border-gray-400" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
                                 <Label htmlFor="remember-me" className="text-gray-300">Remember me</Label>
                             </div>
                             <Button type="button" variant="link" className="p-0 h-auto text-sm text-gray-300 hover:text-white" onClick={() => setView('forgot-password')}>
