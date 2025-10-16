@@ -1,4 +1,3 @@
-
 'use client';
 
 import { CheckCircle, Gem } from 'lucide-react';
@@ -26,6 +25,32 @@ interface PaymentMethod {
     upiId?: string;
 }
 
+function SubscriptionCardSkeleton() {
+    return (
+        <Card className="overflow-hidden">
+            <CardHeader className="p-8 pb-4">
+                <div className="flex items-center gap-3 mb-2">
+                    <Skeleton className="h-10 w-10 rounded-lg" />
+                    <Skeleton className="h-8 w-40" />
+                </div>
+                 <Skeleton className="h-4 w-full" />
+            </CardHeader>
+            <CardContent className="p-8 pt-0">
+                <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                         <Skeleton className="h-5 w-5 rounded-full" />
+                         <Skeleton className="h-5 w-32" />
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                         <Skeleton className="h-10 w-24" />
+                    </div>
+                    <Skeleton className="h-12 w-full" />
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 export function SubscriptionCard() {
     const { locale } = useLanguage();
     const t = translations[locale];
@@ -47,10 +72,13 @@ export function SubscriptionCard() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const isSubscribed = subscription?.active === true;
-    const shouldShowCard = !isUserLoading && user && !isSubscriptionLoading && !isSubscribed;
+    const showSkeleton = isUserLoading || (user && isSubscriptionLoading);
 
+    if (showSkeleton) {
+        return <SubscriptionCardSkeleton />;
+    }
 
-    if (!shouldShowCard) {
+    if (!user || isSubscribed) {
         return null; 
     }
 
