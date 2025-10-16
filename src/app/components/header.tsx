@@ -119,7 +119,14 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           </CollapsibleContent>
         </Collapsible>
 
-        <Separator className="my-2" />
+        <div className="relative my-2">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-start">
+            <span className="bg-popover pr-2 text-sm font-medium text-muted-foreground">{t.header.support}</span>
+          </div>
+        </div>
         
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>

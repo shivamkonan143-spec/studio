@@ -19,7 +19,8 @@
         "register": "Register",
         "myAccount": "Log in",
         "aboutUs": "About Us",
-        "history": "History"
+        "history": "History",
+        "support": "Support"
     },
     "history": {
         "title": "Download History",
