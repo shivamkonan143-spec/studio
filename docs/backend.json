@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "VideoDownload": {
@@ -9,43 +8,40 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the video download entry."
+          "description": "Unique identifier for the video download."
         },
         "userId": {
           "type": "string",
           "description": "Reference to the User who initiated the download. (Relationship: User 1:N VideoDownload)"
         },
-        "videoUrl": {
+        "url": {
           "type": "string",
-          "description": "The URL of the video being downloaded.",
-          "format": "uri"
+          "description": "The URL of the video being downloaded."
         },
         "quality": {
           "type": "string",
-          "description": "The selected video quality (e.g., 720p, 1080p)."
-        },
-        "downloadedAt": {
-          "type": "string",
-          "description": "The date and time when the download was completed.",
-          "format": "date-time"
+          "description": "The selected video quality (resolution) for the download."
         },
         "status": {
           "type": "string",
-          "description": "The current status of the download (e.g., pending, in progress, completed, failed)."
+          "description": "The current status of the download (e.g., 'pending', 'downloading', 'completed', 'failed')."
         },
         "filePath": {
           "type": "string",
-          "description": "The local file path where the video is saved on the device."
+          "description": "The file path on the device where the video is saved after download."
+        },
+        "downloadedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the download was completed.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
         "userId",
-        "videoUrl",
+        "url",
         "quality",
-        "downloadedAt",
-        "status",
-        "filePath"
+        "status"
       ]
     },
     "User": {
@@ -58,70 +54,33 @@
           "type": "string",
           "description": "Unique identifier for the user."
         },
+        "username": {
+          "type": "string",
+          "description": "The username of the user."
+        },
         "email": {
           "type": "string",
-          "description": "The user's email address.",
+          "description": "The email address of the user.",
           "format": "email"
         },
-        "registrationDate": {
+        "joinDate": {
           "type": "string",
-          "description": "The date and time when the user registered.",
+          "description": "Timestamp indicating when the user joined the application.",
           "format": "date-time"
         }
       },
       "required": [
         "id",
-        "registrationDate"
+        "username",
+        "email"
       ]
-    },
-    "Subscription": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Subscription",
-      "type": "object",
-      "description": "Represents a user's subscription status.",
-      "properties": {
-        "active": {
-          "type": "boolean",
-          "description": "Whether the subscription is currently active."
-        },
-        "subscribedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The date and time when the user subscribed."
-        },
-        "expiresAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The date and time when the subscription expires."
-        }
-      },
-      "required": [
-        "active",
-        "subscribedAt",
-        "expiresAt"
-      ]
-    },
-    "Message": {
-      "title": "Message",
-      "description": "Represents a message or announcement sent to users.",
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string",
-          "description": "The title of the message."
-        },
-        "content": {
-          "type": "string",
-          "description": "The main body of the message."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp when the message was created."
-        }
-      },
-      "required": ["title", "content", "createdAt"]
     }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
     "structure": [
@@ -132,11 +91,11 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profiles. Includes standard user information like email and registration date.",
+          "description": "Stores user profile information. The 'userId' parameter identifies the user's document ID.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier for the user."
+              "description": "The unique identifier of the user."
             }
           ]
         }
@@ -148,55 +107,20 @@
           "schema": {
             "$ref": "#/backend/entities/VideoDownload"
           },
-          "description": "Stores video download information for each user. Includes details such as video URL, quality, download status, and file path.",
+          "description": "Stores video download information for a specific user. Includes denormalized 'userId' for authorization independence.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier for the user."
+              "description": "The unique identifier of the user who initiated the download."
             },
             {
               "name": "downloadId",
-              "description": "The unique identifier for the video download."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/subscriptions/{subscriptionId}",
-        "definition": {
-          "entityName": "Subscription",
-          "schema": {
-            "$ref": "#/backend/entities/Subscription"
-          },
-          "description": "Stores user subscription status. There will typically be one main subscription document per user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            },
-            {
-              "name": "subscriptionId",
-              "description": "The unique identifier for the subscription, e.g., 'main'."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/messages/{messageId}",
-        "definition": {
-          "entityName": "Message",
-          "schema": {
-            "$ref": "#/backend/entities/Message"
-          },
-          "description": "Stores global messages or announcements for all users.",
-          "params": [
-            {
-              "name": "messageId",
-              "description": "The unique identifier for the message."
+              "description": "The unique identifier of the video download."
             }
           ]
         }
       }
-    ]
+    ],
+    "reasoning": "The Firestore structure is designed to ensure secure and scalable data management for the Video Grabber application, adhering to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and QAPs (Rules are not Filters). It leverages structural segregation to achieve a homogeneous security posture.\n\n**Authorization Independence:**\n*   The `videoDownloads` subcollection under each user denormalizes the `userId` within each document. This eliminates the need for `get()` calls to parent `users` documents in security rules, enabling atomic operations and simplifying rule logic.\n\n**Structural Segregation:**\n*   User-specific data (video downloads) is stored under `/users/{userId}/videoDownloads/{downloadId}`, ensuring clear ownership and access control.\n\n**Access Modeling:**\n*   **Private Data:** The `/users/{userId}/videoDownloads/{downloadId}` path follows the Path-Based ownership pattern, ensuring only the user can access their downloads.\n\n**QAPs Support:**\n*   The path-based ownership (`/users/{userId}/videoDownloads/{downloadId}`) enables efficient and secure `list` operations. Rules can easily filter downloads based on `request.auth.uid` without needing complex filtering logic.\n\nThis structure provides a clear, maintainable, and secure foundation for the Video Grabber application."
   }
 }

@@ -1,104 +1,84 @@
 /**
- * @file Firebase Security Rules for Video Grabber App
+ * @file Firestore Security Rules for Video Grabber App
  *
- * @description This ruleset enforces a user-ownership model for user profiles, video downloads, and subscriptions,
- *              while allowing public read access to global messages.
+ * @core_philosophy This ruleset enforces a strict user-ownership model, ensuring that only authenticated users can access their own data.
  *
- * @dataStructure
- *  - /users/{userId}: Stores user profile data, accessible only to the owner.
- *  - /users/{userId}/videoDownloads/{downloadId}: Stores video download data, accessible only to the owner.
- *  - /users/{userId}/subscriptions/{subscriptionId}: Stores subscription data, accessible only to the owner.
- *  - /messages/{messageId}: Stores global messages, publicly readable but writeable by a privileged role (not yet implemented).
+ * @data_structure All user data is nested under the /users/{userId} collection. Video download data is stored in a subcollection /users/{userId}/videoDownloads/{downloadId}.
  *
- * @keySecurityDecisions
- *  - User listing is disallowed for privacy.
- *  - Global messages are publicly readable to facilitate announcements.  Write access to messages is not yet secured.
+ * @key_security_decisions
+ *   - Users can only access their own user document.
+ *   - Users can only access video downloads associated with their user ID.
+ *   - Data validation is relaxed to allow for rapid prototyping and flexible data shapes. Only authorization-critical fields are validated.
+ *   - Listing of all users is disallowed. Listing of video downloads is allowed only for the owner.
+ *   - All write operations require the user to be authenticated.
+ *   - `update` and `delete` operations additionally require the target document to exist.
  *
- * @denormalizationForAuthorization
- *  - User ownership is enforced by matching the `userId` path parameter against `request.auth.uid`.  No data denormalization is required.
- *
- * @structuralSegregation
- *  - Public messages are stored in a separate top-level collection (`/messages`) to allow for public read access without compromising user data.
+ * @denormalization_for_authorization The `videoDownloads` documents contain the `userId` of their owner. This avoids needing to perform expensive `get()` operations to check ownership of a download.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures user profiles, allowing only the owner to read and write their own data.
+     * @description Secures the user profile document.
      * @path /users/{userId}
-     * @allow (create) User with ID "user123" can create their own profile if authenticated as "user123".
-     * @allow (get, update, delete) User with ID "user123" can read/update/delete their own profile if authenticated as "user123".
-     * @deny (create) User with ID "user123" cannot create a profile for "user456".
-     * @deny (get, update, delete) User with ID "user123" cannot read/update/delete the profile of "user456".
+     * @allow (create) Authenticated user can create their own profile if the userId matches their auth UID.
+     * @allow (get, update, delete) Authenticated user can get, update, and delete their own profile if the userId matches their auth UID and the document exists.
+     * @deny (create, get, update, delete) Any operation where the userId does not match the auth UID, or the document does not exist for updates/deletes.
      * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      // Verified user is only able to create their own user document.
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
-      allow get: if isOwner(userId);
-      allow list: if false; // Disallow user listing for privacy.
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability of userId.
+      // isOwner function checks if the requested userId matches the authenticated user's id
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // isExistingOwner checks that user ID matches the authenticated user AND that the document exists.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && exists(resource);
+      }
+
+      // isSignedIn function checks if a user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      allow get: if isExistingOwner(userId);
+      allow list: if false; // Do not allow listing all users
+
+      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Secures video download entries, allowing only the owner to read and write their own downloads.
+     * @description Secures video download documents for each user.
      * @path /users/{userId}/videoDownloads/{downloadId}
-     * @allow (create) User with ID "user123" can create a download entry under their profile.
-     * @allow (get, update, delete) User with ID "user123" can read/update/delete a download entry under their profile.
-     * @deny (create) User with ID "user123" cannot create a download entry under the profile of "user456".
-     * @deny (get, update, delete) User with ID "user123" cannot read/update/delete a download entry under the profile of "user456".
-     * @principle Enforces document ownership for all operations.
+     * @allow (create, get, list, update, delete) Authenticated user can create, get, list, update, and delete their own video downloads.
+     * @deny (create, get, list, update, delete) Any operation where the userId does not match the auth UID, or the document does not exist for updates/deletes.
+     * @principle Enforces document ownership for all operations within the user's data tree.
      */
     match /users/{userId}/videoDownloads/{downloadId} {
-      allow create: if isSignedIn() && isOwner(userId);
+       // isOwner function checks if the requested userId matches the authenticated user's id
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // isExistingOwner checks that user ID matches the authenticated user AND that the document exists.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && exists(resource);
+      }
+
+      // isSignedIn function checks if a user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
       allow get: if isOwner(userId);
       allow list: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == userId;
       allow delete: if isExistingOwner(userId);
     }
-
-    /**
-     * @description Secures subscription entries, allowing only the owner to read and write their own subscription.
-     * @path /users/{userId}/subscriptions/{subscriptionId}
-     * @allow (create) User with ID "user123" can create a subscription entry under their profile.
-     * @allow (get, update, delete) User with ID "user123" can read/update/delete a subscription entry under their profile.
-     * @deny (create) User with ID "user123" cannot create a subscription entry under the profile of "user456".
-     * @deny (get, update, delete) User with ID "user123" cannot read/update/delete a subscription entry under the profile of "user456".
-     * @principle Enforces document ownership for all operations.
-     */
-    match /users/{userId}/subscriptions/{subscriptionId} {
-      allow create: if isSignedIn() && isOwner(userId);
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Allows public read access to global messages, but restricts write access (TODO: implement admin role).
-     * @path /messages/{messageId}
-     * @allow (get, list) Any user can read the messages.
-     * @deny (create, update, delete) No unauthenticated user can create, update, or delete messages.
-     * @principle Allows public read access while restricting write access.
-     */
-    match /messages/{messageId} {
-      allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add admin role check for message creation/modification.
-    }
-  }
-
-  // Helper functions
-  function isSignedIn() {
-    return request.auth != null;
-  }
-
-  function isOwner(userId) {
-    return request.auth.uid == userId;
-  }
-
-  function isExistingOwner(userId) {
-    return isOwner(userId) && resource != null;
   }
 }
