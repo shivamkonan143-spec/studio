@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
@@ -63,6 +63,7 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
     const handleAuthSuccess = useCallback((user: User) => {
@@ -123,7 +124,18 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="login-password">{t.login.passwordLabel}</Label>
-                    <Input id="login-password" type="password" placeholder={t.login.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <div className="relative">
+                        <Input id="login-password" type={showPassword ? "text" : "password"} placeholder={t.login.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
                 </div>
                 <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setShowForgotPassword(true)}>
                     {t.login.forgotPassword}
@@ -158,6 +170,7 @@ function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -213,7 +226,18 @@ function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="signup-password">{t.register.passwordLabel}</Label>
-                    <Input id="signup-password" type="password" placeholder={t.register.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <div className="relative">
+                        <Input id="signup-password" type={showPassword ? "text" : "password"} placeholder={t.register.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                    </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
