@@ -126,7 +126,6 @@
         "emailLabel": "Email",
         "emailPlaceholder": "Gmail",
         "button": "Send Reset Link",
-        "openGmailSpam": "Open Gmail Spam",
         "backToLogin": "Back to Login",
         "resetButton": "Reset Password",
         "newPasswordLabel": "New Password",

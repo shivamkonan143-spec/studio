@@ -219,11 +219,6 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <div className="text-center space-y-4">
                         <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
                         <div className="flex flex-col space-y-2">
-                             <Button asChild className="w-full font-bold bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600">
-                                <a href="https://mail.google.com/mail/#spam" target="_blank" rel="noopener noreferrer">
-                                    {t.forgotPassword.openGmailSpam}
-                                </a>
-                            </Button>
                             <Button variant="link" className="p-0 h-auto text-sm text-blue-400 hover:text-blue-300" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
                             </Button>
