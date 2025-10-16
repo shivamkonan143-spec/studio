@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 interface VideoDownload {
+  id: string;
   videoId: string;
   title: string;
   isShort: boolean;
@@ -24,10 +25,10 @@ interface VideoDownload {
 
 function HistoryItem({ item }: { item: VideoDownload }) {
   const thumbnailUrl = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
-  const videoUrl = `https://www.youtube.com/watch?v=${item.videoId}`;
+  const videoUrl = `/?videoId=${item.videoId}&isShort=${item.isShort}`;
   
   return (
-    <Link href={videoUrl} target="_blank" rel="noopener noreferrer" className="group">
+    <Link href={videoUrl} className="group">
       <Card className="overflow-hidden h-full flex flex-col">
         <div className="relative aspect-video">
           <Image

@@ -1,14 +1,24 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput, YoutubeDownloaderPreview } from '@/app/components/video-downloader';
 import { SubscriptionCard } from '@/app/components/subscription-card';
 import { SocialLinks } from '@/app/components/social-links';
 
-export default function Home() {
+function HomeComponent() {
+  const searchParams = useSearchParams();
   const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
+
+  useEffect(() => {
+    const videoId = searchParams.get('videoId');
+    const isShort = searchParams.get('isShort') === 'true';
+    if (videoId) {
+      setPreview({ id: videoId, isShort });
+    }
+  }, [searchParams]);
 
   const handleGetThumbnail = (id: string, isShort: boolean) => {
     setPreview({ id, isShort });
@@ -16,6 +26,8 @@ export default function Home() {
 
   const handleTryAnother = () => {
     setPreview(null);
+    // Clear URL params
+    window.history.replaceState({}, '', '/');
   };
 
   return (
@@ -37,4 +49,11 @@ export default function Home() {
   );
 }
 
-    
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeComponent />
+    </Suspense>
+  )
+}
