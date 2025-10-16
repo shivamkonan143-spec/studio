@@ -44,29 +44,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button"
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      // Vibrate for 20ms if the API is available
-      if (typeof window !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(20);
-      }
-      
-      const button = event.currentTarget;
-      const circle = document.createElement("span");
-      const diameter = Math.max(button.clientWidth, button.clientHeight);
-      const radius = diameter / 2;
-
-      circle.style.width = circle.style.height = `${diameter}px`;
-      circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
-      circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
-      circle.classList.add("ripple-effect");
-
-      const ripple = button.getElementsByClassName("ripple-effect")[0];
-
-      if (ripple) {
-        ripple.remove();
-      }
-
-      button.appendChild(circle);
-
       // Call the original onClick if it exists
       if (onClick) {
         onClick(event);
