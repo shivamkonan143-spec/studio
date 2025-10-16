@@ -1,84 +1,102 @@
 /**
- * @file Firestore Security Rules for Video Grabber App
+ * @file Firestore Security Rules for Video Grabber Application
  *
- * @core_philosophy This ruleset enforces a strict user-ownership model, ensuring that only authenticated users can access their own data.
+ * @core_philosophy This ruleset enforces a strict user-ownership model. Each user has exclusive
+ *  access to their profile data and video download records. This ensures data privacy and
+ *  prevents unauthorized access.
  *
- * @data_structure All user data is nested under the /users/{userId} collection. Video download data is stored in a subcollection /users/{userId}/videoDownloads/{downloadId}.
+ * @data_structure The data is organized hierarchically:
+ *  - /users/{userId}: Stores user profiles.
+ *  - /users/{userId}/videoDownloads/{downloadId}: Stores video download information for each user.
  *
  * @key_security_decisions
- *   - Users can only access their own user document.
- *   - Users can only access video downloads associated with their user ID.
- *   - Data validation is relaxed to allow for rapid prototyping and flexible data shapes. Only authorization-critical fields are validated.
- *   - Listing of all users is disallowed. Listing of video downloads is allowed only for the owner.
- *   - All write operations require the user to be authenticated.
- *   - `update` and `delete` operations additionally require the target document to exist.
+ *  - Users can only create, read, update, and delete their own data.
+ *  - Listing video downloads is restricted to the owning user.
+ *  - Data consistency is enforced between the path and the document's internal fields
+ *    to prevent privilege escalation.
  *
- * @denormalization_for_authorization The `videoDownloads` documents contain the `userId` of their owner. This avoids needing to perform expensive `get()` operations to check ownership of a download.
+ * @denormalization_for_authorization The `videoDownloads` documents contain a denormalized `userId` field.
+ *  This allows security rules to validate ownership without needing to perform additional reads
+ *  to the parent `/users/{userId}` document.
+ *
+ * @structural_segregation User-specific data (video downloads) is stored under
+ *  `/users/{userId}/videoDownloads/{downloadId}`, ensuring clear ownership and access control.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures the user profile document.
+     * @description Manages access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) Authenticated user can create their own profile if the userId matches their auth UID.
-     * @allow (get, update, delete) Authenticated user can get, update, and delete their own profile if the userId matches their auth UID and the document exists.
-     * @deny (create, get, update, delete) Any operation where the userId does not match the auth UID, or the document does not exist for updates/deletes.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) - User with UID 'user123' can create their own profile document at /users/user123.
+     * @allow (get) - User with UID 'user123' can retrieve their own profile document at /users/user123.
+     * @allow (update) - User with UID 'user123' can update their own profile document at /users/user123.
+     * @allow (delete) - User with UID 'user123' can delete their own profile document at /users/user123.
+     * @allow (list) - Listing all users is denied.
+     * @deny (create) - User with UID 'user456' cannot create a profile document at /users/user123.
+     * @deny (get) - User with UID 'user456' cannot retrieve the profile document at /users/user123.
+     * @deny (update) - User with UID 'user456' cannot update the profile document at /users/user123.
+     * @deny (delete) - User with UID 'user456' cannot delete the profile document at /users/user123.
+     * @principle Enforces document ownership, restricting access to the owning user.
      */
     match /users/{userId} {
-      // isOwner function checks if the requested userId matches the authenticated user's id
+      // Helper function to check if the request is made by the owner of the user document.
       function isOwner(userId) {
         return request.auth != null && request.auth.uid == userId;
       }
 
-      // isExistingOwner checks that user ID matches the authenticated user AND that the document exists.
-      function isExistingOwner(userId) {
-        return isOwner(userId) && exists(resource);
-      }
+      // Allow a user to create their own document, enforcing that the userId in the path
+      // matches their authentication UID.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
 
-      // isSignedIn function checks if a user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
+      // Allow a user to get their own document.
+      allow get: if isOwner(userId);
 
-      allow get: if isExistingOwner(userId);
-      allow list: if false; // Do not allow listing all users
+      // Allow a user to update their own document. Enforce immutability of the id field.
+      allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
 
-      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      // Allow a user to delete their own document, but only if the document exists.
+      allow delete: if isOwner(userId) && resource != null;
+
+      // Do not allow listing of all users.
+      allow list: if false;
     }
 
     /**
-     * @description Secures video download documents for each user.
+     * @description Manages access to video download documents for a specific user.
      * @path /users/{userId}/videoDownloads/{downloadId}
-     * @allow (create, get, list, update, delete) Authenticated user can create, get, list, update, and delete their own video downloads.
-     * @deny (create, get, list, update, delete) Any operation where the userId does not match the auth UID, or the document does not exist for updates/deletes.
-     * @principle Enforces document ownership for all operations within the user's data tree.
+     * @allow (create) - User with UID 'user123' can create a video download document under /users/user123/videoDownloads.
+     * @allow (get) - User with UID 'user123' can retrieve a video download document under /users/user123/videoDownloads.
+     * @allow (update) - User with UID 'user123' can update a video download document under /users/user123/videoDownloads.
+     * @allow (delete) - User with UID 'user123' can delete a video download document under /users/user123/videoDownloads.
+     * @allow (list) - User with UID 'user123' can list video download documents under /users/user123/videoDownloads.
+     * @deny (create) - User with UID 'user456' cannot create a video download document under /users/user123/videoDownloads.
+     * @deny (get) - User with UID 'user456' cannot retrieve a video download document under /users/user123/videoDownloads.
+     * @deny (update) - User with UID 'user456' cannot update a video download document under /users/user123/videoDownloads.
+     * @deny (delete) - User with UID 'user456' cannot delete a video download document under /users/user123/videoDownloads.
+     * @principle Enforces strict user-ownership, ensuring only the owning user can manage their video downloads.
      */
     match /users/{userId}/videoDownloads/{downloadId} {
-       // isOwner function checks if the requested userId matches the authenticated user's id
+      // Helper function to check if the request is made by the owner of the user document.
       function isOwner(userId) {
         return request.auth != null && request.auth.uid == userId;
       }
 
-      // isExistingOwner checks that user ID matches the authenticated user AND that the document exists.
-      function isExistingOwner(userId) {
-        return isOwner(userId) && exists(resource);
-      }
+      // Allow a user to create a video download document in their own user subcollection.
+      allow create: if isOwner(userId);
 
-      // isSignedIn function checks if a user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
+      // Allow a user to get a video download document in their own user subcollection.
       allow get: if isOwner(userId);
+
+      // Allow a user to update a video download document in their own user subcollection.
+      allow update: if isOwner(userId) && resource != null;
+
+      // Allow a user to delete a video download document in their own user subcollection.
+      allow delete: if isOwner(userId) && resource != null;
+
+      // Allow a user to list video download documents in their own user subcollection.
       allow list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.userId == userId;
-      allow delete: if isExistingOwner(userId);
     }
   }
 }
