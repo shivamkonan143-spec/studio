@@ -22,11 +22,11 @@ export function ImageToQr() {
     const file = event.target.files?.[0];
     if (file) {
       setIsLoading(true);
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      if (file.size > 2 * 1024) { // 2KB limit
         toast({
             variant: 'destructive',
             title: 'File too large',
-            description: 'Please upload an image smaller than 2MB.',
+            description: 'Please upload an image smaller than 2KB.',
         });
         setIsLoading(false);
         return;
@@ -99,7 +99,7 @@ export function ImageToQr() {
                 >
                     <Upload className="w-10 h-10 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                    <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 2MB</p>
+                    <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 2KB</p>
                 </div>
                 <Input
                     id="image-upload"
