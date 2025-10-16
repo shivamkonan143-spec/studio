@@ -1,8 +1,9 @@
 export const firebaseConfig = {
-  "projectId": "studio-2008852960-a9318",
-  "appId": "1:808392146991:web:e025a0e13774b16debc6da",
-  "apiKey": "AIzaSyAv-6b6y4qIILixgJhh1zoimOMc78M2RFk",
-  "authDomain": "studio-2008852960-a9318.firebaseapp.com",
-  "storageBucket": "studio-2008852960-a9318.appspot.com",
-  "messagingSenderId": "808392146991"
+  apiKey: "AIzaSyDCelVT6SG5-vJvwNRQ3fpR4hiRC19Pj8E",
+  authDomain: "thambnail-downloader.firebaseapp.com",
+  projectId: "thambnail-downloader",
+  storageBucket: "thambnail-downloader.appspot.com",
+  messagingSenderId: "22788421317",
+  appId: "1:22788421317:web:885e8e4e67fac383a622ac",
+  measurementId: "G-Q31YDWT76B"
 };
