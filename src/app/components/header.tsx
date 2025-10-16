@@ -39,7 +39,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { useAuth } from '@/firebase/provider';
+import { useAuth, useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 
@@ -155,10 +155,17 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 }
 
 function AccountButton() {
-  const { user, signOut } = useAuth();
+  const { user } = useUser();
+  const auth = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
   const router = useRouter();
+
+  const handleSignOut = () => {
+    if (auth) {
+      auth.signOut();
+    }
+  };
 
   if (user) {
     return (
@@ -174,7 +181,7 @@ function AccountButton() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>{user.email || t.common.user}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut()}>
+          <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>{t.header.logout}</span>
           </DropdownMenuItem>
@@ -237,4 +244,6 @@ export function Header() {
     </header>
   );
 }
+    
+
     

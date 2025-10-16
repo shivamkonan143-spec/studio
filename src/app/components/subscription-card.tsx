@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/firebase/provider';
+import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 
 
@@ -27,7 +27,7 @@ export function SubscriptionCard() {
     const { locale } = useLanguage();
     const t = translations[locale];
     const { toast } = useToast();
-    const { user } = useAuth();
+    const { user } = useUser();
     const router = useRouter();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -209,3 +209,5 @@ export function SubscriptionCard() {
         </>
     );
 }
+
+    

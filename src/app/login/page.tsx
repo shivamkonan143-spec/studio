@@ -241,6 +241,10 @@ function AuthPage() {
 
 
     useEffect(() => {
+        if (!auth) {
+            setIsRedirecting(false);
+            return;
+        }
         getRedirectResult(auth)
             .then((result) => {
                 if (result) {
