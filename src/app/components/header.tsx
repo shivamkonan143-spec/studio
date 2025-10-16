@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -66,6 +66,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
   const whatsappHref = `https://wa.me/917488530499?text=Support%20Request%20for%20Thumbnail%20Downloader!`;
+  const callHref = `tel:7488530499`;
   
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
@@ -185,6 +186,13 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
                 </div>
             </DialogContent>
         </Dialog>
+
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+          <a href={callHref} onClick={() => closeMenu?.()}>
+            <Phone className="mr-2 h-4 w-4" />
+            <span>{t.header.callSupport}</span>
+          </a>
+        </Button>
 
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
