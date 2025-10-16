@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
-import { AuthError, sendPasswordResetEmail } from 'firebase/auth';
+import { AuthError, sendPasswordResetEmail, getRedirectResult } from 'firebase/auth';
 import { DialogTitle } from '@radix-ui/react-dialog';
 
 import { Button } from '@/components/ui/button';
@@ -88,7 +88,7 @@ function LoginView() {
     router.refresh();
   };
 
-  const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
+  const handleAuthError = (error: AuthError, provider: 'email' | 'google' | 'redirect') => {
     let title = t.login.failedTitle;
     let description = 'An unexpected error occurred. Please try again.';
 
@@ -102,7 +102,7 @@ function LoginView() {
         } else {
             description = t.login.checkCredentials;
         }
-    } else if (provider === 'google') {
+    } else if (provider === 'google' || provider === 'redirect') {
         title = t.login.googleFailed;
         description = 'Could not sign in with Google. Please try again.';
     }
@@ -116,6 +116,20 @@ function LoginView() {
     setIsLoading(false);
     setIsGoogleLoading(false);
   };
+
+  useEffect(() => {
+    if (!auth) return;
+    
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          handleAuthSuccess();
+        }
+      })
+      .catch((error) => {
+        handleAuthError(error, 'redirect');
+      });
+  }, [auth]);
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     if (!auth) return;
@@ -132,13 +146,7 @@ function LoginView() {
   const handleGoogleSignIn = () => {
     if (!auth) return;
     setIsGoogleLoading(true);
-    initiateGoogleSignIn(auth, (user, error) => {
-      if (user) {
-        handleAuthSuccess();
-      } else if (error) {
-        handleAuthError(error, 'google');
-      }
-    })
+    initiateGoogleSignIn(auth);
   }
   
   return (
@@ -277,13 +285,7 @@ function SignupView() {
     const handleGoogleSignIn = () => {
         if (!auth) return;
         setIsGoogleLoading(true);
-        initiateGoogleSignIn(auth, (user, error) => {
-            if (user) {
-                handleAuthSuccess();
-            } else if (error) {
-                handleAuthError(error, 'google');
-            }
-        });
+        initiateGoogleSignIn(auth);
     };
 
     return (

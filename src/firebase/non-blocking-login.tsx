@@ -5,7 +5,7 @@ import {
   signInAnonymously,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
   AuthError,
   User,
@@ -41,12 +41,10 @@ export function initiateEmailSignIn(authInstance: Auth, email: string, password:
     .catch((error) => callback && callback(null, error));
 }
 
-/** Initiate Google sign-in (non-blocking). */
-export function initiateGoogleSignIn(authInstance: Auth, callback?: AuthCallback): void {
+/** Initiate Google sign-in using redirect method. */
+export function initiateGoogleSignIn(authInstance: Auth): void {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(authInstance, provider)
-      .then((userCredential) => callback && callback(userCredential.user, null))
-      .catch((error) => callback && callback(null, error));
+    signInWithRedirect(authInstance, provider);
 }
 
 /** Initiate Phone number sign-in (non-blocking). */
