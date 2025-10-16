@@ -61,20 +61,14 @@ function LoginView() {
     let title = t.login.failedTitle;
     let description = 'An unexpected error occurred. Please try again.';
 
-    if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        form.setError('password', {
-            type: 'manual',
-            message: t.login.wrongPassword,
-        });
-        description = t.login.wrongPassword;
-    } else {
+    if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
         description = t.login.checkCredentials;
     }
       
     toast({
       variant: 'destructive',
       title: title,
-      description: error.message || description,
+      description: description,
     });
 
     setIsLoading(false);
@@ -367,3 +361,5 @@ export function AuthDialog() {
     </Dialog>
   );
 }
+
+    
