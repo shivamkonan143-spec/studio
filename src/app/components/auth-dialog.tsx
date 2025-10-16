@@ -81,11 +81,15 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
         case 'auth/email-already-in-use':
             return t.register.emailInUse;
         case 'auth/invalid-email':
-            return 'Please enter a valid email address.'; // Universal
+            return 'Please enter a valid email address.';
+        case 'auth/popup-closed-by-user':
+            return 'Sign-in window was closed. Please try again.';
+        case 'auth/cancelled-popup-request':
+            return 'Sign-in was cancelled. Please try again.';
         case 'auth/unauthorized-domain':
              return 'This domain is not authorized for authentication. Please contact support.';
         default:
-            return 'An unexpected error occurred. Please try again.'; // Universal
+            return `An unexpected error occurred. Please try again. (${errorCode})`;
     }
 };
 
