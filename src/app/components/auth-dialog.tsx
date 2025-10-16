@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
-import { AuthError, sendPasswordResetEmail, getRedirectResult } from 'firebase/auth';
+import { AuthError, sendPasswordResetEmail } from 'firebase/auth';
 import { DialogTitle } from '@radix-ui/react-dialog';
 
 import { Button } from '@/components/ui/button';
@@ -58,7 +58,6 @@ function LoginView() {
   };
 
   const handleAuthError = (error: AuthError) => {
-    let title = t.login.failedTitle;
     let description = 'An unexpected error occurred. Please try again.';
 
     if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
@@ -67,7 +66,7 @@ function LoginView() {
       
     toast({
       variant: 'destructive',
-      title: title,
+      title: t.login.failedTitle,
       description: description,
     });
 
@@ -173,7 +172,7 @@ function SignupView() {
         toast({
             variant: 'destructive',
             title: t.register.failedTitle,
-            description: error.message || t.register.emailInUse,
+            description: error.code === 'auth/email-already-in-use' ? t.register.emailInUse : (error.message || 'An unexpected error occurred.'),
         });
         setIsLoading(false);
     };
@@ -298,7 +297,7 @@ function ForgotPasswordView() {
                             {t.forgotPassword.submittedDescription}{' '}
                             <span className="font-medium text-foreground">{form.getValues('email')}</span>.
                         </p>
-                        <Button variant="link" onClick={() => setView('login')}>Back to Log In</Button>
+                        <Button variant="link" onClick={() => setView('login')}>{t.register.loginLink}</Button>
                     </div>
                 ) : (
                     <Form {...form}>
@@ -325,7 +324,7 @@ function ForgotPasswordView() {
                  {!isSubmitted && (
                     <p className="mt-4 text-center text-sm text-muted-foreground">
                         <Button variant="link" className="p-0 h-auto font-medium text-primary hover:underline" onClick={() => setView('login')}>
-                            Back to Log In
+                             {t.register.loginLink}
                         </Button>
                     </p>
                  )}
@@ -335,9 +334,8 @@ function ForgotPasswordView() {
 }
 
 export function AuthDialog() {
-  const { isOpen, view, closeModal } = useAuthModal();
+  const { isOpen, view, closeModal, setView } = useAuthModal();
   const { user, isUserLoading } = useUser();
-  const router = useRouter();
 
   // Close the modal if the user logs in successfully
   useEffect(() => {
@@ -348,8 +346,14 @@ export function AuthDialog() {
 
   if (isUserLoading) return null; // Or a spinner if you prefer
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      closeModal();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={closeModal}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md p-0">
         <VisuallyHidden>
           <DialogTitle>Authentication Form</DialogTitle>
@@ -361,5 +365,4 @@ export function AuthDialog() {
     </Dialog>
   );
 }
-
     

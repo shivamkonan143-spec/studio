@@ -96,16 +96,12 @@
         "passwordPlaceholder": "••••••••",
         "forgotPassword": "पासवर्ड भूल गए?",
         "button": "लॉग इन करें",
-        "continueWith": "या इसके साथ जारी रखें",
-        "google": "Google से साइन इन करें",
         "noAccount": "खाता नहीं है?",
         "registerLink": "रजिस्टर करें",
         "successTitle": "लॉगिन सफल",
         "welcomeBack": "वापस स्वागत है!",
         "failedTitle": "लॉगिन विफल",
-        "wrongPassword": "गलत पासवर्ड। कृपया पुन: प्रयास करें।",
-        "checkCredentials": "कृपया अपना ईमेल और पासवर्ड जांचें।",
-        "googleFailed": "Google से साइन इन नहीं किया जा सका। कृपया पुन: प्रयास करें।"
+        "checkCredentials": "कृपया अपना ईमेल और पासवर्ड जांचें।"
     },
     "register": {
         "title": "रजिस्टर करें",
@@ -120,7 +116,7 @@
         "successTitle": "खाता बनाया गया",
         "successDescription": "आप सफलतापूर्वक साइन इन हो गए हैं।",
         "failedTitle": "पंजीकरण विफल",
-        "emailInUse": "यह ईमेल पहले से ही उपयोग में हो सकता है।"
+        "emailInUse": "यह ईमेल पहले से ही उपयोग में है।"
     },
     "forgotPassword": {
         "title": "पासवर्ड भूल गए",

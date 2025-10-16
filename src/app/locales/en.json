@@ -96,16 +96,12 @@
         "passwordPlaceholder": "••••••••",
         "forgotPassword": "Forgot password?",
         "button": "Log In",
-        "continueWith": "Or continue with",
-        "google": "Sign in with Google",
         "noAccount": "Don't have an account?",
         "registerLink": "Register",
         "successTitle": "Login Successful",
         "welcomeBack": "Welcome back!",
         "failedTitle": "Login Failed",
-        "wrongPassword": "Wrong password. Please try again.",
-        "checkCredentials": "Please check your email and password.",
-        "googleFailed": "Could not sign in with Google. Please try again."
+        "checkCredentials": "Please check your email and password."
     },
     "register": {
         "title": "Register",
@@ -120,7 +116,7 @@
         "successTitle": "Account Created",
         "successDescription": "You have been successfully signed in.",
         "failedTitle": "Registration Failed",
-        "emailInUse": "This email might already be in use."
+        "emailInUse": "This email is already in use."
     },
     "forgotPassword": {
         "title": "Forgot Password",
