@@ -251,8 +251,13 @@ function AccountButton() {
   };
 
   if (isUserLoading) {
-    // Render a placeholder or nothing while auth state is loading
-    return <div className="h-8 w-8" />;
+    return (
+      <Avatar className="h-8 w-8">
+        <AvatarFallback>
+          <UserIcon className="h-5 w-5 text-muted-foreground" />
+        </AvatarFallback>
+      </Avatar>
+    );
   }
 
 
