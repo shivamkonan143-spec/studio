@@ -28,7 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, errorEmitter, FirestorePermissionError } from '@/firebase';
 
 
 const formSchema = z.object({
@@ -265,22 +265,26 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const { user } = useUser();
   const firestore = useFirestore();
 
-  const saveToHistory = async (title: string) => {
+  const saveToHistory = (title: string) => {
     if (!user || !firestore || !videoId || !title) return;
 
-    try {
-      const historyRef = doc(firestore, `users/${user.uid}/videoDownloads/${videoId}`);
-      await setDoc(historyRef, {
-        videoId: videoId,
-        title: title,
-        downloadedAt: serverTimestamp(),
-        isShort: isShort,
-      }, { merge: true });
-    } catch (error) {
-      console.error("Error saving to history: ", error);
-      // Optionally show a toast to the user
-      // toast({ variant: 'destructive', title: "Could not save to history." });
-    }
+    const historyRef = doc(firestore, `users/${user.uid}/videoDownloads/${videoId}`);
+    const historyData = {
+      videoId: videoId,
+      title: title,
+      downloadedAt: serverTimestamp(),
+      isShort: isShort,
+    };
+
+    setDoc(historyRef, historyData, { merge: true })
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: historyRef.path,
+          operation: 'write',
+          requestResourceData: historyData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
 
