@@ -162,17 +162,6 @@ function SignupView({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        const provider = new GoogleAuthProvider();
-        setIsLoading(true);
-        try {
-            await signInWithRedirect(auth, provider);
-        } catch (error) {
-            onAuthError(error as AuthError);
-            setIsLoading(false);
-        }
-    };
-
     return (
         <CardContent className="space-y-4">
             <form onSubmit={handleSignup} className="space-y-4">
@@ -200,20 +189,6 @@ function SignupView({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User
                     {t.register.button}
                 </Button>
             </form>
-            
-            <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
-                </div>
-            </div>
-
-            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
-                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-                Sign up with Google
-            </Button>
         </CardContent>
     );
 }
