@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
+import { useSubscription } from '@/hooks/use-subscription';
 
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
@@ -29,6 +30,7 @@ export function SubscriptionCard() {
     const { toast } = useToast();
     const { user } = useUser();
     const router = useRouter();
+    const { activateSubscription } = useSubscription();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -63,6 +65,9 @@ export function SubscriptionCard() {
         setIsProcessing(true);
         // Simulate payment processing
         await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Activate subscription
+        activateSubscription();
         
         toast({
             variant: 'success',

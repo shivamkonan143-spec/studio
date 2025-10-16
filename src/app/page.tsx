@@ -7,10 +7,12 @@ import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput, YoutubeDownloaderPreview } from '@/app/components/video-downloader';
 import { SubscriptionCard } from '@/app/components/subscription-card';
 import { SocialLinks } from '@/app/components/social-links';
+import { useSubscription } from '@/hooks/use-subscription';
 
 function HomeComponent() {
   const searchParams = useSearchParams();
   const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
+  const { isSubscribed } = useSubscription();
 
   const videoId = searchParams.get('videoId');
   const isShort = searchParams.get('isShort') === 'true';
@@ -46,7 +48,7 @@ function HomeComponent() {
           )}
         </div>
 
-        {!preview && <SubscriptionCard />}
+        {!preview && !isSubscribed && <SubscriptionCard />}
         <SocialLinks />
       </div>
     </main>

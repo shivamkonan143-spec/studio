@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -27,6 +27,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useTheme } from 'next-themes';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
@@ -42,6 +53,7 @@ import {
 import { useAuth, useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
+import { useSubscription } from '@/hooks/use-subscription';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -49,12 +61,24 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
   const { user } = useUser();
+  const { isSubscribed, cancelSubscription } = useSubscription();
+  const { toast } = useToast();
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
   const whatsappHref = `https://wa.me/917488530499?text=support%20thambnail%20downloader`;
   
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
+    closeMenu?.();
+  };
+
+  const handleCancelSubscription = () => {
+    cancelSubscription();
+    toast({
+      variant: 'success',
+      title: t.subscription.cancelledTitle,
+      description: t.subscription.cancelledDescription,
+    });
     closeMenu?.();
   };
 
@@ -175,6 +199,32 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <span>{t.header.helpAndSupport}</span>
           </a>
         </Button>
+
+        {isSubscribed && (
+          <>
+            <Separator className="my-2" />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive">
+                    <XCircle className="mr-2 h-4 w-4" />
+                    <span>{t.subscription.cancelSubscription}</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t.subscription.cancelConfirmTitle}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t.subscription.cancelConfirmDescription}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t.subscription.back}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleCancelSubscription} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">{t.subscription.confirm}</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        )}
       </div>
   );
 }
