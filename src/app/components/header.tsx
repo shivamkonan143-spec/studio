@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -50,7 +51,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { user } = useUser();
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
-  const whatsappHref = `https://wa.me/917488530499`;
+  const whatsappHref = `https://wa.me/917488530499?text=support%20thambnail%20downloader`;
   
   const handleLanguageChange = (newLocale: 'en' | 'hi') => {
     changeLocale(newLocale);
