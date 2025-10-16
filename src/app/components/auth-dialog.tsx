@@ -181,7 +181,7 @@ function LoginView() {
                     <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 261.8 0 120.5 109.8 11.8 244 11.8c70.3 0 129.8 27.8 174.4 72.4l-66 66C314.5 118.8 282.8 103 244 103c-83.6 0-152.2 68.2-152.2 158.8s68.6 158.8 152.2 158.8c99.3 0 133-64.2 137.5-98.3H244v-75.1h236.4c2.5 12.8 3.6 26.4 3.6 40.9z"></path></svg>
                 )}
                 Sign in with Google
-            </p>
+            </Button>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {t.login.noAccount}{' '}
