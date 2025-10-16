@@ -40,8 +40,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useAuth } from '@/firebase/provider';
-import { AuthDialog } from '@/app/components/auth-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useRouter } from 'next/navigation';
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -158,7 +158,7 @@ function AccountButton() {
   const { user, signOut } = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
-  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const router = useRouter();
 
   if (user) {
     return (
@@ -184,12 +184,9 @@ function AccountButton() {
   }
 
   return (
-    <>
-      <Button onClick={() => setIsAuthDialogOpen(true)} variant="ghost">
-        {t.header.myAccount}
-      </Button>
-      <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-    </>
+    <Button onClick={() => router.push('/login')} variant="ghost">
+      {t.header.myAccount}
+    </Button>
   )
 }
 
@@ -240,5 +237,4 @@ export function Header() {
     </header>
   );
 }
-
     

@@ -13,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/firebase/provider';
-import { AuthDialog } from '@/app/components/auth-dialog';
+import { useRouter } from 'next/navigation';
 
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
@@ -28,7 +28,7 @@ export function SubscriptionCard() {
     const t = translations[locale];
     const { toast } = useToast();
     const { user } = useAuth();
-    const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+    const router = useRouter();
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [step, setStep] = useState(1);
@@ -37,12 +37,12 @@ export function SubscriptionCard() {
 
     const handleSubscribeClick = () => {
         if (!user) {
-            setIsAuthDialogOpen(true);
             toast({
                 variant: 'destructive',
                 title: t.common.error,
                 description: t.subscription.errorDescription,
             })
+            router.push('/login');
             return;
         }
         setIsDialogOpen(true);
@@ -211,10 +211,6 @@ export function SubscriptionCard() {
                     {renderDialogContent()}
                 </DialogContent>
             </Dialog>
-            <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
-
         </>
     );
 }
-
-    
