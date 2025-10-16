@@ -60,7 +60,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 
   return (
       <div className="flex flex-col gap-1 p-2">
-        <Button variant="ghost" asChild className="w-full justify-start">
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
           <Link href="/" onClick={() => closeMenu?.()}>
             <Home className="mr-2 h-4 w-4" />
             <span>{t.header.home}</span>
@@ -68,7 +68,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         </Button>
         <Collapsible>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
               <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span>{t.header.theme}</span>
@@ -76,15 +76,15 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-1 pl-6">
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('light'); closeMenu?.(); }}>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('light'); closeMenu?.(); }}>
               <Sun className="mr-2 h-4 w-4" />
               <span>{t.header.light}</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('dark'); closeMenu?.(); }}>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('dark'); closeMenu?.(); }}>
               <Moon className="mr-2 h-4 w-4" />
               <span>{t.header.dark}</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => { setTheme('system'); closeMenu?.(); }}>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('system'); closeMenu?.(); }}>
               <Laptop className="mr-2 h-4 w-4" />
               <span>{t.header.system}</span>
             </Button>
@@ -93,23 +93,23 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         
         <Collapsible>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
               <Languages className="mr-2 h-4 w-4" />
               <span>{t.header.language}</span>
               <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-1 pl-6">
-            <Button variant="ghost" className="w-full justify-start" onClick={() => handleLanguageChange('en')}>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => handleLanguageChange('en')}>
               <span>{t.header.english}</span>
             </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={() => handleLanguageChange('hi')}>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => handleLanguageChange('hi')}>
               <span>{t.header.hindi}</span>
             </Button>
           </CollapsibleContent>
         </Collapsible>
 
-        <Button variant="ghost" asChild className="w-full justify-start">
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
               <MessageCircle className="mr-2 h-4 w-4" />
               <span>{t.header.shareApp}</span>
@@ -118,7 +118,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start">
+                <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
                     <Info className="mr-2 h-4 w-4" />
                     <span>{t.header.aboutUs}</span>
                 </Button>
@@ -144,7 +144,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         </Dialog>
 
 
-        <Button variant="ghost" asChild className="w-full justify-start">
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
           <a href={mailtoHref} onClick={() => closeMenu?.()}>
             <LifeBuoy className="mr-2 h-4 w-4" />
             <span>{t.header.helpAndSupport}</span>
