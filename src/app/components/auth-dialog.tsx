@@ -222,6 +222,7 @@ function LoginView() {
 function SignupView() {
     const { setView, closeModal } = useAuthModal();
     const [isLoading, setIsLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
     
@@ -240,13 +241,25 @@ function SignupView() {
         router.refresh();
     };
 
-    const handleAuthError = (error: AuthError) => {
+    const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
+        let title = t.register.failedTitle;
+        let description = 'An unexpected error occurred. Please try again.';
+
+        if (provider === 'email') {
+            description = t.register.emailInUse;
+        } else if (provider === 'google') {
+            title = t.login.googleFailed;
+            description = 'Could not sign in with Google. Please try again.';
+        }
+    
         toast({
             variant: 'destructive',
-            title: t.register.failedTitle,
-            description: error.message || t.register.emailInUse,
+            title: title,
+            description: error.message || description,
         });
+
         setIsLoading(false);
+        setIsGoogleLoading(false);
     };
 
     const onEmailSubmit = (values: z.infer<typeof signupSchema>) => {
@@ -256,7 +269,19 @@ function SignupView() {
             if (user) {
                 handleAuthSuccess();
             } else if (error) {
-                handleAuthError(error);
+                handleAuthError(error, 'email');
+            }
+        });
+    };
+
+    const handleGoogleSignIn = () => {
+        if (!auth) return;
+        setIsGoogleLoading(true);
+        initiateGoogleSignIn(auth, (user, error) => {
+            if (user) {
+                handleAuthSuccess();
+            } else if (error) {
+                handleAuthError(error, 'google');
             }
         });
     };
@@ -296,11 +321,27 @@ function SignupView() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
+                        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                             {isLoading ? <Loader2 className="animate-spin" /> : t.register.button}
                         </Button>
                     </form>
                 </Form>
+
+                <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                            {t.login.continueWith}
+                        </span>
+                    </div>
+                </div>
+
+                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>
+                    {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
+                    {t.login.google}
+                </Button>
 
                 <p className="mt-4 text-center text-sm text-muted-foreground">
                     {t.register.haveAccount}{' '}
