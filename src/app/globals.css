@@ -4,6 +4,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @layer base {
@@ -91,5 +92,20 @@ body {
 @layer components {
   .p-\[6px\] {
     padding: 6px;
+  }
+
+  .ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    animation: ripple-animation 0.6s linear;
+    transform: scale(0);
+  }
+
+  @keyframes ripple-animation {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
   }
 }
