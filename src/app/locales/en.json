@@ -14,10 +14,19 @@
         "helpAndSupport": "Help & Support",
         "shareApp": "Share App",
         "logout": "Log out",
-        "login": "Log In",
+        "login": "Log in",
         "register": "Register",
         "myAccount": "Log in",
-        "aboutUs": "About Us"
+        "aboutUs": "About Us",
+        "history": "History"
+    },
+    "history": {
+        "title": "Download History",
+        "noHistoryTitle": "No History Yet",
+        "noHistoryDescription": "You haven't downloaded any thumbnails yet. Get started on the home page!",
+        "backToHome": "Back to Home",
+        "loginRequiredTitle": "Login Required",
+        "loginRequiredDescription": "Please log in to view your download history."
     },
     "about": {
         "description": "This is a thumbnail downloader app built with Next.js and Firebase.",
@@ -109,7 +118,7 @@
         "emailLabel": "Email",
         "emailPlaceholder": "Gmail",
         "passwordLabel": "Password",
-        "passwordPlaceholder": "••••••••",
+        "passwordPlaceholder": "Create a password",
         "button": "Register",
         "haveAccount": "Already have an account?",
         "loginLink": "Log in",

@@ -9,6 +9,7 @@ import { Download, RefreshCcw, Loader2, Image as ImageIcon, ArrowRight, X, Clipb
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,6 +28,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RatingDialog, checkIfRatingGiven } from '@/app/components/rating-dialog';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
+import { useFirestore, useUser } from '@/firebase';
 
 
 const formSchema = z.object({
@@ -111,7 +113,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                                 placeholder={t.videoDownloader.urlPlaceholder}
                                 {...field}
                                 disabled={isGenerating}
-                                className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                                className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
                             />
                             </FormControl>
                             {field.value && (
@@ -260,6 +262,27 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { toast } = useToast();
+  const { user } = useUser();
+  const firestore = useFirestore();
+
+  const saveToHistory = async (title: string) => {
+    if (!user || !firestore || !videoId || !title) return;
+
+    try {
+      const historyRef = doc(firestore, `users/${user.uid}/videoDownloads/${videoId}`);
+      await setDoc(historyRef, {
+        videoId: videoId,
+        title: title,
+        downloadedAt: serverTimestamp(),
+        isShort: isShort,
+      }, { merge: true });
+    } catch (error) {
+      console.error("Error saving to history: ", error);
+      // Optionally show a toast to the user
+      // toast({ variant: 'destructive', title: "Could not save to history." });
+    }
+  };
+
 
   useEffect(() => {
     if (!videoId) return;
@@ -281,6 +304,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
             if(response.ok) {
                 const data: OembedResponse = await response.json();
                 setVideoTitle(data.title);
+                saveToHistory(data.title);
             } else {
                 setVideoTitle('Title not available');
             }
@@ -294,7 +318,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
     fetchVideoInfo();
 
-  }, [videoId]);
+  }, [videoId, user, firestore]);
 
   useEffect(() => {
     if (textareaRef.current) {

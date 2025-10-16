@@ -17,7 +17,16 @@
         "login": "लॉग इन करें",
         "register": "रजिस्टर करें",
         "myAccount": "लॉग इन करें",
-        "aboutUs": "हमारे बारे में"
+        "aboutUs": "हमारे बारे में",
+        "history": "इतिहास"
+    },
+    "history": {
+        "title": "डाउनलोड इतिहास",
+        "noHistoryTitle": "अभी तक कोई इतिहास नहीं है",
+        "noHistoryDescription": "आपने अभी तक कोई थंबनेल डाउनलोड नहीं किया है। होम पेज पर शुरू करें!",
+        "backToHome": "होम पर वापस जाएं",
+        "loginRequiredTitle": "लॉगिन आवश्यक है",
+        "loginRequiredDescription": "अपना डाउनलोड इतिहास देखने के लिए कृपया लॉग इन करें।"
     },
     "about": {
         "description": "यह Next.js और Firebase के साथ बनाया गया एक थंबनेल डाउनलोडर ऐप है।",
@@ -109,7 +118,7 @@
         "emailLabel": "ईमेल",
         "emailPlaceholder": "Gmail",
         "passwordLabel": "पासवर्ड",
-        "passwordPlaceholder": "••••••••",
+        "passwordPlaceholder": "एक पासवर्ड बनाएं",
         "button": "रजिस्टर करें",
         "haveAccount": "पहले से ही एक खाता है?",
         "loginLink": "लॉग इन करें",

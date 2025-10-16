@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -48,6 +48,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { setTheme } = useTheme();
   const { locale, changeLocale } = useLanguage();
   const t = translations[locale];
+  const { user } = useUser();
   
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
   
@@ -66,6 +67,14 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <span>{t.header.home}</span>
           </Link>
         </Button>
+        {user && (
+          <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+            <Link href="/history" onClick={() => closeMenu?.()}>
+              <History className="mr-2 h-4 w-4" />
+              <span>{t.header.history}</span>
+            </Link>
+          </Button>
+        )}
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
@@ -192,7 +201,7 @@ function AccountButton() {
 
   return (
     <Button onClick={() => router.push('/login')} variant="default">
-      {t.header.myAccount}
+      {t.header.login}
     </Button>
   )
 }
