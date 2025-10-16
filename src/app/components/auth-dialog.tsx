@@ -489,5 +489,3 @@ export function AuthDialog() {
     </Dialog>
   );
 }
-
-    
