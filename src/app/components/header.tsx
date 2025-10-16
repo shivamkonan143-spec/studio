@@ -251,8 +251,7 @@ function AccountButton() {
   };
 
   if (isUserLoading) {
-    // Render a fixed-size invisible spacer to prevent layout shift
-    return <div className="h-8 w-8" />;
+    return <div className="h-8 w-8 rounded-full bg-muted" />;
   }
 
   if (user) {
@@ -339,3 +338,4 @@ export function Header() {
     
 
     
+
