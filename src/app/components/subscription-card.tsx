@@ -37,11 +37,6 @@ export function SubscriptionCard() {
 
     const handleSubscribeClick = () => {
         if (!user) {
-            toast({
-                variant: 'destructive',
-                title: t.common.error,
-                description: t.subscription.errorDescription,
-            })
             router.push('/login');
             return;
         }
