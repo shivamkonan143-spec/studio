@@ -23,8 +23,7 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   AuthError,
   User,
 } from 'firebase/auth';
@@ -103,7 +102,6 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { user, isLoading: authLoading } = useAuth();
 
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -123,20 +121,6 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
         });
     }, [locale, t.login.failedTitle, toast]);
 
-
-    useEffect(() => {
-        if (!authLoading && !user) {
-            getRedirectResult(auth)
-                .then((result) => {
-                    if (result?.user) {
-                        handleAuthSuccess(result.user);
-                    }
-                })
-                .catch(handleAuthError);
-        }
-    }, [authLoading, user, handleAuthSuccess, handleAuthError]);
-
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -150,9 +134,17 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
         }
     };
     
-    const handleGoogleSignIn = () => {
+    const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider);
+        setIsLoading(true);
+        try {
+            const result = await signInWithPopup(auth, provider);
+            handleAuthSuccess(result.user);
+        } catch (error) {
+            handleAuthError(error as AuthError);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -189,8 +181,8 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
                     </div>
                 </div>
 
-                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-                    <GoogleIcon className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
                     Google
                 </Button>
             </div>
@@ -213,7 +205,6 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { user, isLoading: authLoading } = useAuth();
     
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -233,20 +224,6 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
         });
     }, [locale, t.register.failedTitle, toast]);
 
-
-    useEffect(() => {
-        if (!authLoading && !user) {
-            getRedirectResult(auth)
-                .then((result) => {
-                    if (result?.user) {
-                        handleAuthSuccess(result.user);
-                    }
-                })
-                .catch(handleAuthError);
-        }
-    }, [authLoading, user, handleAuthSuccess, handleAuthError]);
-
-
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -260,9 +237,17 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
         }
     };
 
-    const handleGoogleSignIn = () => {
+    const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider);
+        setIsLoading(true);
+        try {
+            const result = await signInWithPopup(auth, provider);
+            handleAuthSuccess(result.user);
+        } catch (error) {
+            handleAuthError(error as AuthError);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -296,8 +281,8 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
                     </div>
                 </div>
 
-                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
-                    <GoogleIcon className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
+                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
                     Google
                 </Button>
             </div>
@@ -390,5 +375,7 @@ function ForgotPasswordView({ setView }: ViewProps) {
         </>
     );
 }
+
+    
 
     
