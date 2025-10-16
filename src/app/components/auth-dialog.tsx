@@ -85,6 +85,8 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
             return t.register.emailInUse;
         case 'auth/invalid-email':
             return 'Please enter a valid email address.'; // Universal
+        case 'auth/unauthorized-domain':
+             return 'This domain is not authorized for authentication. Please contact support.';
         default:
             return 'An unexpected error occurred. Please try again.'; // Universal
     }
@@ -375,7 +377,5 @@ function ForgotPasswordView({ setView }: ViewProps) {
         </>
     );
 }
-
-    
 
     

@@ -43,12 +43,16 @@ export const FirebaseClientProvider = ({
   }, []);
 
   const signOut = async () => {
-    await firebaseSignOut(auth);
+    try {
+        await firebaseSignOut(auth);
+    } catch (error) {
+        console.error("Error signing out: ", error);
+    }
   };
 
   return (
     <FirebaseAuthContext.Provider value={{ user, isLoading, signOut }}>
-      {children}
+      {!isLoading && children}
     </FirebaseAuthContext.Provider>
   );
 };
