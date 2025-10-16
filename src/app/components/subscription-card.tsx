@@ -26,35 +26,6 @@ interface PaymentMethod {
     upiId?: string;
 }
 
-
-function SubscriptionCardSkeleton() {
-    return (
-        <Card className="overflow-hidden">
-            <CardHeader className="p-8 pb-4">
-                <div className="flex items-center gap-3 mb-2">
-                    <Skeleton className="w-10 h-10 rounded-lg" />
-                    <Skeleton className="h-7 w-48" />
-                </div>
-                <Skeleton className="h-4 w-full mt-1" />
-                <Skeleton className="h-4 w-3/4" />
-            </CardHeader>
-            <CardContent className="p-8 pt-0">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                         <Skeleton className="w-5 h-5 rounded-full" />
-                         <Skeleton className="h-5 w-32" />
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                         <Skeleton className="h-10 w-24" />
-                         <Skeleton className="h-6 w-20" />
-                    </div>
-                    <Skeleton className="h-12 w-full rounded-md" />
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
 export function SubscriptionCard() {
     const { locale } = useLanguage();
     const t = translations[locale];
@@ -76,14 +47,11 @@ export function SubscriptionCard() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const isSubscribed = subscription?.active === true;
-    const showSkeleton = isUserLoading || (user && isSubscriptionLoading);
+    const shouldShowCard = !isUserLoading && user && !isSubscriptionLoading && !isSubscribed;
 
-    if (showSkeleton) {
-        return <SubscriptionCardSkeleton />;
-    }
 
-    if (isSubscribed) {
-        return null; // Don't show the card if user is already subscribed
+    if (!shouldShowCard) {
+        return null; 
     }
 
     const handleSubscribeClick = () => {
