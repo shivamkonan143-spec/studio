@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -119,6 +119,8 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           </CollapsibleContent>
         </Collapsible>
 
+        <Separator className="my-2" />
+        
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
             <a href={whatsAppShareUrl} target="_blank" rel="noopener noreferrer" onClick={() => closeMenu?.()}>
               <MessageCircle className="mr-2 h-4 w-4" />
@@ -260,6 +262,8 @@ export function Header() {
     </header>
   );
 }
+    
+
     
 
     
