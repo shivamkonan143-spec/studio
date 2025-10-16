@@ -23,7 +23,10 @@ const firebaseConfig = {
   authDomain: "studio-2008852960-a9318.firebaseapp.com",
   projectId: "studio-2008852960-a9318",
   storageBucket: "studio-2008852960-a9318.appspot.com",
+  messagingSenderId: "808392146991",
+  appId: "1:808392146991:web:e025a0e13774b16debc6da"
 };
+
 
 // Initialize Firebase
 if (!getApps().length) {
