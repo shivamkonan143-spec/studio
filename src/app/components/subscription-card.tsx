@@ -8,47 +8,18 @@ import { translations } from '@/app/locales/translations';
 import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useAuthModal } from '@/app/context/auth-modal-context';
-import { Skeleton } from '@/components/ui/skeleton';
 
 type PaymentMethodType = 'upi' | 'card' | 'netbanking' | 'phonepe';
 
 interface PaymentMethod {
     type: PaymentMethodType;
     upiId?: string;
-}
-
-function SubscriptionCardSkeleton() {
-    return (
-        <Card className="overflow-hidden">
-            <CardHeader className="p-8 pb-4">
-                <div className="flex items-center gap-3 mb-2">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
-                    <Skeleton className="h-8 w-40" />
-                </div>
-                 <Skeleton className="h-4 w-full" />
-            </CardHeader>
-            <CardContent className="p-8 pt-0">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                         <Skeleton className="h-5 w-5 rounded-full" />
-                         <Skeleton className="h-5 w-32" />
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                         <Skeleton className="h-10 w-24" />
-                    </div>
-                    <Skeleton className="h-12 w-full" />
-                </div>
-            </CardContent>
-        </Card>
-    )
 }
 
 export function SubscriptionCard() {
@@ -72,14 +43,10 @@ export function SubscriptionCard() {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const isSubscribed = subscription?.active === true;
-    const showSkeleton = isUserLoading || (user && isSubscriptionLoading);
+    const shouldShowCard = !isUserLoading && user && !isSubscriptionLoading && !isSubscribed;
 
-    if (showSkeleton) {
-        return <SubscriptionCardSkeleton />;
-    }
-
-    if (!user || isSubscribed) {
-        return null; 
+    if (!shouldShowCard) {
+        return null;
     }
 
     const handleSubscribeClick = () => {
