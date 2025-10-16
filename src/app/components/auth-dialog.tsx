@@ -24,7 +24,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import { auth } from '@/firebase/config';
+import { auth } from '@/firebase/provider';
 import { Loader2 } from 'lucide-react';
 
 type View = 'login' | 'signup' | 'forgot-password';

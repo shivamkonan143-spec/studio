@@ -11,8 +11,26 @@ import {
   onAuthStateChanged,
   User,
   signOut as firebaseSignOut,
+  Auth
 } from 'firebase/auth';
-import { auth } from './config';
+import { initializeApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAv-6b6y4qIILixgJhh1zoimOMc78M2RFk",
+  authDomain: "studio-2008852960-a9318.firebaseapp.com",
+  projectId: "studio-2008852960-a9318",
+  storageBucket: "studio-2008852960-a9318.appspot.com",
+};
+
+// Initialize Firebase
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+
+export const auth: Auth = getAuth();
 
 
 interface FirebaseAuthContextType {
