@@ -12,7 +12,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import { useAuth } from '@/firebase/provider';
+import { useAuth, useUser } from '@/firebase';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
@@ -297,3 +297,5 @@ export default function LoginPage() {
     // However, this structure provides the `useAuth` hook with the necessary context.
     return <AuthPage />;
 }
+
+    
