@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -170,7 +170,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{t.header.aboutUs}</DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-sm text-muted-foreground pt-2 text-left">
                         {t.about.description}
                     </DialogDescription>
                 </DialogHeader>
@@ -182,6 +182,16 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">{t.about.averageRating}</span>
                         <span className="font-bold">4.8 / 5</span>
+                    </div>
+                     <Separator />
+                    <div className="space-y-2 text-left">
+                         <h4 className="font-semibold text-foreground">{t.about.contactUs}</h4>
+                         <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-muted-foreground" />
+                            <a href="mailto:shivamkonan143@gmail.com" className="text-sm text-primary hover:underline">
+                                shivamkonan143@gmail.com
+                            </a>
+                         </div>
                     </div>
                 </div>
             </DialogContent>
@@ -338,4 +348,3 @@ export function Header() {
     
 
     
-

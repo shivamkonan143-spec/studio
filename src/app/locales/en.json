@@ -46,9 +46,11 @@
         "deleteErrorDescription": "Failed to delete items. Please try again."
     },
     "about": {
-        "description": "This is a thumbnail downloader app built with Next.js and Firebase.",
+        "description": "Welcome to Thumbnail Downloader, your one-stop solution for grabbing high-quality video thumbnails instantly. Our app allows you to easily download thumbnails in both High (HD) and Low (SD) quality. For YouTube Shorts, we offer a special cropping feature to get the perfect mobile-friendly view. Plus, our advanced editing tools let you customize brightness, contrast, and apply various filters to make your thumbnails stand out. Built with the latest technology for a fast and reliable experience.",
         "totalUsers": "Total Users",
-        "averageRating": "Average Rating"
+        "averageRating": "Average Rating",
+        "contactUs": "Contact Us",
+        "yourEmail": "Your Email"
     },
     "videoDownloader": {
         "pasteUrl": "Paste the URL of the video to download its thumbnail.",
