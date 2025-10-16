@@ -230,6 +230,7 @@ function LoginView() {
       .finally(() => {
         setIsGoogleLoading(false);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth]);
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
@@ -394,6 +395,7 @@ function SignupView() {
           .finally(() => {
             setIsGoogleLoading(false);
           });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [auth]);
 
 
