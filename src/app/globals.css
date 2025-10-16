@@ -7,6 +7,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.login-background {
+  background: radial-gradient(circle at 100% 0%, rgba(255, 0, 150, 0.2), transparent 30%),
+              radial-gradient(circle at 0% 100%, rgba(0, 100, 255, 0.2), transparent 30%),
+              #1a0b2e;
+}
+
+
 @layer base {
   :root {
     --background: 210 20% 98%;
@@ -82,10 +89,10 @@ body {
 @layer base {
   * {
     @apply border-border;
-    -webkit-tap-highlight-color: transparent;
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
