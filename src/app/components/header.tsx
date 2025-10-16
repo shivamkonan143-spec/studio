@@ -251,15 +251,9 @@ function AccountButton() {
   };
 
   if (isUserLoading) {
-    return (
-      <Avatar className="h-8 w-8">
-        <AvatarFallback>
-          <UserIcon className="h-5 w-5 text-muted-foreground" />
-        </AvatarFallback>
-      </Avatar>
-    );
+    // Render a fixed-size invisible spacer to prevent layout shift
+    return <div className="h-8 w-8" />;
   }
-
 
   if (user) {
     return (
