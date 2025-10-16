@@ -132,7 +132,7 @@
         "submittedTitle": "अपना इनबॉक्स जांचें",
         "submittedDescription": "हमने एक पासवर्ड रीसेट लिंक भेजा है",
         "checkEmailToast": "अपना ईमेल जांचें",
-        "resetLinkSent": "{email} पर एक पासवर्ड रीसेट लिंक भेजा गया है।",
+        "resetLinkSent": "{email} पर एक पासवर्ड रीसेट लिंक भेजा गया है। कृपया अपना स्पैम फ़ोल्डर जांचें।",
         "failedToast": "रीसेट विफल",
         "successTitle": "पासवर्ड रीसेट सफल",
         "successDescription": "अब आप अपने नए पासवर्ड से लॉग इन कर सकते हैं।",

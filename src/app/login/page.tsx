@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -61,6 +60,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [oobCode, setOobCode] = useState(initialOobCode);
+    const { toast } = useToast();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,6 +94,11 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
         try {
             await sendPasswordResetEmail(auth, email);
             setView('forgot-password-submitted');
+            toast({
+              variant: 'success',
+              title: t.forgotPassword.submittedTitle,
+              description: t.forgotPassword.resetLinkSent.replace('{email}', email),
+            });
         } catch (error) {
             onAuthError(error);
         } finally {
@@ -212,7 +217,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
             case 'forgot-password-submitted':
                  return (
                     <div className="text-center space-y-4">
-                        <p className="text-gray-300">{t.forgotPassword.resetLinkSent.replace('{email}', email)}</p>
+                        <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
                         <Button variant="link" className="p-0 h-auto text-sm text-blue-400 hover:text-blue-300" onClick={() => setView('login')}>
                             Back to Login
                         </Button>

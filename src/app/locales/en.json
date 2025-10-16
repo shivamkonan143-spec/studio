@@ -132,7 +132,7 @@
         "submittedTitle": "Check Your Inbox",
         "submittedDescription": "We've sent a password reset link to",
         "checkEmailToast": "Check your email",
-        "resetLinkSent": "A password reset link has been sent to {email}.",
+        "resetLinkSent": "A password reset link has been sent to {email}. Please check your spam folder.",
         "failedToast": "Reset Failed",
         "successTitle": "Password Reset Successful",
         "successDescription": "You can now log in with your new password.",
