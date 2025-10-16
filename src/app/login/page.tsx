@@ -355,13 +355,13 @@ export default function LoginPage() {
                     </Link>
                 </Button>
             </div>
-            <Tabs defaultValue="login" className="w-full max-w-md">
+            <Tabs defaultValue="register" className="w-full max-w-md">
                 <Card>
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl">{t.header.myAccount}</CardTitle>
                         <TabsList className="grid w-full grid-cols-2 mt-4">
-                            <TabsTrigger value="login">{t.header.login}</TabsTrigger>
                             <TabsTrigger value="register">{t.header.register}</TabsTrigger>
+                            <TabsTrigger value="login">{t.header.login}</TabsTrigger>
                         </TabsList>
                     </CardHeader>
 
