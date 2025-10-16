@@ -374,7 +374,7 @@ function AuthPage() {
             <AuthForm 
                 onAuthSuccess={handleAuthSuccess}
                 onAuthError={handleAuthError}
-                initialView={mode === 'resetPassword' ? 'reset-password' : 'register'}
+                initialView={mode === 'resetPassword' ? 'reset-password' : 'login'}
                 oobCode={oobCode}
             />
         </div>
