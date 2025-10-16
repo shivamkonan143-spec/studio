@@ -16,7 +16,7 @@ export function SocialLinks() {
           </Link>
         </Button>
         <Button variant="outline" size="icon" asChild>
-          <Link href="https://www.youtube.com/@techythief" target="_blank" aria-label="YouTube">
+          <Link href="https://youtube.com/@onlyp4x" target="_blank" aria-label="YouTube">
             <Youtube className="h-5 w-5" />
           </Link>
         </Button>
