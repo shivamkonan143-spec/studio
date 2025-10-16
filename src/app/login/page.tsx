@@ -157,7 +157,7 @@ function LoginView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
 
             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-                Google
+                Sign in with Google
             </Button>
         </CardContent>
     );
@@ -256,7 +256,7 @@ function SignupView({ onAuthSuccess }: { onAuthSuccess: () => void }) {
 
             <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isLoading}>
                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-4 w-4" />}
-                Google
+                Sign up with Google
             </Button>
         </CardContent>
     );
@@ -387,3 +387,5 @@ export default function LoginPage() {
         </div>
     );
 }
+
+    
