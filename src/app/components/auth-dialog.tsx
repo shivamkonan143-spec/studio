@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, Mail } from 'lucide-react';
-import { AuthError, sendPasswordResetEmail } from 'firebase/auth';
+import { AuthError, sendPasswordResetEmail, getRedirectResult } from 'firebase/auth';
 import { DialogTitle } from '@radix-ui/react-dialog';
 
 import { Button } from '@/components/ui/button';
@@ -16,11 +16,12 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormMessage, FormItem, FormLabel } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn, initiateEmailSignUp } from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn, initiateEmailSignUp, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useAuthModal } from '@/app/context/auth-modal-context';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
+import { Separator } from '@/components/ui/separator';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -39,6 +40,7 @@ const forgotPasswordSchema = z.object({
 function LoginView() {
   const { setView, closeModal } = useAuthModal();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const { locale } = useLanguage();
   const t = translations[locale];
   
@@ -71,7 +73,26 @@ function LoginView() {
     });
 
     setIsLoading(false);
+    setIsGoogleLoading(false);
   };
+  
+  // Effect to handle redirect result from Google sign-in
+  useEffect(() => {
+    if (!auth) return;
+    setIsGoogleLoading(true);
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          handleAuthSuccess();
+        }
+      })
+      .catch((error) => {
+        handleAuthError(error);
+      })
+      .finally(() => {
+        setIsGoogleLoading(false);
+      });
+  }, [auth]);
 
   const onSubmit = (values: z.infer<typeof loginSchema>) => {
     if (!auth) return;
@@ -83,6 +104,12 @@ function LoginView() {
         handleAuthError(error);
       }
     });
+  };
+
+  const handleGoogleSignIn = () => {
+    if (!auth) return;
+    setIsGoogleLoading(true);
+    initiateGoogleSignIn(auth);
   };
   
   return (
@@ -130,11 +157,31 @@ function LoginView() {
                     </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                     {isLoading ? <Loader2 className="animate-spin" /> : t.login.button}
                 </Button>
                 </form>
             </Form>
+          
+            <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                        Or continue with
+                    </span>
+                </div>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+                {isGoogleLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                    <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 261.8 0 120.5 109.8 11.8 244 11.8c70.3 0 129.8 27.8 174.4 72.4l-66 66C314.5 118.8 282.8 103 244 103c-83.6 0-152.2 68.2-152.2 158.8s68.6 158.8 152.2 158.8c99.3 0 133-64.2 137.5-98.3H244v-75.1h236.4c2.5 12.8 3.6 26.4 3.6 40.9z"></path></svg>
+                )}
+                Sign in with Google
+            </p>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {t.login.noAccount}{' '}
@@ -150,6 +197,7 @@ function LoginView() {
 function SignupView() {
     const { setView, closeModal } = useAuthModal();
     const [isLoading, setIsLoading] = useState(false);
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
     
@@ -175,7 +223,27 @@ function SignupView() {
             description: error.code === 'auth/email-already-in-use' ? t.register.emailInUse : (error.message || 'An unexpected error occurred.'),
         });
         setIsLoading(false);
+        setIsGoogleLoading(false);
     };
+    
+    // Effect to handle redirect result from Google sign-in
+    useEffect(() => {
+        if (!auth) return;
+        setIsGoogleLoading(true);
+        getRedirectResult(auth)
+          .then((result) => {
+            if (result) {
+              handleAuthSuccess();
+            }
+          })
+          .catch((error) => {
+            handleAuthError(error);
+          })
+          .finally(() => {
+            setIsGoogleLoading(false);
+          });
+      }, [auth]);
+
 
     const onEmailSubmit = (values: z.infer<typeof signupSchema>) => {
         if (!auth) return;
@@ -187,6 +255,12 @@ function SignupView() {
                 handleAuthError(error);
             }
         });
+    };
+
+    const handleGoogleSignIn = () => {
+        if (!auth) return;
+        setIsGoogleLoading(true);
+        initiateGoogleSignIn(auth);
     };
 
     return (
@@ -224,11 +298,31 @@ function SignupView() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
+                        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                             {isLoading ? <Loader2 className="animate-spin" /> : t.register.button}
                         </Button>
                     </form>
                 </Form>
+                
+                <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                            Or continue with
+                        </span>
+                    </div>
+                </div>
+
+                <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+                    {isGoogleLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <svg className="mr-2 h-4 w-4" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 109.8 512 0 402.2 0 261.8 0 120.5 109.8 11.8 244 11.8c70.3 0 129.8 27.8 174.4 72.4l-66 66C314.5 118.8 282.8 103 244 103c-83.6 0-152.2 68.2-152.2 158.8s68.6 158.8 152.2 158.8c99.3 0 133-64.2 137.5-98.3H244v-75.1h236.4c2.5 12.8 3.6 26.4 3.6 40.9z"></path></svg>
+                    )}
+                    Sign up with Google
+                </Button>
 
                 <p className="mt-4 text-center text-sm text-muted-foreground">
                     {t.register.haveAccount}{' '}
