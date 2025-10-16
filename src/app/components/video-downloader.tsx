@@ -350,11 +350,58 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
   }
   
   const handleCopyTitle = () => {
-    navigator.clipboard.writeText(videoTitle);
-    toast({
-        title: t.videoDownloader.titleCopied,
-    });
-  }
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(videoTitle)
+            .then(() => {
+                toast({ title: t.videoDownloader.titleCopied });
+            })
+            .catch(err => {
+                console.warn('Clipboard API failed, falling back.', err);
+                fallbackCopyTextToClipboard(videoTitle);
+            });
+    } else {
+        fallbackCopyTextToClipboard(videoTitle);
+    }
+  };
+
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Make the textarea invisible
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.width = "2em";
+    textArea.style.height = "2em";
+    textArea.style.padding = "0";
+    textArea.style.border = "none";
+    textArea.style.outline = "none";
+    textArea.style.boxShadow = "none";
+    textArea.style.background = "transparent";
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            toast({ title: t.videoDownloader.titleCopied });
+        } else {
+            throw new Error('Copy command failed');
+        }
+    } catch (err) {
+        console.error('Fallback copy failed', err);
+        toast({
+            variant: 'destructive',
+            title: t.common.error,
+            description: 'Could not copy text.',
+        });
+    }
+
+    document.body.removeChild(textArea);
+  };
 
   const triggerDownload = (blob: Blob, fileName: string) => {
     const downloadUrl = window.URL.createObjectURL(blob);
@@ -639,6 +686,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
 
     
+
 
 
 
