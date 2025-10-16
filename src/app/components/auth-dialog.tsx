@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,16 +16,16 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import {
-  getAuth,
   sendPasswordResetEmail,
   GoogleAuthProvider,
   signInWithPopup,
   AuthError,
   User,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '@/firebase/config';
 import { Loader2 } from 'lucide-react';
-import { useAuth } from '@/firebase/provider';
 
 type View = 'login' | 'signup' | 'forgot-password';
 
@@ -102,8 +101,6 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { signIn } = useAuth();
-
 
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -116,7 +113,7 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
 
     const handleAuthError = useCallback((error: any) => {
         setIsLoading(false);
-        const errorCode = error.code || (error.isGenkitError ? error.data?.code : 'unknown');
+        const errorCode = error.code || 'unknown';
         toast({
             variant: 'destructive',
             title: t.login.failedTitle,
@@ -128,7 +125,7 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const userCredential = await signIn(email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
             handleAuthSuccess(userCredential.user);
         } catch (error) {
             handleAuthError(error);
@@ -208,7 +205,6 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { signUp } = useAuth();
     
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -221,7 +217,7 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
     
     const handleAuthError = useCallback((error: any) => {
         setIsLoading(false);
-        const errorCode = error.code || (error.isGenkitError ? error.data?.code : 'unknown');
+        const errorCode = error.code || 'unknown';
         toast({
             variant: 'destructive',
             title: t.register.failedTitle,
@@ -233,7 +229,7 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const userCredential = await signUp(email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             handleAuthSuccess(userCredential.user);
         } catch (error) {
             handleAuthError(error);
@@ -380,5 +376,4 @@ function ForgotPasswordView({ setView }: ViewProps) {
         </>
     );
 }
-
     
