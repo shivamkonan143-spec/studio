@@ -16,25 +16,15 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormMessage, FormItem, FormLabel } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn, initiateEmailSignUp, initiateGoogleSignIn, initiatePhoneSignIn, verifyOtp } from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn, initiateEmailSignUp, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import { useAuthModal } from '@/app/context/auth-modal-context';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
-});
-
-const phoneLoginSchema = z.object({
-    phone: z.string().min(10, { message: 'Please enter a valid phone number.' }),
-});
-
-const otpSchema = z.object({
-    otp: z.string().length(6, { message: 'OTP must be 6 digits.' }),
 });
 
 const signupSchema = z.object({
@@ -46,134 +36,6 @@ const forgotPasswordSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
 });
 
-
-function PhoneAuthForm({ isLogin }: { isLogin: boolean }) {
-    const [isLoading, setIsLoading] = useState(false);
-    const [otpSent, setOtpSent] = useState(false);
-    const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-    const auth = useAuth();
-    const { toast } = useToast();
-    const { closeModal } = useAuthModal();
-    const router = useRouter();
-
-    const phoneForm = useForm<z.infer<typeof phoneLoginSchema>>({
-        resolver: zodResolver(phoneLoginSchema),
-        defaultValues: { phone: '' },
-    });
-
-    const otpForm = useForm<z.infer<typeof otpSchema>>({
-        resolver: zodResolver(otpSchema),
-        defaultValues: { otp: '' },
-    });
-
-    useEffect(() => {
-        if (!auth) return;
-        
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          'size': 'invisible',
-          'callback': (response: any) => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-          }
-        });
-
-        return () => {
-            window.recaptchaVerifier?.clear();
-        }
-    }, [auth]);
-
-
-    const handlePhoneSubmit = (values: z.infer<typeof phoneLoginSchema>) => {
-        if (!auth || !window.recaptchaVerifier) return;
-        setIsLoading(true);
-        // Format phone number to E.164 format
-        const phoneNumber = `+${values.phone.replace(/\D/g, '')}`;
-        initiatePhoneSignIn(auth, phoneNumber, window.recaptchaVerifier, (result, error) => {
-            setIsLoading(false);
-            if (result) {
-                setConfirmationResult(result);
-                setOtpSent(true);
-                toast({ title: "OTP Sent", description: "An OTP has been sent to your phone number." });
-            } else if (error) {
-                toast({ variant: 'destructive', title: "Error", description: error.message });
-            }
-        });
-    };
-
-    const handleOtpSubmit = (values: z.infer<typeof otpSchema>) => {
-        if (!confirmationResult) return;
-        setIsLoading(true);
-        verifyOtp(confirmationResult, values.otp, (user, error) => {
-            setIsLoading(false);
-            if (user) {
-                toast({ variant: 'success', title: "Login Successful", description: "Welcome!" });
-                closeModal();
-                router.refresh();
-            } else if (error) {
-                toast({ variant: 'destructive', title: "Verification Failed", description: "Invalid OTP. Please try again." });
-            }
-        });
-    };
-
-    return (
-        <div>
-            {!otpSent ? (
-                <Form {...phoneForm}>
-                    <form onSubmit={phoneForm.handleSubmit(handlePhoneSubmit)} className="space-y-4">
-                        <FormField
-                            control={phoneForm.control}
-                            name="phone"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Phone Number</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="e.g., 911234567890" {...field} className="pl-10" />
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="animate-spin" /> : "Send OTP"}
-                        </Button>
-                    </form>
-                </Form>
-            ) : (
-                <Form {...otpForm}>
-                    <form onSubmit={otpForm.handleSubmit(handleOtpSubmit)} className="space-y-4">
-                         <FormField
-                            control={otpForm.control}
-                            name="otp"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Enter OTP</FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                            <Input placeholder="6-digit OTP" {...field} className="pl-10" />
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <div className="flex gap-2">
-                             <Button variant="outline" className="w-full" onClick={() => setOtpSent(false)} disabled={isLoading}>
-                                Back
-                            </Button>
-                            <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? <Loader2 className="animate-spin" /> : "Verify OTP"}
-                            </Button>
-                        </div>
-                    </form>
-                </Form>
-            )}
-            <div id="recaptcha-container" className="mt-4"></div>
-        </div>
-    )
-}
 
 function LoginView() {
   const { setView, closeModal } = useAuthModal();
@@ -259,62 +121,49 @@ function LoginView() {
           <CardDescription>{t.login.description}</CardDescription>
         </CardHeader>
         <CardContent>
-            <Tabs defaultValue="email" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="email">Email</TabsTrigger>
-                    <TabsTrigger value="phone">Phone</TabsTrigger>
-                </TabsList>
-                <TabsContent value="email">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{t.login.emailLabel}</FormLabel>
-                                <FormControl>
-                                <Input placeholder={t.login.emailPlaceholder} {...field} autoFocus={false} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                            <FormItem>
-                                <div className="flex items-center justify-between">
-                                    <FormLabel>{t.login.passwordLabel}</FormLabel>
-                                    <Button
-                                        type="button"
-                                        variant="link"
-                                        className="p-0 h-auto text-sm font-medium text-primary hover:underline"
-                                        onClick={() => setView('forgot_password')}
-                                    >
-                                        {t.login.forgotPassword}
-                                    </Button>
-                                </div>
-                                <FormControl>
-                                <Input type="password" placeholder={t.login.passwordPlaceholder} {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                            {isLoading ? <Loader2 className="animate-spin" /> : t.login.button}
-                        </Button>
-                        </form>
-                    </Form>
-                </TabsContent>
-                <TabsContent value="phone">
-                   <div className="pt-4">
-                    <PhoneAuthForm isLogin={true} />
-                   </div>
-                </TabsContent>
-            </Tabs>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{t.login.emailLabel}</FormLabel>
+                        <FormControl>
+                        <Input placeholder="name@example.com" {...field} autoFocus />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                    <FormItem>
+                        <div className="flex items-center justify-between">
+                            <FormLabel>{t.login.passwordLabel}</FormLabel>
+                            <Button
+                                type="button"
+                                variant="link"
+                                className="p-0 h-auto text-sm font-medium text-primary hover:underline"
+                                onClick={() => setView('forgot_password')}
+                            >
+                                {t.login.forgotPassword}
+                            </Button>
+                        </div>
+                        <FormControl>
+                        <Input type="password" placeholder={t.login.passwordPlaceholder} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+                    {isLoading ? <Loader2 className="animate-spin" /> : t.login.button}
+                </Button>
+                </form>
+            </Form>
           
             <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
@@ -425,52 +274,39 @@ function SignupView() {
                 <CardDescription>{t.register.description}</CardDescription>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="email" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="email">Email</TabsTrigger>
-                        <TabsTrigger value="phone">Phone</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="email">
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onEmailSubmit)} className="space-y-4 mt-4">
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t.register.emailLabel}</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder={t.register.emailPlaceholder} {...field} autoFocus={false}/>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>{t.register.passwordLabel}</FormLabel>
-                                            <FormControl>
-                                                <Input type="password" placeholder={t.register.passwordPlaceholder} {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
-                                    {isLoading ? <Loader2 className="animate-spin" /> : t.register.button}
-                                </Button>
-                            </form>
-                        </Form>
-                    </TabsContent>
-                    <TabsContent value="phone">
-                        <div className="pt-4">
-                          <PhoneAuthForm isLogin={false} />
-                        </div>
-                    </TabsContent>
-                </Tabs>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onEmailSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t.register.emailLabel}</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="name@example.com" {...field} autoFocus />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t.register.passwordLabel}</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" placeholder={t.register.passwordPlaceholder} {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
+                            {isLoading ? <Loader2 className="animate-spin" /> : t.register.button}
+                        </Button>
+                    </form>
+                </Form>
                 
                 <div className="relative my-4">
                     <div className="absolute inset-0 flex items-center">
@@ -595,14 +431,8 @@ function ForgotPasswordView() {
     );
 }
 
-declare global {
-    interface Window {
-        recaptchaVerifier?: RecaptchaVerifier;
-    }
-}
-
 export function AuthDialog() {
-  const { isOpen, view, closeModal, setView } = useAuthModal();
+  const { isOpen, view, closeModal } = useAuthModal();
   const { user, isUserLoading } = useUser();
 
   // Close the modal if the user logs in successfully
