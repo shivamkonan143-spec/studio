@@ -120,16 +120,23 @@
     },
     "forgotPassword": {
         "title": "Forgot Password",
+        "resetTitle": "Reset Password",
         "description": "Enter your email to receive a password reset link.",
         "descriptionSubmitted": "You can close this page now.",
         "emailLabel": "Email",
         "emailPlaceholder": "Gmail",
         "button": "Send Reset Link",
+        "resetButton": "Reset Password",
+        "newPasswordLabel": "New Password",
+        "newPasswordPlaceholder": "Enter your new password",
         "submittedTitle": "Check Your Inbox",
         "submittedDescription": "We've sent a password reset link to",
         "checkEmailToast": "Check your email",
         "resetLinkSent": "A password reset link has been sent to {email}.",
-        "failedToast": "Reset Failed"
+        "failedToast": "Reset Failed",
+        "successTitle": "Password Reset Successful",
+        "successDescription": "You can now log in with your new password.",
+        "invalidCode": "Invalid or expired password reset code. Please try again."
     },
     "ad": {
         "placeholder": "Advertisement"

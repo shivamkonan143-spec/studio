@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
@@ -11,6 +12,7 @@ import {
   User,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  confirmPasswordReset,
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
 import { useLanguage } from '@/app/context/language-context';
@@ -23,7 +25,7 @@ import { Loader2, ArrowLeft, Eye, EyeOff, Mail, Lock, User as UserIcon } from 'l
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 
-type View = 'login' | 'register' | 'forgot-password' | 'forgot-password-submitted';
+type View = 'login' | 'register' | 'forgot-password' | 'forgot-password-submitted' | 'reset-password';
 
 const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
     const t = translations[locale];
@@ -41,21 +43,24 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
             return 'Sign-in was cancelled. Please try again.';
         case 'auth/unauthorized-domain':
              return 'This domain is not authorized for authentication. Please contact support.';
+        case 'auth/invalid-action-code':
+            return t.forgotPassword.invalidCode;
         default:
             return `An unexpected error occurred. Please try again. (${errorCode})`;
     }
 };
 
 
-function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) => void, onAuthError: (error: any) => void }) {
+function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: initialOobCode }: { onAuthSuccess: (user: User) => void, onAuthError: (error: any) => void, initialView?: View, oobCode?: string | null }) {
     const { locale } = useLanguage();
     const t = translations[locale];
     const auth = useAuth();
-    const [view, setView] = useState<View>('login');
+    const [view, setView] = useState<View>(initialOobCode ? 'reset-password' : initialView);
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [oobCode, setOobCode] = useState(initialOobCode);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,7 +88,7 @@ function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) 
         }
     };
 
-    const handlePasswordReset = async (e: React.FormEvent) => {
+    const handlePasswordResetRequest = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         try {
@@ -96,11 +101,30 @@ function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) 
         }
     };
 
+    const handlePasswordReset = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!oobCode) {
+            onAuthError({ code: 'auth/missing-action-code' });
+            return;
+        }
+        setIsLoading(true);
+        try {
+            await confirmPasswordReset(auth, oobCode, password);
+            onAuthSuccess(null as any); // Special case for password reset success
+        } catch (error) {
+            onAuthError(error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+
     const currentTitle = {
         login: t.login.title,
         register: t.register.title,
         'forgot-password': t.forgotPassword.title,
         'forgot-password-submitted': t.forgotPassword.submittedTitle,
+        'reset-password': t.forgotPassword.resetTitle,
     }[view];
 
 
@@ -167,7 +191,7 @@ function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) 
                 );
             case 'forgot-password':
                 return (
-                     <form onSubmit={handlePasswordReset} className="space-y-6">
+                     <form onSubmit={handlePasswordResetRequest} className="space-y-6">
                         <p className="text-center text-sm text-gray-300">
                             {t.forgotPassword.description}
                         </p>
@@ -193,6 +217,29 @@ function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) 
                             Back to Login
                         </Button>
                     </div>
+                );
+            case 'reset-password':
+                return (
+                    <form onSubmit={handlePasswordReset} className="space-y-6">
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <Input 
+                                id="new-password" 
+                                type={showPassword ? "text" : "password"} 
+                                placeholder={t.forgotPassword.newPasswordPlaceholder}
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-purple-500 transition" 
+                            />
+                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
+                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            </Button>
+                        </div>
+                        <Button type="submit" className="w-full font-bold bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600" disabled={isLoading}>
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.forgotPassword.resetButton}
+                        </Button>
+                    </form>
                 );
         }
     }
@@ -220,7 +267,21 @@ function AuthPage() {
     const { toast } = useToast();
     const [isRedirecting, setIsRedirecting] = useState(true);
 
-    const handleAuthSuccess = useCallback((user: User) => {
+    const mode = searchParams.get('mode');
+    const oobCode = searchParams.get('oobCode');
+
+    const handleAuthSuccess = useCallback((user: User | null) => {
+        // Special handling for password reset success
+        if (user === null) {
+             toast({
+                variant: 'success',
+                title: t.forgotPassword.successTitle,
+                description: t.forgotPassword.successDescription,
+            });
+            router.replace('/login');
+            return;
+        }
+
         toast({
             variant: 'success',
             title: t.login.successTitle,
@@ -245,19 +306,24 @@ function AuthPage() {
             setIsRedirecting(false);
             return;
         }
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result) {
-                    handleAuthSuccess(result.user);
-                } else {
-                     setIsRedirecting(false);
-                }
-            })
-            .catch((error) => {
-                handleAuthError(error);
-                setIsRedirecting(false);
-            });
-    }, [auth, handleAuthSuccess, handleAuthError]);
+        // Only process redirect result if not in password reset mode
+        if (mode !== 'resetPassword') {
+            getRedirectResult(auth)
+                .then((result) => {
+                    if (result) {
+                        handleAuthSuccess(result.user);
+                    } else {
+                        setIsRedirecting(false);
+                    }
+                })
+                .catch((error) => {
+                    handleAuthError(error);
+                    setIsRedirecting(false);
+                });
+        } else {
+            setIsRedirecting(false);
+        }
+    }, [auth, handleAuthSuccess, handleAuthError, mode]);
     
 
     useEffect(() => {
@@ -267,8 +333,16 @@ function AuthPage() {
         }
     }, [user, isUserLoading, router, searchParams, isRedirecting]);
 
-    if (isUserLoading || user || isRedirecting) {
+    if (isUserLoading || isRedirecting) {
         return (
+            <div className="flex min-h-screen w-full items-center justify-center login-background">
+                <Loader2 className="h-8 w-8 animate-spin text-white" />
+            </div>
+        );
+    }
+
+    if (user) {
+         return (
             <div className="flex min-h-screen w-full items-center justify-center login-background">
                 <Loader2 className="h-8 w-8 animate-spin text-white" />
             </div>
@@ -288,6 +362,8 @@ function AuthPage() {
             <AuthForm 
                 onAuthSuccess={handleAuthSuccess}
                 onAuthError={handleAuthError}
+                initialView={mode === 'resetPassword' ? 'reset-password' : 'login'}
+                oobCode={oobCode}
             />
         </div>
     );
@@ -301,5 +377,3 @@ export default function LoginPage() {
     // However, this structure provides the `useAuth` hook with the necessary context.
     return <AuthPage />;
 }
-
-    

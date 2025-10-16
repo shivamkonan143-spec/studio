@@ -120,16 +120,23 @@
     },
     "forgotPassword": {
         "title": "पासवर्ड भूल गए",
+        "resetTitle": "पासवर्ड रीसेट करें",
         "description": "पासवर्ड रीसेट लिंक प्राप्त करने के लिए अपना ईमेल दर्ज करें।",
         "descriptionSubmitted": "अब आप यह पेज बंद कर सकते हैं।",
         "emailLabel": "ईमेल",
         "emailPlaceholder": "Gmail",
         "button": "रीसेट लिंक भेजें",
+        "resetButton": "पासवर्ड रीसेट करें",
+        "newPasswordLabel": "नया पासवर्ड",
+        "newPasswordPlaceholder": "अपना नया पासवर्ड दर्ज करें",
         "submittedTitle": "अपना इनबॉक्स जांचें",
         "submittedDescription": "हमने एक पासवर्ड रीसेट लिंक भेजा है",
         "checkEmailToast": "अपना ईमेल जांचें",
         "resetLinkSent": "{email} पर एक पासवर्ड रीसेट लिंक भेजा गया है।",
-        "failedToast": "रीसेट विफल"
+        "failedToast": "रीसेट विफल",
+        "successTitle": "पासवर्ड रीसेट सफल",
+        "successDescription": "अब आप अपने नए पासवर्ड से लॉग इन कर सकते हैं।",
+        "invalidCode": "अमान्य या समाप्त हो चुका पासवर्ड रीसेट कोड। कृपया पुनः प्रयास करें।"
     },
     "ad": {
         "placeholder": "विज्ञापन"
