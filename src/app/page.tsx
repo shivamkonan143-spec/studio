@@ -9,7 +9,8 @@ import { SubscriptionCard } from '@/app/components/subscription-card';
 import { SocialLinks } from '@/app/components/social-links';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageToQr } from '@/app/components/image-to-qr';
-import { QrCode, Youtube } from 'lucide-react';
+import { ImageCompressor } from '@/app/components/image-compressor';
+import { QrCode, Youtube, Shrink } from 'lucide-react';
 
 function HomeComponent() {
   const searchParams = useSearchParams();
@@ -38,14 +39,18 @@ function HomeComponent() {
       <Header />
       <div className="w-full max-w-2xl space-y-6">
         <Tabs defaultValue="thumbnail" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="thumbnail">
               <Youtube className="mr-2 h-4 w-4" />
-              Thumbnail Downloader
+              Thumbnail
             </TabsTrigger>
             <TabsTrigger value="image-qr">
                <QrCode className="mr-2 h-4 w-4" />
               Image to QR
+            </TabsTrigger>
+            <TabsTrigger value="image-compressor">
+               <Shrink className="mr-2 h-4 w-4" />
+              Compressor
             </TabsTrigger>
           </TabsList>
           <TabsContent value="thumbnail" className="mt-6">
@@ -62,6 +67,9 @@ function HomeComponent() {
           </TabsContent>
           <TabsContent value="image-qr" className="mt-6">
             <ImageToQr />
+          </TabsContent>
+          <TabsContent value="image-compressor" className="mt-6">
+            <ImageCompressor />
           </TabsContent>
         </Tabs>
 
