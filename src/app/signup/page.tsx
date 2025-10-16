@@ -15,7 +15,7 @@ import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { useEffect, useState } from 'react';
 import { Loader2, X } from 'lucide-react';
-import { AuthError } from 'firebase/auth';
+import { AuthError, getRedirectResult } from 'firebase/auth';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 
@@ -69,24 +69,18 @@ export default function SignUpPage() {
         defaultValues: { email: '', password: '' },
     });
 
-  useEffect(() => {
-    if (!isUserLoading && user) {
-      router.push('/');
-    }
-  }, [user, isUserLoading, router]);
-
   const handleAuthSuccess = () => {
     toast({ title: t.register.successTitle, description: t.register.successDescription });
     router.push('/');
   };
 
-  const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
+  const handleAuthError = (error: AuthError, provider: 'email' | 'google' | 'redirect') => {
     let title = t.register.failedTitle;
     let description = 'An unexpected error occurred. Please try again.';
 
     if (provider === 'email') {
         description = t.register.emailInUse;
-    } else if (provider === 'google') {
+    } else if (provider === 'google' || provider === 'redirect') {
         title = t.login.googleFailed;
         description = 'Could not sign in with Google. Please try again.';
     }
@@ -100,6 +94,26 @@ export default function SignUpPage() {
     setIsLoading(false);
     setIsGoogleLoading(false);
   };
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      router.push('/');
+    }
+  }, [user, isUserLoading, router]);
+
+  useEffect(() => {
+    if (!auth || isUserLoading || user) return;
+    
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          handleAuthSuccess();
+        }
+      })
+      .catch((error) => {
+        handleAuthError(error, 'redirect');
+      });
+  }, [auth, isUserLoading, user]);
 
   const onEmailSubmit = (values: z.infer<typeof formSchema>) => {
     if (!auth) return;
@@ -116,13 +130,7 @@ export default function SignUpPage() {
   const handleGoogleSignIn = () => {
     if (!auth) return;
     setIsGoogleLoading(true);
-    initiateGoogleSignIn(auth, (user, error) => {
-        if (user) {
-            handleAuthSuccess();
-        } else if (error) {
-            handleAuthError(error, 'google');
-        }
-    });
+    initiateGoogleSignIn(auth);
   };
 
   if (isUserLoading || (!isUserLoading && user)) {
@@ -207,3 +215,5 @@ export default function SignUpPage() {
     </main>
   );
 }
+
+    

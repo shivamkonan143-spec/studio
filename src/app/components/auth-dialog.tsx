@@ -249,13 +249,13 @@ function SignupView() {
         router.refresh();
     };
 
-    const handleAuthError = (error: AuthError, provider: 'email' | 'google') => {
+    const handleAuthError = (error: AuthError, provider: 'email' | 'google' | 'redirect') => {
         let title = t.register.failedTitle;
         let description = 'An unexpected error occurred. Please try again.';
 
         if (provider === 'email') {
             description = t.register.emailInUse;
-        } else if (provider === 'google') {
+        } else if (provider === 'google' || provider === 'redirect') {
             title = t.login.googleFailed;
             description = 'Could not sign in with Google. Please try again.';
         }
@@ -269,6 +269,20 @@ function SignupView() {
         setIsLoading(false);
         setIsGoogleLoading(false);
     };
+
+    useEffect(() => {
+        if (!auth) return;
+        
+        getRedirectResult(auth)
+          .then((result) => {
+            if (result) {
+              handleAuthSuccess();
+            }
+          })
+          .catch((error) => {
+            handleAuthError(error, 'redirect');
+          });
+    }, [auth]);
 
     const onEmailSubmit = (values: z.infer<typeof signupSchema>) => {
         if (!auth) return;
@@ -475,3 +489,5 @@ export function AuthDialog() {
     </Dialog>
   );
 }
+
+    
