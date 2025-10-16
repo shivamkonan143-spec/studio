@@ -12,13 +12,18 @@ import {
   onAuthStateChanged,
   User,
   signOut as firebaseSignOut,
+  UserCredential,
 } from 'firebase/auth';
 import { auth } from './config';
+import { signIn as genkitSignIn, signUp as genkitSignUp } from '@genkit-ai/next/auth';
+
 
 interface FirebaseAuthContextType {
   user: User | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<UserCredential>;
+  signUp: (email: string, password: string) => Promise<UserCredential>;
 }
 
 const FirebaseAuthContext = createContext<FirebaseAuthContextType | undefined>(
@@ -50,8 +55,16 @@ export const FirebaseClientProvider = ({
     }
   };
 
+  const signIn = async (email: string, password: string): Promise<UserCredential> => {
+    return await genkitSignIn(email, password);
+  };
+
+  const signUp = async (email: string, password: string): Promise<UserCredential> => {
+    return await genkitSignUp(email, password);
+  };
+
   return (
-    <FirebaseAuthContext.Provider value={{ user, isLoading, signOut }}>
+    <FirebaseAuthContext.Provider value={{ user, isLoading, signOut, signIn, signUp }}>
       {!isLoading && children}
     </FirebaseAuthContext.Provider>
   );

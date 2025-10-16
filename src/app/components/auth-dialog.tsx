@@ -13,14 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
 import {
   getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   GoogleAuthProvider,
   signInWithPopup,
@@ -80,7 +77,8 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
     switch (errorCode) {
         case 'auth/wrong-password':
         case 'auth/user-not-found':
-            return t.login.checkCredentials;
+        case 'auth/invalid-credential':
+             return t.login.checkCredentials;
         case 'auth/email-already-in-use':
             return t.register.emailInUse;
         case 'auth/invalid-email':
@@ -104,6 +102,8 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { signIn } = useAuth();
+
 
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -114,12 +114,13 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
         onAuthSuccess?.();
     }, [onAuthSuccess, t.login.successTitle, t.login.welcomeBack, toast]);
 
-    const handleAuthError = useCallback((error: AuthError) => {
+    const handleAuthError = useCallback((error: any) => {
         setIsLoading(false);
+        const errorCode = error.code || (error.isGenkitError ? error.data?.code : 'unknown');
         toast({
             variant: 'destructive',
             title: t.login.failedTitle,
-            description: getAuthErrorMessage(error.code, locale),
+            description: getAuthErrorMessage(errorCode, locale),
         });
     }, [locale, t.login.failedTitle, toast]);
 
@@ -127,10 +128,10 @@ function LoginView({ setView, onAuthSuccess }: ViewProps) {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signIn(email, password);
             handleAuthSuccess(userCredential.user);
         } catch (error) {
-            handleAuthError(error as AuthError);
+            handleAuthError(error);
         } finally {
             setIsLoading(false);
         }
@@ -207,6 +208,7 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { signUp } = useAuth();
     
     const handleAuthSuccess = useCallback((user: User) => {
         toast({
@@ -217,12 +219,13 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
         onAuthSuccess?.();
     }, [onAuthSuccess, t.register.successTitle, t.register.successDescription, toast]);
     
-    const handleAuthError = useCallback((error: AuthError) => {
+    const handleAuthError = useCallback((error: any) => {
         setIsLoading(false);
+        const errorCode = error.code || (error.isGenkitError ? error.data?.code : 'unknown');
         toast({
             variant: 'destructive',
             title: t.register.failedTitle,
-            description: getAuthErrorMessage(error.code, locale),
+            description: getAuthErrorMessage(errorCode, locale),
         });
     }, [locale, t.register.failedTitle, toast]);
 
@@ -230,10 +233,10 @@ function SignupView({ setView, onAuthSuccess }: ViewProps) {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await signUp(email, password);
             handleAuthSuccess(userCredential.user);
         } catch (error) {
-            handleAuthError(error as AuthError);
+            handleAuthError(error);
         } finally {
             setIsLoading(false);
         }
