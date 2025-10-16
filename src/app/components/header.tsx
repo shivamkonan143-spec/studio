@@ -191,7 +191,7 @@ function AccountButton() {
   }
 
   return (
-    <Button onClick={() => router.push('/login')} variant="ghost">
+    <Button onClick={() => router.push('/login')} variant="default">
       {t.header.myAccount}
     </Button>
   )
