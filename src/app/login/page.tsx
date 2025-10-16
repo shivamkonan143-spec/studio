@@ -12,7 +12,6 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import { auth } from '@/firebase/provider';
 import { useAuth } from '@/firebase/provider';
 import { useLanguage } from '@/app/context/language-context';
 import { translations } from '@/app/locales/translations';
@@ -51,6 +50,7 @@ const getAuthErrorMessage = (errorCode: string, locale: 'en' | 'hi') => {
 function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) => void, onAuthError: (error: any) => void }) {
     const { locale } = useLanguage();
     const t = translations[locale];
+    const auth = useAuth();
     const [view, setView] = useState<View>('login');
     const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
@@ -210,8 +210,9 @@ function AuthForm({ onAuthSuccess, onAuthError }: { onAuthSuccess: (user: User) 
     )
 }
 
-export default function LoginPage() {
-    const { user, isLoading: isAuthLoading } = useAuth();
+function AuthPage() {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const { locale } = useLanguage();
@@ -256,13 +257,13 @@ export default function LoginPage() {
     
 
     useEffect(() => {
-        if (!isAuthLoading && user && !isRedirecting) {
+        if (!isUserLoading && user && !isRedirecting) {
             const redirectUrl = searchParams.get('redirect') || '/';
             router.replace(redirectUrl);
         }
-    }, [user, isAuthLoading, router, searchParams, isRedirecting]);
+    }, [user, isUserLoading, router, searchParams, isRedirecting]);
 
-    if (isAuthLoading || user || isRedirecting) {
+    if (isUserLoading || user || isRedirecting) {
         return (
             <div className="flex min-h-screen w-full items-center justify-center login-background">
                 <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -286,4 +287,13 @@ export default function LoginPage() {
             />
         </div>
     );
+}
+
+
+export default function LoginPage() {
+    // This outer component is needed to wrap the page with Firebase context if it's not already in the layout.
+    // In this case, we have a specific layout for the login page, so we can use the provider here.
+    // If your app has Firebase available globally in the root layout, you might not need this.
+    // However, this structure provides the `useAuth` hook with the necessary context.
+    return <AuthPage />;
 }
