@@ -43,7 +43,6 @@ export function ImageCompressor() {
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
         setOriginalImage(imageUrl);
-        // Initial compression is handled by the useEffect below
       };
       reader.readAsDataURL(file);
     }
@@ -95,6 +94,7 @@ export function ImageCompressor() {
     if (originalImage) {
         compressImage(originalImage, quality, imageType);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [originalImage, quality, imageType]);
 
   const handleQualityInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -232,3 +232,5 @@ export function ImageCompressor() {
     </Card>
   );
 }
+
+    
