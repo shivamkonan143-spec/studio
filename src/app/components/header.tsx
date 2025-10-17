@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone, Mail, User, ShieldCheck } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone, Mail, User, ShieldCheck, MessageCircleWarning } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -54,6 +54,72 @@ import { useAuth, useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { useSubscription } from '@/hooks/use-subscription';
+
+
+function ReportProblemDialog({ closeMenu }: { closeMenu?: () => void }) {
+  const { locale } = useLanguage();
+  const t = translations[locale];
+  const { user } = useUser();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const reportOptions = [
+    { key: 'not_downloading', label: t.reportProblem.options.not_downloading },
+    { key: 'incorrect_thumbnail', label: t.reportProblem.options.incorrect_thumbnail },
+    { key: 'slow_performance', label: t.reportProblem.options.slow_performance },
+    { key: 'feature_request', label: t.reportProblem.options.feature_request },
+    { key: 'login_issue', label: t.reportProblem.options.login_issue },
+    { key: 'other', label: t.reportProblem.options.other },
+  ];
+
+  const handleReport = (problem: string) => {
+    const subject = `Problem Report: ${problem} - Thumbnail Downloader`;
+    const body = `
+-----------------------------
+Please describe the issue in more detail below:
+
+
+-----------------------------
+App Version: 1.0.0
+User: ${user ? user.email : 'Not logged in'}
+UID: ${user ? user.uid : 'N/A'}
+Date: ${new Date().toUTCString()}
+-----------------------------
+    `;
+    const mailto = `mailto:shivamkonan143@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    setIsOpen(false);
+    closeMenu?.();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+          <MessageCircleWarning className="mr-2 h-4 w-4" />
+          <span>{t.reportProblem.title}</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t.reportProblem.dialogTitle}</DialogTitle>
+          <DialogDescription>{t.reportProblem.dialogDescription}</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col space-y-2 pt-4">
+          {reportOptions.map((option) => (
+            <Button
+              key={option.key}
+              variant="outline"
+              className="justify-start"
+              onClick={() => handleReport(option.label)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 
 function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
@@ -199,6 +265,8 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
                 </div>
             </DialogContent>
         </Dialog>
+
+        <ReportProblemDialog closeMenu={closeMenu} />
 
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
           <a href={callHref} onClick={() => closeMenu?.()}>

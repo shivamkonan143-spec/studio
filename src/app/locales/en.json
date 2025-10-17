@@ -170,6 +170,19 @@
         "successDescription": "You can now log in with your new password.",
         "invalidCode": "Invalid or expired password reset code. Please try again."
     },
+    "reportProblem": {
+        "title": "Report a Problem",
+        "dialogTitle": "Report a Problem",
+        "dialogDescription": "Please select the type of problem you are experiencing.",
+        "options": {
+            "not_downloading": "Thumbnail not downloading",
+            "incorrect_thumbnail": "Incorrect thumbnail displayed",
+            "slow_performance": "App is slow or lagging",
+            "feature_request": "Suggest a new feature",
+            "login_issue": "Problem with login/register",
+            "other": "Other issue"
+        }
+    },
     "ad": {
         "placeholder": "Advertisement"
     },
