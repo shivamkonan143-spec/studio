@@ -41,8 +41,6 @@ interface OembedResponse {
     title: string;
 }
 
-const SOCIAL_LOCK_KEY = 'social-lock-confirmed';
-
 function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean } {
   try {
     const urlObj = new URL(url);
@@ -64,62 +62,14 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
   return { id: null, isShort: false };
 }
 
-function SocialLockDialog({ isOpen, onOpenChange, onConfirm }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onConfirm: () => void }) {
-    const { locale } = useLanguage();
-    const t = translations[locale];
-
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{t.socialLock.title}</DialogTitle>
-                    <DialogDescription>{t.socialLock.description}</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <Button asChild className="w-full" variant="destructive">
-                        <a href="https://youtube.com/@onlyp4x" target="_blank" rel="noopener noreferrer">
-                            <Youtube className="mr-2 h-5 w-5" />
-                            {t.socialLock.subscribeYoutube}
-                        </a>
-                    </Button>
-                    <Button asChild className="w-full" style={{ background: 'linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)' }}>
-                        <a href="https://instagram.com/techythief" target="_blank" rel="noopener noreferrer">
-                            <Instagram className="mr-2 h-5 w-5" />
-                            {t.socialLock.followInstagram}
-                        </a>
-                    </Button>
-                </div>
-                <DialogFooter>
-                    <Button onClick={onConfirm} className="w-full">
-                        <Check className="mr-2 h-5 w-5" />
-                        {t.socialLock.confirm}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id: string, isShort: boolean) => void }) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [showAd, setShowAd] = useState(false);
-    const [isSocialLockOpen, setIsSocialLockOpen] = useState(false);
-    const [isSocialLockConfirmed, setIsSocialLockConfirmed] = useState(true);
     const { locale } = useLanguage();
     const t = translations[locale];
     const { toast } = useToast();
     
-    useEffect(() => {
-        try {
-            const confirmed = localStorage.getItem(SOCIAL_LOCK_KEY) === 'true';
-            setIsSocialLockConfirmed(confirmed);
-        } catch (error) {
-            console.error('Could not read from local storage', error);
-            setIsSocialLockConfirmed(true); // Default to confirmed if LS is unavailable
-        }
-    }, []);
-
-    const proceedWithGetThumbnail = (values: z.infer<typeof formSchema>) => {
+    const onSubmit = (values: z.infer<typeof formSchema>) => {
       setShowAd(true);
       setIsGenerating(true);
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
@@ -134,26 +84,6 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
         });
       }
       setIsGenerating(false);
-    };
-
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        if (!isSocialLockConfirmed) {
-            setIsSocialLockOpen(true);
-            return;
-        }
-        proceedWithGetThumbnail(values);
-    };
-
-    const handleSocialLockConfirm = () => {
-        try {
-            localStorage.setItem(SOCIAL_LOCK_KEY, 'true');
-        } catch (error) {
-            console.error('Could not write to local storage', error);
-        }
-        setIsSocialLockConfirmed(true);
-        setIsSocialLockOpen(false);
-        // Automatically submit the form after confirmation
-        form.handleSubmit(proceedWithGetThumbnail)();
     };
   
     const form = useForm<z.infer<typeof formSchema>>({
@@ -215,11 +145,6 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                      <AdPlaceholder showAd={showAd} />
                 </CardContent>
             </Card>
-            <SocialLockDialog 
-                isOpen={isSocialLockOpen} 
-                onOpenChange={setIsSocialLockOpen}
-                onConfirm={handleSocialLockConfirm}
-            />
         </>
     );
 }
