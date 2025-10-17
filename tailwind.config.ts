@@ -86,7 +86,7 @@ export default {
         'fade-in-up': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(10px)',
+            transform: 'translateY(24px)',
           },
           '100%': {
             opacity: '1',
@@ -110,7 +110,7 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
+        'fade-in-up': 'fade-in-up 0.8s cubic-bezier(0.32, 0.72, 0, 1) forwards',
         'pull-in-from-left': 'pull-in-from-left 0.5s ease-out',
         'pull-hand': 'pull-hand 0.6s ease-out forwards',
       },

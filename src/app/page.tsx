@@ -33,7 +33,7 @@ function HomeComponent() {
   };
 
   return (
-    <main className="flex min-h-screen w-full flex-col items-center bg-background px-4 pb-12 unroll-down">
+    <main className="flex min-h-screen w-full flex-col items-center bg-background px-4 pb-12 animate-fade-in-up">
       <Header />
       <div className="w-full max-w-2xl space-y-8">
         <div className="space-y-8">
