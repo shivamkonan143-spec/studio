@@ -341,7 +341,7 @@ function AccountButton() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 rounded-full">
-            <Avatar className="h-8 w-8">
+            <Avatar className="h-8 w-8 border-2 border-green-500">
               <AvatarImage src={user.photoURL || ''} alt={user.displayName || user.email || 'User'} />
               <AvatarFallback>{user.email ? user.email.charAt(0).toUpperCase() : <UserIcon />}</AvatarFallback>
             </Avatar>
