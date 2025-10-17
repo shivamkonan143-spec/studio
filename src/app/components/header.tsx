@@ -318,7 +318,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 }
 
 function AccountButton() {
-  const { user, isUserLoading } = useUser();
+  const { user } = useUser();
   const auth = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
@@ -329,10 +329,6 @@ function AccountButton() {
       auth.signOut();
     }
   };
-
-  if (isUserLoading) {
-    return <div className="h-8 w-8 rounded-full bg-muted" />;
-  }
 
   if (user) {
     return (
@@ -371,6 +367,7 @@ export function Header() {
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
   const { isMenuOpen, setIsMenuOpen } = useLayout();
+  const { isUserLoading } = useUser();
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
@@ -397,23 +394,27 @@ export function Header() {
       )}
       <div className="w-full flex items-center justify-between">
         <div className="flex-1 flex justify-start">
-           <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <MenuTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
-                <Menu className="h-5 w-5" />
-              </Button>
-            </MenuTrigger>
-            <MenuContentContainer
-              side="left"
-              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-2xl p-0"}
-            >
-              <MenuHeader className="p-4 pb-2">
-                  <MenuTitle>{t.header.menu}</MenuTitle>
-                  {!isMobile && <Separator className="mt-2" />}
-              </MenuHeader>
-              <MenuContent closeMenu={() => setIsMenuOpen(false)} />
-            </MenuContentContainer>
-          </MenuContainer>
+          {isUserLoading ? (
+            <div className="h-10 w-10 rounded-md bg-muted animate-pulse" />
+          ) : (
+            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <MenuTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </MenuTrigger>
+              <MenuContentContainer
+                side="left"
+                className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-2xl p-0"}
+              >
+                <MenuHeader className="p-4 pb-2">
+                    <MenuTitle>{t.header.menu}</MenuTitle>
+                    {!isMobile && <Separator className="mt-2" />}
+                </MenuHeader>
+                <MenuContent closeMenu={() => setIsMenuOpen(false)} />
+              </MenuContentContainer>
+            </MenuContainer>
+          )}
         </div>
         <div className="flex-1 flex justify-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -421,7 +422,11 @@ export function Header() {
             </h1>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
+          {isUserLoading ? (
+            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          ) : (
             <AccountButton />
+          )}
         </div>
       </div>
     </header>
