@@ -53,6 +53,7 @@ import { useAuth, useUser } from '@/firebase';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useRouter } from 'next/navigation';
 import { useSubscription } from '@/hooks/use-subscription';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 function ReportProblemDialog({ closeMenu }: { closeMenu?: () => void }) {
@@ -318,7 +319,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
 }
 
 function AccountButton() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { locale } = useLanguage();
   const t = translations[locale];
@@ -329,6 +330,10 @@ function AccountButton() {
       auth.signOut();
     }
   };
+  
+  if (isUserLoading) {
+    return <Skeleton className="h-8 w-8 rounded-full" />;
+  }
 
   if (user) {
     return (
