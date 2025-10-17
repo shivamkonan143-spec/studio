@@ -171,8 +171,8 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
-              <Sun className="mr-2 h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute mr-2 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <Sun className="mr-2 h-4 w-4 dark:hidden" />
+              <Moon className="mr-2 hidden h-4 w-4 dark:block" />
               <span>{t.header.theme}</span>
               <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
             </Button>
@@ -185,10 +185,6 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('dark'); closeMenu?.(); }}>
               <Moon className="mr-2 h-4 w-4" />
               <span>{t.header.dark}</span>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('system'); closeMenu?.(); }}>
-              <Laptop className="mr-2 h-4 w-4" />
-              <span>{t.header.system}</span>
             </Button>
           </CollapsibleContent>
         </Collapsible>
@@ -399,13 +395,9 @@ export function Header() {
         <div className="flex-1 flex justify-start">
             <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <MenuTrigger asChild>
-                {isUserLoading ? (
-                  <Skeleton className="h-9 w-9 rounded-md" />
-                ) : (
                   <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
                     <Menu className="h-5 w-5" />
                   </Button>
-                )}
               </MenuTrigger>
               <MenuContentContainer
                 side="left"
