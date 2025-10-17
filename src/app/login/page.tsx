@@ -359,7 +359,7 @@ function AuthPage() {
     }
     
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center p-4 login-background">
+        <div className="flex min-h-screen flex-col items-center justify-start p-4 pt-20 login-background">
             <div className="absolute top-4 right-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/">
