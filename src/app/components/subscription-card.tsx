@@ -184,7 +184,7 @@ export function SubscriptionCard() {
 
     return (
         <>
-            <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-gradient-to-br from-accent/10 via-transparent to-transparent">
+            <Card className="overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 bg-card rounded-3xl">
                 <CardHeader className="p-8 pb-4">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-accent/10 rounded-lg">
@@ -203,11 +203,11 @@ export function SubscriptionCard() {
                             <span className="font-medium">{t.subscription.benefit}</span>
                         </div>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl font-bold text-green-600">{t.subscription.price}</span>
+                            <span className="text-4xl font-bold text-foreground">{t.subscription.price}</span>
                             <span className="text-lg text-muted-foreground line-through">{t.subscription.originalPrice}</span>
                             <span className="text-muted-foreground">{t.subscription.duration}</span>
                         </div>
-                        <Button size="lg" variant="default" className="w-full" onClick={handleSubscribeClick}>
+                        <Button size="lg" variant="default" className="w-full rounded-2xl" onClick={handleSubscribeClick}>
                             {t.subscription.buttonSubscribe}
                         </Button>
                     </div>
@@ -221,3 +221,5 @@ export function SubscriptionCard() {
         </>
     );
 }
+
+    

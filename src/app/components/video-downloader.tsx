@@ -93,9 +93,9 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
   
     return (
         <>
-            <Card className="overflow-hidden shadow-xl shadow-slate-200/50 dark:shadow-none bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(223,200,242,0.2),rgba(255,0,0,0.0))] dark:bg-[radial-gradient(ellipse_100%_100%_at_50%_-20%,rgba(22_3,200,242,0.1),rgba(255,0,0,0.0))]">
-                <CardContent className="p-8 text-center">
-                    <h2 className="text-2xl font-bold tracking-tight text-foreground mb-6">
+            <Card className="overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 rounded-3xl">
+                <CardContent className="p-6 md:p-8 text-center">
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-4">
                         {t.title}
                     </h2>
                     
@@ -112,7 +112,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                                     placeholder={t.videoDownloader.urlPlaceholder}
                                     {...field}
                                     disabled={isGenerating}
-                                    className="h-12 w-full rounded-lg border-2 bg-white/50 dark:bg-card pr-10 text-base shadow-inner-white focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                                    className="h-14 w-full rounded-2xl border-border bg-background/50 pr-12 text-base shadow-inner focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
                                 />
                                 </FormControl>
                                 {field.value && (
@@ -121,7 +121,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                                     size="icon"
                                     variant="ghost"
                                     onClick={() => form.reset({ url: '' })}
-                                    className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 text-muted-foreground hover:bg-muted"
+                                    className="absolute right-2 top-1/2 h-10 w-10 -translate-y-1/2 text-muted-foreground hover:bg-muted"
                                 >
                                     <X className="h-5 w-5" />
                                 </Button>
@@ -133,7 +133,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                         />
                         <Button 
                         type="submit" 
-                        className="w-full"
+                        className="w-full rounded-2xl"
                         size="lg"
                         disabled={isGenerating}
                         >
@@ -183,7 +183,7 @@ function AdvancedEditDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full" onClick={() => setIsOpen(true)}>
+        <Button variant="outline" className="w-full rounded-2xl" onClick={() => setIsOpen(true)}>
           <SlidersHorizontal className="mr-2 h-4 w-4" />
           Customize
         </Button>
@@ -236,8 +236,8 @@ function AdvancedEditDialog({
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" onClick={resetFilters} className="w-full">Reset Filters</Button>
-                    <Button size="sm" onClick={() => { if (thumbnail) { onDownload(thumbnail, filters); setIsOpen(false); } }} className="w-full">
+                    <Button variant="outline" size="sm" onClick={resetFilters} className="w-full rounded-xl">Reset Filters</Button>
+                    <Button size="sm" onClick={() => { if (thumbnail) { onDownload(thumbnail, filters); setIsOpen(false); } }} className="w-full rounded-xl">
                         <Download className="mr-2 h-4 w-4" />
                         Download
                     </Button>
@@ -552,7 +552,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     return (
         <Card>
             <CardContent className="pt-6">
-                <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+                <div className="flex min-h-[200px] w-full items-center justify-center rounded-2xl border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <ImageIcon className="h-8 w-8" />
                     <span>{t.videoDownloader.loadingThumbnail}</span>
@@ -565,7 +565,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     
   return (
     <>
-      <Card ref={previewRef}>
+      <Card ref={previewRef} className="rounded-3xl shadow-xl shadow-black/5 dark:shadow-white/5">
           <CardHeader>
           <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
@@ -577,7 +577,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               <Dialog>
               <DialogTrigger asChild>
                   <div className={cn(
-                      "relative w-full cursor-zoom-in overflow-hidden rounded-lg border",
+                      "relative w-full cursor-zoom-in overflow-hidden rounded-2xl border",
                       isShort ? "aspect-[9/16] max-h-[70vh] mx-auto max-w-[300px]" : "aspect-video"
                   )}>
                   <Image src={thumbnailUrl} alt="Video thumbnail" layout="fill" objectFit="cover" className="mx-auto"
@@ -608,7 +608,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               </DialogContent>
               </Dialog>
           ) : (
-              <div className="flex min-h-[200px] w-full items-center justify-center rounded-md border border-dashed">
+              <div className="flex min-h-[200px] w-full items-center justify-center rounded-2xl border border-dashed">
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <ImageIcon className="h-8 w-8" />
                   <span>{t.videoDownloader.loadingThumbnail}</span>
@@ -630,10 +630,10 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
                       ref={textareaRef}
                       value={isTitleLoading ? t.common.loading : videoTitle}
                       readOnly
-                      className="pr-12 bg-muted/40 resize-none overflow-hidden min-h-[40px]"
+                      className="pr-12 bg-muted/40 resize-none overflow-hidden min-h-[40px] rounded-2xl"
                       rows={2}
                   />
-                  <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white border-0" disabled={isTitleLoading}>
+                  <Button onClick={handleCopyTitle} size="icon" variant="outline" className="shrink-0 bg-primary text-primary-foreground border-0 rounded-xl" disabled={isTitleLoading}>
                       {isTitleLoading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Clipboard className="h-4 w-4" />}
                       <span className="sr-only">{t.videoDownloader.copyTitle}</span>
                   </Button>
@@ -643,7 +643,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
           <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                   <Label htmlFor="quality">{t.videoDownloader.quality}</Label>                  <Select onValueChange={(v) => handleQualityChange(v as ThumbnailQuality)} defaultValue={quality} value={quality}>
-                      <SelectTrigger id="quality">
+                      <SelectTrigger id="quality" className="rounded-2xl">
                           <SelectValue placeholder="Select quality" />
                       </SelectTrigger>
                       <SelectContent>
@@ -655,13 +655,13 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
           </div>
           
           
-          <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full">
+          <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full rounded-2xl">
               <Download className="mr-2 h-4 w-4" />
               {t.videoDownloader.downloadThumbnail}
           </Button>
 
 
-          <Button onClick={onTryAnother} className="w-full" size="lg" variant="outline">
+          <Button onClick={onTryAnother} className="w-full rounded-2xl" size="lg" variant="outline">
               <RefreshCcw className="mr-2 h-4 w-4" />
               <span>{t.videoDownloader.tryAnother}</span>
           </Button>
@@ -672,3 +672,5 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
+
+    

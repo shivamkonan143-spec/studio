@@ -390,7 +390,7 @@ export function Header() {
             </MenuTrigger>
             <MenuContentContainer
               side="left"
-              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-lg p-0"}
+              className={isMobile ? "w-3/4 p-0" : "max-w-xs rounded-2xl p-0"}
             >
               <MenuHeader className="p-4 pb-2">
                   <MenuTitle>{t.header.menu}</MenuTitle>
@@ -401,7 +401,7 @@ export function Header() {
           </MenuContainer>
         </div>
         <div className="flex-1 flex justify-center">
-            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 bg-clip-text text-transparent font-headline">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">
                 Welcome
             </h1>
         </div>
@@ -412,4 +412,6 @@ export function Header() {
     </header>
   );
 }
+    
+
     

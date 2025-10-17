@@ -144,29 +144,29 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                 return (
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="relative">
-                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="login-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
+                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                           <Input id="login-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
                         </div>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
-                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                                <Checkbox id="remember-me" className="border-gray-400" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
-                                <Label htmlFor="remember-me" className="text-gray-300">Remember me</Label>
+                                <Checkbox id="remember-me" className="border-muted-foreground" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
+                                <Label htmlFor="remember-me" className="text-muted-foreground">Remember me</Label>
                             </div>
-                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-gray-300 hover:text-white" onClick={() => setView('forgot-password')}>
+                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-muted-foreground hover:text-foreground" onClick={() => setView('forgot-password')}>
                                 Forgot Password?
                             </Button>
                         </div>
-                        <Button type="submit" className="w-full font-bold" disabled={isLoading}>
+                        <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "LOGIN"}
                         </Button>
-                        <p className="text-center text-sm text-gray-300">
+                        <p className="text-center text-sm text-muted-foreground">
                            Need an account?{' '}
                             <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setView('register')}>
                                 Register
@@ -178,20 +178,20 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                  return (
                     <form onSubmit={handleRegister} className="space-y-6">
                         <div className="relative">
-                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="register-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
+                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                           <Input id="register-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
                         </div>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
-                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
                         </div>
-                        <Button type="submit" className="w-full font-bold" disabled={isLoading}>
+                        <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "REGISTER"}
                         </Button>
-                        <p className="text-center text-sm text-gray-300">
+                        <p className="text-center text-sm text-muted-foreground">
                            Already have an account?{' '}
                             <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
                                 Log in
@@ -202,14 +202,14 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
             case 'forgot-password':
                 return (
                      <form onSubmit={handlePasswordResetRequest} className="space-y-6">
-                        <p className="text-center text-sm text-gray-300">
+                        <p className="text-center text-sm text-muted-foreground">
                             {t.forgotPassword.description}
                         </p>
                         <div className="relative">
-                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                           <Input id="reset-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" />
+                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                           <Input id="reset-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
                         </div>
-                        <Button type="submit" className="w-full font-bold" disabled={isLoading}>
+                        <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.forgotPassword.button}
                         </Button>
                          <p className="text-center text-sm text-gray-300">
@@ -222,7 +222,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
             case 'forgot-password-submitted':
                  return (
                     <div className="text-center space-y-4">
-                        <p className="text-gray-300">{t.forgotPassword.descriptionSubmitted}</p>
+                        <p className="text-muted-foreground">{t.forgotPassword.descriptionSubmitted}</p>
                         <div className="flex flex-col space-y-2">
                             <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
@@ -234,7 +234,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                 return (
                     <form onSubmit={handlePasswordReset} className="space-y-6">
                         <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input 
                                 id="new-password" 
                                 type={showPassword ? "text" : "password"} 
@@ -242,13 +242,13 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                                 value={password} 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 required 
-                                className="pl-10 bg-transparent border-0 border-b rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-b-primary" 
+                                className="pl-10 bg-card border-border h-12 rounded-2xl" 
                             />
-                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-400 hover:bg-transparent hover:text-white" onClick={() => setShowPassword(p => !p)}>
+                            <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
                         </div>
-                        <Button type="submit" className="w-full font-bold" disabled={isLoading}>
+                        <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.forgotPassword.resetButton}
                         </Button>
                     </form>
@@ -257,12 +257,9 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
     }
 
     return (
-        <div className="w-full max-w-sm mx-auto bg-white/10 backdrop-blur-md rounded-2xl shadow-lg p-8 text-white">
+        <div className="w-full max-w-sm mx-auto bg-card rounded-3xl shadow-2xl shadow-black/10 dark:shadow-white/5 p-8 text-foreground">
             <div className="text-center mb-8">
-                <div className="inline-block p-4 bg-white/10 rounded-full mb-4">
-                    <UserIcon className="h-12 w-12 text-white/70" />
-                </div>
-                <h1 className="text-2xl font-bold">{currentTitle}</h1>
+                <h1 className="text-3xl font-bold">{currentTitle}</h1>
             </div>
             {renderContent()}
         </div>
@@ -348,7 +345,7 @@ function AuthPage() {
     if (isUserLoading || isRedirecting) {
         return (
             <div className="flex min-h-screen w-full items-center justify-center login-background">
-                <Loader2 className="h-8 w-8 animate-spin text-white" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -356,7 +353,7 @@ function AuthPage() {
     if (user && mode !== 'resetPassword') {
          return (
             <div className="flex min-h-screen w-full items-center justify-center login-background">
-                <Loader2 className="h-8 w-8 animate-spin text-white" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -364,7 +361,7 @@ function AuthPage() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4 login-background">
             <div className="absolute top-4 left-4">
-                <Button variant="ghost" asChild className="text-white hover:bg-white/10 hover:text-white">
+                <Button variant="ghost" asChild>
                     <Link href="/">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Home
@@ -389,3 +386,5 @@ export default function LoginPage() {
     // However, this structure provides the `useAuth` hook with the necessary context.
     return <AuthPage />;
 }
+
+    
