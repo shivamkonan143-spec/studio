@@ -8,7 +8,9 @@ body {
 }
 
 .login-background {
-  background: hsl(var(--background));
+  background: radial-gradient(circle at top, hsl(340 80% 88% / 0.3), transparent 40%),
+              radial-gradient(circle at bottom, hsl(270 80% 92% / 0.3), transparent 40%),
+              hsl(var(--background));
 }
 
 
