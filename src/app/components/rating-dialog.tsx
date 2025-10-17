@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';

@@ -3,9 +3,11 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/app/components/theme-provider';
-import { LanguageProvider } from '@/app/context/language-context';
+import { LanguageProvider, LayoutProvider } from '@/app/context/layout-context';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { SubscriptionProvider } from '@/hooks/use-subscription';
+import { LayoutWrapper } from '@/app/components/layout-wrapper';
+
 
 export const metadata: Metadata = {
   title: 'Thumbnail Downloader',
@@ -29,19 +31,21 @@ export default function RootLayout({
       </head>
       <body>
         <LanguageProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <FirebaseClientProvider>
-              <SubscriptionProvider>
-                {children}
-              </SubscriptionProvider>
-            </FirebaseClientProvider>
-            <Toaster />
-          </ThemeProvider>
+         <LayoutProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <FirebaseClientProvider>
+                <SubscriptionProvider>
+                  <LayoutWrapper>{children}</LayoutWrapper>
+                </SubscriptionProvider>
+              </FirebaseClientProvider>
+              <Toaster />
+            </ThemeProvider>
+          </LayoutProvider>
         </LanguageProvider>
       </body>
     </html>

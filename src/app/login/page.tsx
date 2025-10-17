@@ -17,7 +17,7 @@ import {
   browserSessionPersistence
 } from 'firebase/auth';
 import { useAuth, useUser } from '@/firebase';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';

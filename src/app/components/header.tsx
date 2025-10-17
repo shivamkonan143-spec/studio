@@ -38,7 +38,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useTheme } from 'next-themes';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage, useLayout } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -365,15 +365,12 @@ function AccountButton() {
 }
 
 
-export function Header({ isMenuOpen: isMenuOpenProp, setIsMenuOpen: setIsMenuOpenProp }: { isMenuOpen?: boolean; setIsMenuOpen?: (isOpen: boolean) => void; }) {
+export function Header() {
   const { locale } = useLanguage();
   const t = translations[locale];
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isMenuOpenLocal, setIsMenuOpenLocal] = useState(false);
-
-  const isMenuOpen = isMenuOpenProp !== undefined ? isMenuOpenProp : isMenuOpenLocal;
-  const setIsMenuOpen = setIsMenuOpenProp !== undefined ? setIsMenuOpenProp : setIsMenuOpenLocal;
+  const { isMenuOpen, setIsMenuOpen } = useLayout();
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;

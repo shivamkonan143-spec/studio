@@ -1,30 +1,25 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput, YoutubeDownloaderPreview } from '@/app/components/video-downloader';
 import { SubscriptionCard } from '@/app/components/subscription-card';
 import { SocialLinks } from '@/app/components/social-links';
-
-const SWIPE_THRESHOLD = 50; // Minimum pixels for a swipe
+import { useLayout } from '@/app/context/layout-context';
 
 function HomeComponent() {
   const searchParams = useSearchParams();
-  const [preview, setPreview] = useState<{ id: string; isShort: boolean } | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
+  const { setPreview, preview } = useLayout();
 
   const videoId = searchParams.get('videoId');
   const isShort = searchParams.get('isShort') === 'true';
 
-  useEffect(() => {
-    if (videoId) {
-      setPreview({ id: videoId, isShort });
-    }
-  }, [videoId, isShort]);
+  // Effect to sync URL params to state on initial load
+  if (videoId && (!preview || preview.id !== videoId)) {
+    setPreview({ id: videoId, isShort });
+  }
 
   const handleGetThumbnail = (id: string, isShort: boolean) => {
     setPreview({ id, isShort });
@@ -36,41 +31,11 @@ function HomeComponent() {
     window.history.replaceState({}, '', '/');
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX;
-    touchEndX.current = e.targetTouches[0].clientX; // Reset on new touch
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX;
-  };
-
-  const handleTouchEnd = () => {
-    const swipeDistance = touchStartX.current - touchEndX.current;
-    const isLeftSwipe = swipeDistance > SWIPE_THRESHOLD;
-    const isRightSwipe = swipeDistance < -SWIPE_THRESHOLD;
-    
-    if (isRightSwipe) {
-      setIsMenuOpen(true);
-    }
-
-    if (isLeftSwipe && isMenuOpen) {
-      setIsMenuOpen(false);
-    }
-
-    // Reset touch positions
-    touchStartX.current = 0;
-    touchEndX.current = 0;
-  };
-
   return (
     <main 
       className="flex min-h-screen w-full flex-col items-center bg-background px-4 pb-12 animate-fade-in-up"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
-      <Header isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      <Header />
       <div className="w-full max-w-2xl space-y-8">
         <div className="space-y-8">
           {!preview && (

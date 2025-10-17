@@ -3,7 +3,7 @@
 import { CheckCircle, Gem } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';

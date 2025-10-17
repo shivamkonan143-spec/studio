@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogClose } from '@/components/ui/dialog';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { cn } from '@/lib/utils';
 import { Slider } from "@/components/ui/slider"

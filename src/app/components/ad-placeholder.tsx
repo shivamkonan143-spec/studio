@@ -1,6 +1,6 @@
 
 import { Megaphone } from 'lucide-react';
-import { useLanguage } from '@/app/context/language-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { Button } from '@/components/ui/button';
 
