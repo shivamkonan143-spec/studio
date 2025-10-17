@@ -37,11 +37,11 @@ function HomeComponent() {
       <Header />
       <div className="w-full max-w-2xl space-y-8">
         <div className="space-y-8">
-          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards' }}>
+          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '100ms' }}>
             <YoutubeDownloaderInput onGetThumbnail={handleGetThumbnail} />
           </div>
           {preview && (
-            <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '150ms' }}>
+            <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '200ms' }}>
               <YoutubeDownloaderPreview
                 videoId={preview.id}
                 isShort={preview.isShort}
@@ -52,7 +52,7 @@ function HomeComponent() {
         </div>
 
         {!preview && (
-          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '150ms' }}>
+          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '200ms' }}>
             <SubscriptionCard />
           </div>
         )}
