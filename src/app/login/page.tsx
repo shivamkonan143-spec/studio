@@ -360,11 +360,11 @@ function AuthPage() {
     
     return (
         <div className="flex min-h-screen flex-col items-center justify-start p-4 pt-20 login-background">
-            <div className="absolute top-4 right-4">
-                <Button variant="ghost" size="icon" asChild>
+            <div className="absolute top-4 left-4">
+                <Button variant="outline" asChild>
                     <Link href="/">
-                        <X className="h-5 w-5" />
-                        <span className="sr-only">Back to Home</span>
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back to Home
                     </Link>
                 </Button>
             </div>
