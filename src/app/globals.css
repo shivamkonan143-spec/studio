@@ -73,7 +73,14 @@
   .animate-fade-in-up {
     animation: fade-in-up 0.8s cubic-bezier(0.32, 0.72, 0, 1) forwards;
   }
-
+  .sheet-hole {
+    @apply absolute w-12 h-12 bg-background rounded-full;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -1.5rem; /* (12 / 4 / 2) */
+    box-shadow: 0 0 0 1px var(--border);
+    z-index: -1;
+  }
 }
 
 @layer utilities {

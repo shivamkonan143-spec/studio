@@ -163,10 +163,10 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
           </Link>
         </Button>
         <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
-          <Link href="/history" onClick={() => closeMenu?.()}>
-            <History className="mr-2 h-4 w-4" />
-            <span>{t.header.history}</span>
-          </Link>
+            <Link href="/history" onClick={() => closeMenu?.()}>
+                <History className="mr-2 h-4 w-4" />
+                <span>{t.header.history}</span>
+            </Link>
         </Button>
         <Collapsible>
           <CollapsibleTrigger asChild>
@@ -370,6 +370,7 @@ export function Header() {
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
   const { isMenuOpen, setIsMenuOpen } = useLayout();
+  const { isUserLoading } = useUser();
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
@@ -398,9 +399,13 @@ export function Header() {
         <div className="flex-1 flex justify-start">
             <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <MenuTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
-                  <Menu className="h-5 w-5" />
-                </Button>
+                {isUserLoading ? (
+                  <Skeleton className="h-9 w-9 rounded-md" />
+                ) : (
+                  <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                )}
               </MenuTrigger>
               <MenuContentContainer
                 side="left"
@@ -426,5 +431,3 @@ export function Header() {
     </header>
   );
 }
-
-    
