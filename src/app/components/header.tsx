@@ -188,6 +188,27 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             </Button>
           </CollapsibleContent>
         </Collapsible>
+
+        <Collapsible>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+              <Sun className="mr-2 h-4 w-4 dark:hidden" />
+              <Moon className="mr-2 hidden h-4 w-4 dark:block" />
+              <span>{t.header.newTheme}</span>
+              <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-1 pl-6">
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('light'); closeMenu?.(); }}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>{t.header.light}</span>
+            </Button>
+            <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent" onClick={() => { setTheme('dark'); closeMenu?.(); }}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>{t.header.dark}</span>
+            </Button>
+          </CollapsibleContent>
+        </Collapsible>
         
         <Collapsible>
           <CollapsibleTrigger asChild>
@@ -423,3 +444,5 @@ export function Header() {
     </header>
   );
 }
+
+    
