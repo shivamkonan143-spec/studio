@@ -95,9 +95,10 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
         <>
             <Card className="overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 rounded-3xl">
                 <CardContent className="p-6 md:p-8 text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-4">
+                    <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">
                         {t.title}
                     </h2>
+                     <p className="text-muted-foreground mb-6">{t.videoDownloader.pasteUrl}</p>
                     
                     <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-lg mx-auto">
@@ -550,7 +551,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
 
   if (!thumbnailUrl) {
     return (
-        <Card>
+        <Card className="rounded-3xl">
             <CardContent className="pt-6">
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-2xl border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -571,6 +572,7 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
               <ImageIcon className="h-5 w-5" />
               <span>{t.videoDownloader.previewTitle}</span>
           </CardTitle>
+          <CardDescription>{t.videoDownloader.previewDescription}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
           {thumbnailUrl ? (
@@ -672,5 +674,3 @@ export function YoutubeDownloaderPreview({ videoId, isShort, onTryAnother }: { v
     </>
   );
 }
-
-    

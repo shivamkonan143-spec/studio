@@ -145,11 +145,11 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <form onSubmit={handleLogin} className="space-y-6">
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                           <Input id="login-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                           <Input id="login-email" type="email" placeholder={t.login.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card/50 border-border h-12 rounded-2xl" />
                         </div>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                            <Input id="login-password" type={showPassword ? "text" : "password"} placeholder={t.login.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card/50 border-border h-12 rounded-2xl" />
                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
@@ -159,17 +159,17 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                                 <Checkbox id="remember-me" className="border-muted-foreground" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked as boolean)} />
                                 <Label htmlFor="remember-me" className="text-muted-foreground">Remember me</Label>
                             </div>
-                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-muted-foreground hover:text-foreground" onClick={() => setView('forgot-password')}>
-                                Forgot Password?
+                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-primary hover:text-primary/80" onClick={() => setView('forgot-password')}>
+                                {t.login.forgotPassword}
                             </Button>
                         </div>
                         <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "LOGIN"}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.login.button}
                         </Button>
                         <p className="text-center text-sm text-muted-foreground">
-                           Need an account?{' '}
-                            <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setView('register')}>
-                                Register
+                           {t.login.noAccount}{' '}
+                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-primary hover:text-primary/80" onClick={() => setView('register')}>
+                                {t.login.registerLink}
                             </Button>
                         </p>
                     </form>
@@ -179,22 +179,22 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <form onSubmit={handleRegister} className="space-y-6">
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                           <Input id="register-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                           <Input id="register-email" type="email" placeholder={t.register.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card/50 border-border h-12 rounded-2xl" />
                         </div>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                            <Input id="register-password" type={showPassword ? "text" : "password"} placeholder={t.register.passwordPlaceholder} value={password} onChange={(e) => setPassword(e.target.value)} required className="pl-10 bg-card/50 border-border h-12 rounded-2xl" />
                              <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                             </Button>
                         </div>
                         <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
-                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "REGISTER"}
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.register.button}
                         </Button>
                         <p className="text-center text-sm text-muted-foreground">
-                           Already have an account?{' '}
-                            <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
-                                Log in
+                           {t.register.haveAccount}{' '}
+                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-primary hover:text-primary/80" onClick={() => setView('login')}>
+                                {t.register.loginLink}
                             </Button>
                         </p>
                     </form>
@@ -207,13 +207,13 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                         </p>
                         <div className="relative">
                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                           <Input id="reset-email" type="email" placeholder="Email ID" value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card border-border h-12 rounded-2xl" />
+                           <Input id="reset-email" type="email" placeholder={t.forgotPassword.emailPlaceholder} value={email} onChange={(e) => setEmail(e.target.value)} required className="pl-10 bg-card/50 border-border h-12 rounded-2xl" />
                         </div>
                         <Button type="submit" size="lg" className="w-full font-bold rounded-2xl" disabled={isLoading}>
                             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : t.forgotPassword.button}
                         </Button>
                          <p className="text-center text-sm text-gray-300">
-                            <Button type="button" variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
+                            <Button type="button" variant="link" className="p-0 h-auto text-sm text-primary hover:text-primary/80" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
                             </Button>
                         </p>
@@ -224,7 +224,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                     <div className="text-center space-y-4">
                         <p className="text-muted-foreground">{t.forgotPassword.descriptionSubmitted}</p>
                         <div className="flex flex-col space-y-2">
-                            <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setView('login')}>
+                            <Button variant="link" className="p-0 h-auto text-sm text-primary hover:text-primary/80" onClick={() => setView('login')}>
                                 {t.forgotPassword.backToLogin}
                             </Button>
                         </div>
@@ -242,7 +242,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
                                 value={password} 
                                 onChange={(e) => setPassword(e.target.value)} 
                                 required 
-                                className="pl-10 bg-card border-border h-12 rounded-2xl" 
+                                className="pl-10 bg-card/50 border-border h-12 rounded-2xl" 
                             />
                             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground" onClick={() => setShowPassword(p => !p)}>
                                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -257,7 +257,7 @@ function AuthForm({ onAuthSuccess, onAuthError, initialView = 'login', oobCode: 
     }
 
     return (
-        <div className="w-full max-w-sm mx-auto bg-card rounded-3xl shadow-2xl shadow-black/10 dark:shadow-white/5 p-8 text-foreground">
+        <div className="w-full max-w-sm mx-auto bg-card/80 backdrop-blur-lg rounded-3xl shadow-2xl shadow-black/10 dark:shadow-white/5 p-8 text-foreground">
             <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">{currentTitle}</h1>
             </div>
@@ -386,5 +386,3 @@ export default function LoginPage() {
     // However, this structure provides the `useAuth` hook with the necessary context.
     return <AuthPage />;
 }
-
-    

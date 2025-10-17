@@ -379,7 +379,7 @@ export function Header() {
   const MenuTitle = isMobile ? SheetTitle : DialogTitle;
 
   return (
-    <header className="flex w-full flex-col items-center gap-2 py-2">
+    <header className="flex w-full flex-col items-center gap-2 py-2 mb-8">
       <div className="w-full flex items-center justify-between">
         <div className="flex-1 flex justify-start">
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -401,7 +401,7 @@ export function Header() {
           </MenuContainer>
         </div>
         <div className="flex-1 flex justify-center">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground font-headline">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 Welcome
             </h1>
         </div>
@@ -412,6 +412,3 @@ export function Header() {
     </header>
   );
 }
-    
-
-    

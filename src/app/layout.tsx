@@ -27,7 +27,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased">
+      <body>
         <LanguageProvider>
           <ThemeProvider
             attribute="class"
@@ -47,4 +47,3 @@ export default function RootLayout({
     </html>
   );
 }
-    

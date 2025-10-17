@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-}
-
 .login-background {
   background: radial-gradient(circle at top, hsl(340 80% 88% / 0.3), transparent 40%),
               radial-gradient(circle at bottom, hsl(270 80% 92% / 0.3), transparent 40%),
@@ -96,11 +91,5 @@ body {
   }
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
-  }
-}
-
-@layer components {
-  .p-\[6px\] {
-    padding: 6px;
   }
 }
