@@ -360,7 +360,7 @@ function AuthPage() {
     
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4 login-background">
-            <div className="absolute top-4 left-4">
+            <div className="absolute top-4 right-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/">
                         <X className="h-5 w-5" />

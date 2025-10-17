@@ -670,7 +670,7 @@ a.href = downloadUrl;
           </div>
           
           
-          <Button onClick={handleDownloadThumbnail} variant="destructive" className="w-full rounded-2xl">
+          <Button onClick={handleDownloadThumbnail} className="w-full rounded-2xl">
               <Download className="mr-2 h-4 w-4" />
               {t.videoDownloader.downloadThumbnail}
           </Button>
