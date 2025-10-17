@@ -24,8 +24,8 @@
     --secondary-foreground: 20 14% 4%;
     --muted: 10 30% 90%;
     --muted-foreground: 20 9% 34%;
-    --accent: 0 84% 60%; /* Reddish-pink for accents */
-    --accent-foreground: 0 0% 98%;
+    --accent: 30 90% 70%; /* Soft Peach for accents */
+    --accent-foreground: 20 14% 4%; /* Dark text on accent */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 10 20% 88%;
@@ -59,13 +59,13 @@
     --secondary-foreground: 10 20% 90%;
     --muted: 350 15% 25%;
     --muted-foreground: 10 20% 65%;
-    --accent: 0 84% 60%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 30 90% 70%;
+    --accent-foreground: 20 14% 4%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 350 15% 25%;
     --input: 350 15% 25%;
-    --ring: 0 84% 60%;
+    --ring: 30 90% 70%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
