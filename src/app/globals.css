@@ -9,6 +9,12 @@
               hsl(var(--background));
 }
 
+.dark .login-background {
+    background: radial-gradient(circle at top, hsl(180 100% 50% / 0.1), transparent 50%),
+                radial-gradient(circle at bottom, hsl(300 100% 50% / 0.1), transparent 50%),
+                hsl(var(--background));
+}
+
 
 @layer base {
   :root {
@@ -47,25 +53,25 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 340 20% 12%; /* Dark charcoal with more pink tint */
-    --foreground: 340 20% 90%;
-    --card: 340 15% 16%;
-    --card-foreground: 340 20% 90%;
-    --popover: 340 15% 16%;
-    --popover-foreground: 340 20% 90%;
-    --primary: 340 80% 92%; /* Soft pink for dark mode primary */
-    --primary-foreground: 340 10% 20%;
-    --secondary: 340 15% 25%;
-    --secondary-foreground: 340 20% 90%;
-    --muted: 340 15% 25%;
-    --muted-foreground: 340 20% 65%;
-    --accent: 340 90% 70%;
-    --accent-foreground: 340 10% 15%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 340 15% 25%;
-    --input: 340 15% 25%;
-    --ring: 340 90% 70%;
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+    --card: 240 4% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 240 10% 4%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 180 100% 10%;
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 4% 12%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 240 4% 12%;
+    --input: 240 4% 12%;
+    --ring: 180 100% 50%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -101,5 +107,3 @@
     perspective: 800px;
   }
 }
-
-    
