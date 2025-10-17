@@ -30,7 +30,7 @@
     --secondary-foreground: 340_10%_20%;
     --muted: 340 30% 92%;
     --muted-foreground: 340 9% 45%;
-    --accent: 340 90% 70%; /* Bright pink accent */
+    --accent: 30 90% 70%; /* Bright pink accent */
     --accent-foreground: 340 10% 15%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -53,24 +53,24 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 240 10% 4%;
-    --foreground: 210 40% 98%;
-    --card: 35 15% 15%;
-    --card-foreground: 210 40% 98%;
-    --popover: 240 10% 4%;
-    --popover-foreground: 210 40% 98%;
+    --background: 255 42% 22%; /* #312051 */
+    --foreground: 255 15% 85%;
+    --card: 255 42% 25%;
+    --card-foreground: 255 15% 85%;
+    --popover: 255 42% 18%;
+    --popover-foreground: 255 15% 85%;
     --primary: 180 100% 50%;
     --primary-foreground: 180 100% 10%;
-    --secondary: 240 4% 12%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 240 4% 12%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 4% 12%;
-    --accent-foreground: 210 40% 98%;
+    --secondary: 255 42% 28%;
+    --secondary-foreground: 255 15% 85%;
+    --muted: 255 42% 28%;
+    --muted-foreground: 255 10% 65%;
+    --accent: 255 42% 35%;
+    --accent-foreground: 255 15% 95%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-    --border: 240 4% 12%;
-    --input: 240 4% 12%;
+    --border: 255 42% 30%;
+    --input: 255 42% 28%;
     --ring: 180 100% 50%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
