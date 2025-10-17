@@ -365,12 +365,15 @@ function AccountButton() {
 }
 
 
-export function Header() {
+export function Header({ isMenuOpen: isMenuOpenProp, setIsMenuOpen: setIsMenuOpenProp }: { isMenuOpen?: boolean; setIsMenuOpen?: (isOpen: boolean) => void; }) {
   const { locale } = useLanguage();
   const t = translations[locale];
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpenLocal, setIsMenuOpenLocal] = useState(false);
+
+  const isMenuOpen = isMenuOpenProp !== undefined ? isMenuOpenProp : isMenuOpenLocal;
+  const setIsMenuOpen = setIsMenuOpenProp !== undefined ? setIsMenuOpenProp : setIsMenuOpenLocal;
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
