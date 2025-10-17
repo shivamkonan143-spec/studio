@@ -23,7 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowLeft, Eye, EyeOff, Mail, Lock, User as UserIcon } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, EyeOff, Mail, Lock, User as UserIcon, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import Link from 'next/link';
 
@@ -361,10 +361,10 @@ function AuthPage() {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center p-4 login-background">
             <div className="absolute top-4 left-4">
-                <Button variant="ghost" asChild>
+                <Button variant="ghost" size="icon" asChild>
                     <Link href="/">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Home
+                        <X className="h-5 w-5" />
+                        <span className="sr-only">Back to Home</span>
                     </Link>
                 </Button>
             </div>
