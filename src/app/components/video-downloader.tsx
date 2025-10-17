@@ -64,7 +64,6 @@ function getYouTubeVideoId(url: string): { id: string | null; isShort: boolean }
 
 export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id: string, isShort: boolean) => void }) {
     const [isGenerating, setIsGenerating] = useState(false);
-    const [isButtonDisintegrating, setIsButtonDisintegrating] = useState(false);
     const [showAd, setShowAd] = useState(false);
     const { locale } = useLanguage();
     const t = translations[locale];
@@ -73,11 +72,10 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
     const onSubmit = (values: z.infer<typeof formSchema>) => {
       setShowAd(true);
       setIsGenerating(true);
-      setIsButtonDisintegrating(true);
 
       const { id: extractedVideoId, isShort: isShortVideo } = getYouTubeVideoId(values.url);
       
-      // Simulate a delay for the animation to be visible before processing
+      // Simulate a delay for a better user experience
       setTimeout(() => {
         if (extractedVideoId) {
           onGetThumbnail(extractedVideoId, isShortVideo);
@@ -88,9 +86,8 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
             description: t.videoDownloader.invalidUrlDescription,
           });
           setIsGenerating(false);
-          setIsButtonDisintegrating(false); // Reset button if there was an error
         }
-      }, 1000); // 1s delay matches animation duration
+      }, 1000); // 1s delay
     };
   
     const form = useForm<z.infer<typeof formSchema>>({
@@ -139,20 +136,23 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                             </FormItem>
                         )}
                         />
-                        <Button 
-                          type="submit" 
-                          className={cn("w-full rounded-2xl", isButtonDisintegrating && "disintegrating")}
-                          size="lg"
-                          disabled={isGenerating}
-                          onAnimationEnd={() => {
-                            if (isButtonDisintegrating) {
-                               // The button will be visually gone, but to remove it from the DOM
-                               // we'd need more complex state management. For now, it will just be invisible.
-                            }
-                          }}
-                        >
-                          {isGenerating && !isButtonDisintegrating ? <Loader2 className="animate-spin" /> : <><Download /> {t.videoDownloader.getThumbnail}</>}
-                        </Button>
+                        {!isGenerating ? (
+                          <Button 
+                            type="submit" 
+                            className="w-full rounded-2xl"
+                            size="lg"
+                          >
+                            <Download /> {t.videoDownloader.getThumbnail}
+                          </Button>
+                        ) : (
+                          <Button 
+                            className="w-full rounded-2xl"
+                            size="lg"
+                            disabled
+                          >
+                            <Loader2 className="animate-spin" />
+                          </Button>
+                        )}
                     </form>
                     </Form>
                      <AdPlaceholder showAd={showAd} />
