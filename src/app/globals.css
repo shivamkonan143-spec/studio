@@ -4,8 +4,8 @@
 @tailwind utilities;
 
 .login-background {
-  background: radial-gradient(circle at top, hsl(340 80% 88% / 0.3), transparent 40%),
-              radial-gradient(circle at bottom, hsl(270 80% 92% / 0.3), transparent 40%),
+  background: radial-gradient(circle at top, hsl(180 100% 50% / 0.1), transparent 50%),
+              radial-gradient(circle at bottom, hsl(300 100% 50% / 0.1), transparent 50%),
               hsl(var(--background));
 }
 
@@ -20,7 +20,7 @@
   :root {
     --background: 340 80% 95%; /* More vibrant pink */
     --foreground: 340 10% 20%; /* Dark, slightly pink-tinted grey */
-    --card: 340 30% 98%; /* Almost white with a hint of pink */
+    --card: 35 79% 75%; /* #F0C38E */
     --card-foreground: 340 10% 20%;
     --popover: 340 30% 98%;
     --popover-foreground: 340 10% 20%;
@@ -55,7 +55,7 @@
   .dark {
     --background: 240 10% 4%;
     --foreground: 210 40% 98%;
-    --card: 240 4% 9%;
+    --card: 35 15% 15%;
     --card-foreground: 210 40% 98%;
     --popover: 240 10% 4%;
     --popover-foreground: 210 40% 98%;
