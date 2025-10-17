@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import Link from 'next/link';
@@ -367,11 +365,12 @@ function AccountButton() {
 }
 
 
-export function Header({ isMenuOpen, setIsMenuOpen }: { isMenuOpen: boolean, setIsMenuOpen: (open: boolean) => void }) {
+export function Header() {
   const { locale } = useLanguage();
   const t = translations[locale];
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
@@ -428,5 +427,3 @@ export function Header({ isMenuOpen, setIsMenuOpen }: { isMenuOpen: boolean, set
     </header>
   );
 }
-
-    
