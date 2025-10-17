@@ -162,14 +162,12 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
             <span>{t.header.home}</span>
           </Link>
         </Button>
-        {user && (
-          <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
-            <Link href="/history" onClick={() => closeMenu?.()}>
-              <History className="mr-2 h-4 w-4" />
-              <span>{t.header.history}</span>
-            </Link>
-          </Button>
-        )}
+        <Button variant="ghost" asChild className="w-full justify-start hover:bg-transparent focus:bg-transparent">
+          <Link href="/history" onClick={() => closeMenu?.()}>
+            <History className="mr-2 h-4 w-4" />
+            <span>{t.header.history}</span>
+          </Link>
+        </Button>
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-start hover:bg-transparent focus:bg-transparent">
@@ -428,3 +426,5 @@ export function Header() {
     </header>
   );
 }
+
+    
