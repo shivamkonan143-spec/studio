@@ -53,7 +53,7 @@
         "yourEmail": "Your Email"
     },
     "videoDownloader": {
-        "pasteUrl": "Paste the URL of the video to download its thumbnail.",
+        "pasteUrl": "Paste the video URL to get its thumbnail.",
         "urlPlaceholder": "Enter your video URL",
         "getThumbnail": "Get Thumbnail",
         "previewTitle": "Thumbnail Preview",

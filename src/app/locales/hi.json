@@ -53,7 +53,7 @@
         "yourEmail": "आपका ईमेल"
     },
     "videoDownloader": {
-        "pasteUrl": "थंबनेल डाउनलोड करने के लिए वीडियो का URL पेस्ट करें।",
+        "pasteUrl": "थंबनेल पाने के लिए वीडियो का URL पेस्ट करें।",
         "urlPlaceholder": "अपना वीडियो URL दर्ज करें",
         "getThumbnail": "थंबनेल प्राप्त करें",
         "previewTitle": "थंबनेल पूर्वावलोकन",
