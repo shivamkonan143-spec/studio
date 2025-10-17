@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -85,8 +84,8 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
             title: t.videoDownloader.invalidUrlTitle,
             description: t.videoDownloader.invalidUrlDescription,
           });
-          setIsGenerating(false);
         }
+        setIsGenerating(false);
       }, 1000); // 1s delay
     };
   
@@ -97,7 +96,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
   
     return (
         <>
-            <Card className="overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 rounded-3xl">
+            <Card>
                 <CardContent className="p-6 md:p-8 text-center">
                     <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground mb-2">
                         {t.title}
@@ -117,7 +116,7 @@ export function YoutubeDownloaderInput({ onGetThumbnail }: { onGetThumbnail: (id
                                     placeholder={t.videoDownloader.urlPlaceholder}
                                     {...field}
                                     disabled={isGenerating}
-                                    className="h-14 w-full rounded-2xl border-border bg-background/50 pr-12 text-base shadow-inner focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
+                                    className="h-14 w-full rounded-2xl border-border bg-background/50 pr-12 text-base focus:border-primary/50 focus:ring-4 focus:ring-primary/10 focus-visible:ring-offset-0"
                                 />
                                 </FormControl>
                                 {field.value && (
@@ -564,7 +563,7 @@ a.href = downloadUrl;
 
   if (!thumbnailUrl) {
     return (
-        <Card className="rounded-3xl">
+        <Card>
             <CardContent className="pt-6">
                 <div className="flex min-h-[200px] w-full items-center justify-center rounded-2xl border border-dashed">
                     <div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -579,7 +578,7 @@ a.href = downloadUrl;
     
   return (
     <>
-      <Card ref={previewRef} className="rounded-3xl shadow-xl shadow-black/5 dark:shadow-white/5">
+      <Card ref={previewRef}>
           <CardHeader>
           <CardTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5" />
@@ -670,7 +669,7 @@ a.href = downloadUrl;
           </div>
           
           
-          <Button onClick={handleDownloadThumbnail} className="w-full rounded-2xl">
+          <Button onClick={handleDownloadThumbnail} className="w-full rounded-2xl" variant="destructive">
               <Download className="mr-2 h-4 w-4" />
               {t.videoDownloader.downloadThumbnail}
           </Button>

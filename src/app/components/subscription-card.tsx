@@ -1,4 +1,3 @@
-
 'use client';
 
 import { CheckCircle, Gem } from 'lucide-react';
@@ -184,7 +183,7 @@ export function SubscriptionCard() {
 
     return (
         <>
-            <Card className="overflow-hidden shadow-xl shadow-black/5 dark:shadow-white/5 bg-card rounded-3xl">
+            <Card>
                 <CardHeader className="p-8 pb-4">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-accent/10 rounded-lg">
