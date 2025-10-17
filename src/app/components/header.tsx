@@ -65,7 +65,7 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { toast } = useToast();
   
   const mailtoSubject = user 
-    ? `Support Request from ${user.email}` 
+    ? `Support from Thumbnail Downloader - ${user.email}` 
     : 'Support Request for Thumbnail Downloader';
   const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=${encodeURIComponent(mailtoSubject)}`;
   const whatsappHref = `https://wa.me/917488530499?text=Support%20Request%20for%20Thumbnail%20Downloader!`;
