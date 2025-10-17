@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { collection, query, orderBy, writeBatch, doc } from 'firebase/firestore';
 import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { Header } from '@/app/components/header';
-import { useLayout } from '@/app/context/layout-context';
+import { useLanguage } from '@/app/context/layout-context';
 import { translations } from '@/app/locales/translations';
 import { Loader2, VideoOff, CheckCircle, Circle, Trash2, X } from 'lucide-react';
 import Image from 'next/image';
@@ -94,7 +94,7 @@ function HistoryItem({
 export default function HistoryPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
-  const { locale } = useLayout();
+  const { locale } = useLanguage();
   const t = translations[locale];
   const { toast } = useToast();
 
