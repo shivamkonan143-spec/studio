@@ -1,102 +1,11 @@
-/**
- * @file Firestore Security Rules for Video Grabber Application
- *
- * @core_philosophy This ruleset enforces a strict user-ownership model. Each user has exclusive
- *  access to their profile data and video download records. This ensures data privacy and
- *  prevents unauthorized access.
- *
- * @data_structure The data is organized hierarchically:
- *  - /users/{userId}: Stores user profiles.
- *  - /users/{userId}/videoDownloads/{downloadId}: Stores video download information for each user.
- *
- * @key_security_decisions
- *  - Users can only create, read, update, and delete their own data.
- *  - Listing video downloads is restricted to the owning user.
- *  - Data consistency is enforced between the path and the document's internal fields
- *    to prevent privilege escalation.
- *
- * @denormalization_for_authorization The `videoDownloads` documents contain a denormalized `userId` field.
- *  This allows security rules to validate ownership without needing to perform additional reads
- *  to the parent `/users/{userId}` document.
- *
- * @structural_segregation User-specific data (video downloads) is stored under
- *  `/users/{userId}/videoDownloads/{downloadId}`, ensuring clear ownership and access control.
- */
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * @description Manages access to user profile documents.
-     * @path /users/{userId}
-     * @allow (create) - User with UID 'user123' can create their own profile document at /users/user123.
-     * @allow (get) - User with UID 'user123' can retrieve their own profile document at /users/user123.
-     * @allow (update) - User with UID 'user123' can update their own profile document at /users/user123.
-     * @allow (delete) - User with UID 'user123' can delete their own profile document at /users/user123.
-     * @allow (list) - Listing all users is denied.
-     * @deny (create) - User with UID 'user456' cannot create a profile document at /users/user123.
-     * @deny (get) - User with UID 'user456' cannot retrieve the profile document at /users/user123.
-     * @deny (update) - User with UID 'user456' cannot update the profile document at /users/user123.
-     * @deny (delete) - User with UID 'user456' cannot delete the profile document at /users/user123.
-     * @principle Enforces document ownership, restricting access to the owning user.
-     */
-    match /users/{userId} {
-      // Helper function to check if the request is made by the owner of the user document.
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      // Allow a user to create their own document, enforcing that the userId in the path
-      // matches their authentication UID.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-
-      // Allow a user to get their own document.
-      allow get: if isOwner(userId);
-
-      // Allow a user to update their own document. Enforce immutability of the id field.
-      allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
-
-      // Allow a user to delete their own document, but only if the document exists.
-      allow delete: if isOwner(userId) && resource != null;
-
-      // Do not allow listing of all users.
-      allow list: if false;
-    }
-
-    /**
-     * @description Manages access to video download documents for a specific user.
-     * @path /users/{userId}/videoDownloads/{downloadId}
-     * @allow (create) - User with UID 'user123' can create a video download document under /users/user123/videoDownloads.
-     * @allow (get) - User with UID 'user123' can retrieve a video download document under /users/user123/videoDownloads.
-     * @allow (update) - User with UID 'user123' can update a video download document under /users/user123/videoDownloads.
-     * @allow (delete) - User with UID 'user123' can delete a video download document under /users/user123/videoDownloads.
-     * @allow (list) - User with UID 'user123' can list video download documents under /users/user123/videoDownloads.
-     * @deny (create) - User with UID 'user456' cannot create a video download document under /users/user123/videoDownloads.
-     * @deny (get) - User with UID 'user456' cannot retrieve a video download document under /users/user123/videoDownloads.
-     * @deny (update) - User with UID 'user456' cannot update a video download document under /users/user123/videoDownloads.
-     * @deny (delete) - User with UID 'user456' cannot delete a video download document under /users/user123/videoDownloads.
-     * @principle Enforces strict user-ownership, ensuring only the owning user can manage their video downloads.
-     */
-    match /users/{userId}/videoDownloads/{downloadId} {
-      // Helper function to check if the request is made by the owner of the user document.
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      // Allow a user to create a video download document in their own user subcollection.
-      allow create: if isOwner(userId);
-
-      // Allow a user to get a video download document in their own user subcollection.
-      allow get: if isOwner(userId);
-
-      // Allow a user to update a video download document in their own user subcollection.
-      allow update: if isOwner(userId) && resource != null;
-
-      // Allow a user to delete a video download document in their own user subcollection.
-      allow delete: if isOwner(userId) && resource != null;
-
-      // Allow a user to list video download documents in their own user subcollection.
-      allow list: if isOwner(userId);
+    // Allow users to read and write only their own data
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
