@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone, Mail } from 'lucide-react';
+import { Settings, Sun, Moon, Laptop, Languages, Menu, LifeBuoy, Info, ChevronDown, MessageCircle, Home, User as UserIcon, LogOut, History, MessageSquare, Sparkles, XCircle, Phone, Mail, User, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -64,7 +64,10 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
   const { isSubscribed, cancelSubscription } = useSubscription();
   const { toast } = useToast();
   
-  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=Support%20Request%20for%20Thumbnail%20Downloader`;
+  const mailtoSubject = user 
+    ? `Support Request from ${user.email}` 
+    : 'Support Request for Thumbnail Downloader';
+  const mailtoHref = `mailto:shivamkonan143@gmail.com?subject=${encodeURIComponent(mailtoSubject)}`;
   const whatsappHref = `https://wa.me/917488530499?text=Support%20Request%20for%20Thumbnail%20Downloader!`;
   const callHref = `tel:7488530499`;
   
