@@ -37,18 +37,28 @@ function HomeComponent() {
       <Header />
       <div className="w-full max-w-2xl space-y-8">
         <div className="space-y-8">
-          <YoutubeDownloaderInput onGetThumbnail={handleGetThumbnail} />
+          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards' }}>
+            <YoutubeDownloaderInput onGetThumbnail={handleGetThumbnail} />
+          </div>
           {preview && (
-            <YoutubeDownloaderPreview
-              videoId={preview.id}
-              isShort={preview.isShort}
-              onTryAnother={handleTryAnother}
-            />
+            <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '150ms' }}>
+              <YoutubeDownloaderPreview
+                videoId={preview.id}
+                isShort={preview.isShort}
+                onTryAnother={handleTryAnother}
+              />
+            </div>
           )}
         </div>
 
-        {!preview && <SubscriptionCard />}
-        <SocialLinks />
+        {!preview && (
+          <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '150ms' }}>
+            <SubscriptionCard />
+          </div>
+        )}
+         <div className="animate-fade-in-up opacity-0" style={{ animationFillMode: 'forwards', animationDelay: '300ms' }}>
+          <SocialLinks />
+        </div>
       </div>
     </main>
   );
@@ -62,5 +72,3 @@ export default function Home() {
     </Suspense>
   )
 }
-
-    

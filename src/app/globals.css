@@ -92,6 +92,9 @@ body {
     @apply bg-background text-foreground;
     -webkit-tap-highlight-color: transparent;
   }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
 }
 
 @layer components {
@@ -99,5 +102,3 @@ body {
     padding: 6px;
   }
 }
-
-    
