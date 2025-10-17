@@ -367,7 +367,6 @@ export function Header() {
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
   const { isMenuOpen, setIsMenuOpen } = useLayout();
-  const { isUserLoading } = useUser();
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
@@ -394,9 +393,6 @@ export function Header() {
       )}
       <div className="w-full flex items-center justify-between">
         <div className="flex-1 flex justify-start">
-          {isUserLoading ? (
-            <div className="h-10 w-10 rounded-md bg-muted animate-pulse" />
-          ) : (
             <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <MenuTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
@@ -414,7 +410,6 @@ export function Header() {
                 <MenuContent closeMenu={() => setIsMenuOpen(false)} />
               </MenuContentContainer>
             </MenuContainer>
-          )}
         </div>
         <div className="flex-1 flex justify-center">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -422,11 +417,7 @@ export function Header() {
             </h1>
         </div>
         <div className="flex flex-1 items-center justify-end gap-2">
-          {isUserLoading ? (
-            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
-          ) : (
             <AccountButton />
-          )}
         </div>
       </div>
     </header>
