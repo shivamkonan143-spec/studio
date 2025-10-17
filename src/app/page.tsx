@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/app/components/header';
 import { YoutubeDownloaderInput, YoutubeDownloaderPreview } from '@/app/components/video-downloader';
@@ -17,9 +17,11 @@ function HomeComponent() {
   const isShort = searchParams.get('isShort') === 'true';
 
   // Effect to sync URL params to state on initial load
-  if (videoId && (!preview || preview.id !== videoId)) {
-    setPreview({ id: videoId, isShort });
-  }
+  useEffect(() => {
+    if (videoId && (!preview || preview.id !== videoId)) {
+      setPreview({ id: videoId, isShort });
+    }
+  }, [videoId, isShort, preview, setPreview]);
 
   const handleGetThumbnail = (id: string, isShort: boolean) => {
     setPreview({ id, isShort });
