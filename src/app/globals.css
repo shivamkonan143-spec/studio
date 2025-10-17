@@ -10,44 +10,38 @@
 }
 
 .dark .login-background {
-    background: radial-gradient(circle at top, hsl(180 100% 50% / 0.1), transparent 50%),
-                radial-gradient(circle at bottom, hsl(340 90% 70% / 0.1), transparent 50%),
+    background: radial-gradient(circle at top, hsl(224 83% 53% / 0.1), transparent 50%),
+                radial-gradient(circle at bottom, hsl(262 84% 59% / 0.1), transparent 50%),
                 hsl(var(--background));
 }
 
 
 @layer base {
   :root {
-    /* Color Palette:
-       #ED8063 (Coral) - HSL: 14 83% 66%
-       #AA455B (Maroon) - HSL: 346 43% 47%
-       #E7D6C4 (Almond) - HSL: 33 44% 84%
-       #303F52 (Dark Blue) - HSL: 213 28% 25%
-    */
-    --background: 33 44% 94%; /* Lighter Almond for more contrast */
-    --foreground: 213 28% 25%; /* #303F52 */
-    --card: 33 44% 84%; /* #E7D6C4 */
-    --card-foreground: 213 28% 25%;
-    --popover: 33 44% 84%;
-    --popover-foreground: 213 28% 25%;
-    --primary: 14 83% 66%; /* #ED8063 */
-    --primary-foreground: 213 28% 15%;
-    --secondary: 346 43% 47%; /* #AA455B */
-    --secondary-foreground: 33 44% 94%;
-    --muted: 33 30% 88%;
-    --muted-foreground: 213 20% 40%;
-    --accent: 346 30% 80%; /* Lighter Maroon for hover */
-    --accent-foreground: 346 43% 37%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 33 25% 78%;
-    --input: 33 30% 88%;
-    --ring: 14 83% 66%; /* #ED8063 */
-    --chart-1: 14 83% 66%;
-    --chart-2: 346 43% 47%;
-    --chart-3: 213 28% 25%;
-    --chart-4: 14 83% 76%;
-    --chart-5: 346 43% 57%;
+    --background: 220 14% 96%; /* #F3F4F6 */
+    --foreground: 222 47% 11%; /* #111827 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 222 47% 11%; /* #111827 */
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 222 47% 11%; /* #111827 */
+    --primary: 224 83% 53%; /* #2563EB */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+    --secondary: 215 9% 47%; /* #6B7280 */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+    --muted: 220 13% 91%; /* #E5E7EB */
+    --muted-foreground: 215 9% 47%; /* #6B7280 */
+    --accent: 262 84% 59%; /* #7C3AED */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 350 79% 51%; /* #DC2626 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%; /* #E5E7EB */
+    --input: 214 32% 91%;
+    --ring: 224 83% 53%;
+    --chart-1: 224 83% 53%;
+    --chart-2: 262 84% 59%;
+    --chart-3: 153 71% 45%;
+    --chart-4: 33 93% 55%;
+    --chart-5: 350 79% 51%;
     --radius: 1.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -59,36 +53,30 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    /* Color Palette:
-       #ED8063 (Coral) - HSL: 14 83% 66%
-       #AA455B (Maroon) - HSL: 346 43% 47%
-       #E7D6C4 (Almond) - HSL: 33 44% 84%
-       #303F52 (Dark Blue) - HSL: 213 28% 25%
-    */
-    --background: 213 28% 25%; /* #303F52 */
-    --foreground: 33 44% 84%; /* #E7D6C4 */
-    --card: 213 28% 30%; /* Darker blue */
-    --card-foreground: 33 44% 84%;
-    --popover: 213 28% 20%;
-    --popover-foreground: 33 44% 84%;
-    --primary: 14 83% 66%; /* #ED8063 */
-    --primary-foreground: 213 28% 15%;
-    --secondary: 346 43% 47%; /* #AA455B */
-    --secondary-foreground: 33 44% 94%;
-    --muted: 213 28% 35%;
-    --muted-foreground: 33 30% 70%;
-    --accent: 346 43% 57%; /* Brighter Maroon for hover */
-    --accent-foreground: 33 44% 94%;
-    --destructive: 0 63% 31%;
+    --background: 222 47% 11%; /* #111827 */
+    --foreground: 210 40% 98%; /* #F9FAFB */
+    --card: 222 40% 15%; /* Darker shade of background */
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 224 83% 63%; /* Brighter blue for dark mode */
+    --primary-foreground: 222 47% 11%;
+    --secondary: 215 9% 47%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 262 84% 69%; /* Brighter violet for dark mode */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 350 79% 61%; /* Brighter red */
     --destructive-foreground: 210 40% 98%;
-    --border: 213 28% 40%;
-    --input: 213 28% 35%;
-    --ring: 14 83% 66%; /* #ED8063 */
-    --chart-1: 14 83% 66%;
-    --chart-2: 346 43% 47%;
-    --chart-3: 33 44% 84%;
-    --chart-4: 14 83% 56%;
-    --chart-5: 346 43% 37%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 83% 63%;
+    --chart-1: 224 83% 63%;
+    --chart-2: 262 84% 69%;
+    --chart-3: 153 71% 55%;
+    --chart-4: 33 93% 65%;
+    --chart-5: 350 79% 61%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
