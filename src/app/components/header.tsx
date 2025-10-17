@@ -367,11 +367,10 @@ function AccountButton() {
 }
 
 
-export function Header() {
+export function Header({ isMenuOpen, setIsMenuOpen }: { isMenuOpen: boolean, setIsMenuOpen: (open: boolean) => void }) {
   const { locale } = useLanguage();
   const t = translations[locale];
   const isMobile = useIsMobile();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
 
 
@@ -429,3 +428,5 @@ export function Header() {
     </header>
   );
 }
+
+    
