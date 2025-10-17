@@ -106,4 +106,32 @@
   .perspective {
     perspective: 800px;
   }
+  .pull-animation-active .hand {
+    animation: pull-hand 0.6s ease-out forwards;
+  }
+  .pull-animation-active .rope {
+    animation: pull-hand 0.6s ease-out forwards;
+  }
+}
+
+.hand, .rope {
+  position: fixed;
+  top: 1.5rem; 
+  left: -50px; 
+  opacity: 0;
+  z-index: 100;
+  transform-origin: right center;
+}
+
+.hand {
+  font-size: 24px;
+  transform: rotate(-45deg);
+}
+
+.rope {
+  width: 50px;
+  height: 2px;
+  background-color: #8b5cf6; 
+  top: 2.5rem; 
+  left: -50px; 
 }

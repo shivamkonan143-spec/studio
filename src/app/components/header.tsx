@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -371,20 +372,36 @@ export function Header() {
   const t = translations[locale];
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
 
   const MenuContainer = isMobile ? Sheet : Dialog;
   const MenuTrigger = isMobile ? SheetTrigger : DialogTrigger;
   const MenuContentContainer = isMobile ? SheetContent : DialogContent;
   const MenuHeader = isMobile ? SheetHeader : DialogHeader;
   const MenuTitle = isMobile ? SheetTitle : DialogTitle;
+  
+  const handleMenuTrigger = () => {
+    if (isMobile) {
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 600); // Animation duration + buffer
+    }
+    setIsMenuOpen(true);
+  };
 
   return (
     <header className="flex w-full flex-col items-center gap-2 py-2 mb-8">
+      {isAnimating && (
+        <div className="pull-animation-active">
+          <div className="hand">👋</div>
+          <div className="rope"></div>
+        </div>
+      )}
       <div className="w-full flex items-center justify-between">
         <div className="flex-1 flex justify-start">
            <MenuContainer open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <MenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={handleMenuTrigger}>
                 <Menu className="h-5 w-5" />
               </Button>
             </MenuTrigger>

@@ -98,6 +98,13 @@ export default {
           '60%': { transform: 'translateX(5%)' },
           '80%': { transform: 'translateX(-2%)' },
           '100%': { transform: 'translateX(0)' },
+        },
+        'pull-hand': {
+          '0%': { opacity: '1', transform: 'translateX(0) scaleX(1)' },
+          '20%': { transform: 'translateX(100px) scaleX(1)' },
+          '50%': { transform: 'translateX(100px) scaleX(2.5)' },
+          '80%': { opacity: '1', transform: 'translateX(250px) scaleX(1)' },
+          '100%': { opacity: '0', transform: 'translateX(250px) scaleX(1)' },
         }
       },
       animation: {
@@ -105,6 +112,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
         'pull-in-from-left': 'pull-in-from-left 0.5s ease-out',
+        'pull-hand': 'pull-hand 0.6s ease-out forwards',
       },
     },
   },
