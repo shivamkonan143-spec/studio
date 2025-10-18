@@ -171,9 +171,9 @@ function MenuContent({ closeMenu }: { closeMenu?: () => void }) {
         <Collapsible>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" className="w-full justify-start">
-              <Sun className="mr-2 h-4 w-4 dark:hidden" />
-              <Moon className="mr-2 hidden h-4 w-4 dark:block" />
-              <span>{t.header.theme}</span>
+              <Sun className="h-4 w-4 dark:hidden" />
+              <Moon className="hidden h-4 w-4 dark:block" />
+              <span className="ml-2">{t.header.theme}</span>
               <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200" />
             </Button>
           </CollapsibleTrigger>
@@ -366,7 +366,6 @@ export function Header() {
   const isMobile = useIsMobile();
   const [isAnimating, setIsAnimating] = useState(false);
   const { isMenuOpen, setIsMenuOpen } = useLayout();
-  const { isUserLoading } = useUser();
 
 
   const MenuContainer = isMobile ? Sheet : Dialog;
